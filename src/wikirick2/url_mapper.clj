@@ -15,4 +15,4 @@
     (expand-path self (concat-paths "wiki" (.title article))))
 
   (expand-path [self path]
-    (concat-paths base-path path)))
+    (.getPath (.resolve (URI. base-path) path))))

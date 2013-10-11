@@ -3,7 +3,7 @@
         wikirick2.types
         speclj.core))
 
-(def urlm (->URLMapper ""))
+(def urlm (->URLMapper "/"))
 
 (describe "url mapper"
   (it "expands index pathes"
