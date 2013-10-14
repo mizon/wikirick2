@@ -1,7 +1,6 @@
 (ns wikirick2.repository
   (:use wikirick2.types
-        slingshot.slingshot
-        blancas.kern.core)
+        slingshot.slingshot)
   (:require [clojure.java.shell :as shell]
             [clojure.string :as string])
   (:import java.util.concurrent.locks.ReentrantReadWriteLock))
