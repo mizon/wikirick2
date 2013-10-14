@@ -65,5 +65,6 @@
           (spit path (.source article)))
         (shell/sh "ci" (.title article) :in (.edit-comment article) :dir base-dir)))))
 
-(defn make-repository [base-dir]
+(defn create-repository [base-dir]
+  (shell/sh "mkdir" "-p" (format "%s/RCS" base-dir))
   (Repository. base-dir (ReentrantReadWriteLock.)))
