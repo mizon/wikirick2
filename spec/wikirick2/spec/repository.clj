@@ -5,7 +5,7 @@
   (:require [clojure.java.shell :as shell]))
 
 (def test-repo-name "test-repo")
-(def repo (->Repository test-repo-name))
+(def repo (make-repository test-repo-name))
 
 (defn should-article= [expected actual]
   (should= (.title expected) (.title actual))

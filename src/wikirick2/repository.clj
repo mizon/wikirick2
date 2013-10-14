@@ -4,7 +4,7 @@
         blancas.kern.core)
   (:require [clojure.java.shell :as shell]
             [clojure.string :as string])
-  (:import java.io.File))
+  (:import java.util.concurrent.locks.ReentrantReadWriteLock))
 
 (defn- select-article- [repo title co-args]
   (defn parse-revision [text]
@@ -19,24 +19,51 @@
         (assoc article :revision rev))
       (throw (RuntimeException. (:err result))))))
 
-(deftype Repository [base-dir]
+(defn- with-read-lock [repo f]
+  (do
+    (-> repo .rwlock .readLock .lock)
+    (try
+      (f)
+      (finally
+        (-> repo .rwlock .readLock .unlock)))))
+
+(defn- with-write-lock [repo f]
+  (do
+    (-> repo .rwlock .writeLock .lock)
+    (try
+      (f)
+      (finally
+        (-> repo .rwlock .writeLock .unlock)))))
+
+(deftype Repository [base-dir rwlock]
   IRepository
   (select-article [self title]
-    (select-article- self title ["-p" title]))
+    (with-read-lock self
+      (fn []
+        (select-article- self title ["-p" title]))))
 
   (select-article-by-revision [self title rev]
-    (select-article- self title [(format "-r1.%s" rev) "-p" title]))
+    (with-read-lock self
+      (fn []
+        (select-article- self title [(format "-r1.%s" rev) "-p" title]))))
 
   (select-all-article-titles [self]
-    (for [rcs-file (string/split-lines (:out (shell/sh "ls" "-t" (format "%s/RCS" base-dir))))]
-      (let [[_ article-name] (re-find #"(.+),v" rcs-file)]
-        article-name)))
+    (with-read-lock self
+      (fn []
+        (for [rcs-file (string/split-lines (:out (shell/sh "ls" "-t" (format "%s/RCS" base-dir))))]
+          (let [[_ article-name] (re-find #"(.+),v" rcs-file)]
+            article-name)))))
 
   (post-article [self article]
     (defn check-out-rcs-file []
       (shell/sh "co" "-l" (.title article) :dir (.base-dir self)))
 
-    (check-out-rcs-file)
-    (let [path (format "%s/%s" base-dir (.title article))]
-      (spit path (.source article)))
-    (shell/sh "ci" (.title article) :in (.edit-comment article) :dir base-dir)))
+    (with-write-lock self
+      (fn []
+        (check-out-rcs-file)
+        (let [path (format "%s/%s" base-dir (.title article))]
+          (spit path (.source article)))
+        (shell/sh "ci" (.title article) :in (.edit-comment article) :dir base-dir)))))
+
+(defn make-repository [base-dir]
+  (Repository. base-dir (ReentrantReadWriteLock.)))
