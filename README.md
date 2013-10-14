@@ -1,3 +1,3 @@
-Wirkirick2
+Wikirick2
 ----------------------------------------------------------------
 A wiki engine for my site.
