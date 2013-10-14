@@ -19,20 +19,18 @@
       (throw (RuntimeException. (:err result))))))
 
 (defn- with-read-lock [repo f]
-  (do
-    (-> repo .rwlock .readLock .lock)
-    (try
-      (f)
-      (finally
-        (-> repo .rwlock .readLock .unlock)))))
+  (-> repo .rwlock .readLock .lock)
+  (try
+    (f)
+    (finally
+      (-> repo .rwlock .readLock .unlock))))
 
 (defn- with-write-lock [repo f]
-  (do
-    (-> repo .rwlock .writeLock .lock)
-    (try
-      (f)
-      (finally
-        (-> repo .rwlock .writeLock .unlock)))))
+  (-> repo .rwlock .writeLock .lock)
+  (try
+    (f)
+    (finally
+      (-> repo .rwlock .writeLock .unlock))))
 
 (deftype Repository [base-dir rwlock]
   IRepository
