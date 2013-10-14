@@ -47,6 +47,10 @@
       (should= 2 (.revision (select-article @repo "SomePage")))))
 
   (it "selects titles of all saved articles"
+    (should= [] (select-all-article-titles @repo))
+
     (post-article @repo (make-article "FooPage" "foo content"))
+    (should= ["FooPage"] (select-all-article-titles @repo))
+
     (post-article @repo (make-article "BarPage" "bar content"))
     (should= ["BarPage" "FooPage"] (select-all-article-titles @repo))))

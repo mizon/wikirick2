@@ -47,9 +47,12 @@
         (select-article- self title [(format "-r1.%s" rev) "-p" title]))))
 
   (select-all-article-titles [self]
+    (defn ls-rcs-dir []
+      (:out (shell/sh "ls" "-t" (format "%s/RCS" base-dir))))
+
     (with-read-lock self
       (fn []
-        (for [rcs-file (string/split-lines (:out (shell/sh "ls" "-t" (format "%s/RCS" base-dir))))]
+        (for [rcs-file (string/split-lines (ls-rcs-dir)) :when (not (empty? rcs-file))]
           (let [[_ article-name] (re-find #"(.+),v" rcs-file)]
             article-name)))))
 
