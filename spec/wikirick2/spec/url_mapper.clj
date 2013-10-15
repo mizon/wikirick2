@@ -15,5 +15,3 @@
 
   (it "expands some pathes"
     (should= "/foo" (expand-path urlm "foo"))))
-
-(run-specs)

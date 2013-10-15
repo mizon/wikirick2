@@ -12,5 +12,3 @@
   (it "handles invalid requests"
     (let [res (app (request :get "/invalid"))]
       (should= (:status res) 404))))
-
-(run-specs)
