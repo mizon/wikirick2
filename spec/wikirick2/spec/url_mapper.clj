@@ -3,7 +3,7 @@
         wikirick2.types
         speclj.core))
 
-(def urlm (->URLMapper "/"))
+(def urlm (->URLMapper "/wiki"))
 
 (describe "url mapper"
   (it "expands index pathes"
@@ -14,4 +14,7 @@
       (should= "/wiki/SomePage" (article-path urlm article))))
 
   (it "expands some pathes"
-    (should= "/foo" (expand-path urlm "foo"))))
+    (should= "/foo" (expand-path urlm "foo")))
+
+  (it "expands the css path"
+    (should= "/wikirick.css" (css-path urlm))))

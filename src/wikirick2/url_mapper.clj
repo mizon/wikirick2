@@ -15,4 +15,7 @@
     (expand-path self (concat-paths "wiki" (.title article))))
 
   (expand-path [self path]
-    (.toString (.resolve (URI. base-path) path))))
+    (.toString (.resolve (URI. base-path) path)))
+
+  (css-path [self]
+    (expand-path self "wikirick.css")))
