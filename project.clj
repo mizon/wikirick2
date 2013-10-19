@@ -9,7 +9,7 @@
   :plugins [[lein-ring "0.8.5"]
             [speclj "2.5.0"]
             [lein-cljsbuild "0.3.4"]]
-  :ring {:handler wikirick2.handler/app}
+  :ring {:handler wikirick2.main/application}
   :profiles {:dev {:dependencies [[ring-mock "0.1.5"]
                                   [speclj "2.5.0"]]}}
   :test-paths ["spec"]

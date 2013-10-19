@@ -6,14 +6,16 @@
         wikirick2.types
         wikirick2.spec.spec-helper)
   (:require [clojure.java.shell :as shell]
+            [compojure.core :as compojure]
+            [compojure.handler :as handler]
             [wikirick2.screen :as screen]))
+
+(compojure/defroutes app
+  (wrap-with-service (handler/site wikirick-routes) testing-service))
 
 (describe "application handler"
   (after
     (cleanup-test-repo))
-  (around [example]
-    (binding [wiki-service testing-service]
-      (example)))
 
   (it "handles GET /"
     (let [res (app (request :get "/"))]
