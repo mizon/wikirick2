@@ -1,8 +1,14 @@
 (ns wikirick2.types)
 
 (defprotocol IService
-  (get-repository [self])
+  (get-config [self])
   (get-url-mapper [self]))
+
+(defprotocol IService
+  (get-repository [self])
+  (get-url-mapper [self])
+  (get-config [self])
+  (get-screen [self]))
 
 (defprotocol IRepository
   (select-article [self title])
@@ -13,7 +19,14 @@
 (defprotocol IURLMapper
   (index-path [self])
   (article-path [self article])
-  (expand-path [self path]))
+  (expand-path [self path])
+  (css-path [self]))
+
+(defprotocol IScreen
+  (render-full [self template])
+  (render-fragment [self template]))
+
+(defrecord Template [title body])
 
 (defrecord Article [title source revision edit-comment])
 
