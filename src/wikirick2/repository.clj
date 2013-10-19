@@ -18,50 +18,42 @@
         (assoc article :revision rev))
       (throw (RuntimeException. (:err result))))))
 
-(defn- with-read-lock [repo f]
-  (-> repo .rwlock .readLock .lock)
-  (try
-    (f)
-    (finally
-      (-> repo .rwlock .readLock .unlock))))
+(defmacro with-rw-lock [lock-type & forms]
+  `(do
+     (.. ~'rw-lock ~lock-type lock)
+     (try
+       ~@forms
+       (finally
+         (.. ~'rw-lock ~lock-type unlock)))))
 
-(defn- with-write-lock [repo f]
-  (-> repo .rwlock .writeLock .lock)
-  (try
-    (f)
-    (finally
-      (-> repo .rwlock .writeLock .unlock))))
-
-(deftype Repository [base-dir rwlock]
+(deftype Repository [base-dir rw-lock]
   IRepository
   (select-article [self title]
-    (with-read-lock self
-      (fn []
-        (select-article- self title ["-p" title]))))
+    (with-rw-lock readLock
+      (select-article- self title ["-p" title])))
 
   (select-article-by-revision [self title rev]
-    (with-read-lock self
-      (fn []
-        (select-article- self title [(format "-r1.%s" rev) "-p" title]))))
+    (with-rw-lock readLock
+      (select-article- self title [(format "-r1.%s" rev) "-p" title])))
 
   (select-all-article-titles [self]
-    (letfn [(ls-rcs-dir []
-              (:out (shell/sh "ls" "-t" (format "%s/RCS" base-dir))))]
-      (with-read-lock self
-        (fn []
-          (for [rcs-file (string/split-lines (ls-rcs-dir)) :when (not (empty? rcs-file))]
-            (let [[_ article-name] (re-find #"(.+),v" rcs-file)]
-              article-name))))))
+    (letfn
+      [(ls-rcs-dir []
+         (:out (shell/sh "ls" "-t" (format "%s/RCS" base-dir))))]
+      (with-rw-lock readLock
+        (for [rcs-file (string/split-lines (ls-rcs-dir)) :when (not (empty? rcs-file))]
+          (let [[_ article-name] (re-find #"(.+),v" rcs-file)]
+            article-name)))))
 
   (post-article [self article]
-    (letfn [(check-out-rcs-file []
-              (shell/sh "co" "-l" (.title article) :dir (.base-dir self)))]
-      (with-write-lock self
-        (fn []
-          (check-out-rcs-file)
-          (let [path (format "%s/%s" base-dir (.title article))]
-            (spit path (.source article)))
-          (shell/sh "ci" (.title article) :in (.edit-comment article) :dir base-dir))))))
+    (letfn
+      [(check-out-rcs-file []
+         (shell/sh "co" "-l" (.title article) :dir (.base-dir self)))]
+      (with-rw-lock writeLock
+        (check-out-rcs-file)
+        (let [path (format "%s/%s" base-dir (.title article))]
+          (spit path (.source article)))
+        (shell/sh "ci" (.title article) :in (.edit-comment article) :dir base-dir)))))
 
 (defn create-repository [base-dir]
   (shell/sh "mkdir" "-p" (format "%s/RCS" base-dir))
