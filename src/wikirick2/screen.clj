@@ -5,8 +5,8 @@
 
 (defn base [fragment service]
   (->Template (.title fragment)
-    (let [url-mapper (get-url-mapper service)
-          config (get-config service)]
+    (let [url-mapper (.url-mapper service)
+          config (.config service)]
       [:html
        [:head
         [:link {:href (css-path url-mapper) :type "text-css" :rel "stylesheet"}]

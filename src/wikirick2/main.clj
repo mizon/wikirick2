@@ -5,7 +5,7 @@
         wikirick2.types)
   (:require [compojure.handler :as handler]))
 
-(def main-service (->WikiService (load-file "./wikirick-config.clj")))
+(def main-service (make-wiki-service (load-file "./wikirick-config.clj")))
 
 (defroutes application
-  (wrap-with-service (handler/site wikirick-routes) main-service))
+  (wrap-with-wiki-service (handler/site wikirick-routes) main-service))

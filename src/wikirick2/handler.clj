@@ -15,8 +15,8 @@
 (defn- handle-navigation [])
 
 (defn- handle-article [title]
-  (let [article (select-article (repository) title)]
-    (render-full (screen) (screen/article article))))
+  (let [article (select-article (ws :repository) title)]
+    (render-full (ws :screen) (screen/article article))))
 
 (defroutes wikirick-routes
   (GET "/" [] (handle-route))

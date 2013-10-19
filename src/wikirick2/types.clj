@@ -1,11 +1,5 @@
 (ns wikirick2.types)
 
-(defprotocol IService
-  (get-repository [self])
-  (get-url-mapper [self])
-  (get-config [self])
-  (get-screen [self]))
-
 (defprotocol IRepository
   (select-article [self title])
   (select-article-by-revision [self title rev])
@@ -28,3 +22,5 @@
 
 (defn make-article [title source]
   (->Article title source nil nil))
+
+(defrecord WikiService [config repository url-mapper screen])

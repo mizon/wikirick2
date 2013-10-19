@@ -14,6 +14,8 @@
   (handler/site wikirick-routes))
 
 (describe "application handler"
+  (before
+    (setup-test-repo))
   (after
     (cleanup-test-repo))
   (around [example]
@@ -29,8 +31,8 @@
     (with foo-page (make-article "FooPage" "some content"))
     (with bar-page (make-article "FooPage" "some content"))
     (before
-      (post-article (repository) @foo-page)
-      (post-article (repository) @bar-page))
+      (post-article (ws :repository) @foo-page)
+      (post-article (ws :repository) @bar-page))
 
     (it "handles GET /FooPage"
       (let [res (app (request :get "/FooPage"))]
