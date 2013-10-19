@@ -11,11 +11,14 @@
             [wikirick2.screen :as screen]))
 
 (compojure/defroutes app
-  (wrap-with-service (handler/site wikirick-routes) testing-service))
+  (handler/site wikirick-routes))
 
 (describe "application handler"
   (after
     (cleanup-test-repo))
+  (around [example]
+    (binding [wiki-service testing-service]
+      (example)))
 
   (it "handles GET /"
     (let [res (app (request :get "/"))]
@@ -26,8 +29,8 @@
     (with foo-page (make-article "FooPage" "some content"))
     (with bar-page (make-article "FooPage" "some content"))
     (before
-      (post-article (service get-repository) @foo-page)
-      (post-article (service get-repository) @bar-page))
+      (post-article (repository) @foo-page)
+      (post-article (repository) @bar-page))
 
     (it "handles GET /FooPage"
       (let [res (app (request :get "/FooPage"))]

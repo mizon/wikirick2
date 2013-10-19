@@ -17,3 +17,19 @@
 
   (get-screen [self]
     (screen/->Screen self)))
+
+(def ^:dynamic wiki-service nil)
+
+(defn wrap-with-service [app service]
+  (fn [req]
+    (binding [wiki-service service]
+      (app req))))
+
+(defn repository []
+  (get-repository wiki-service))
+
+(defn url-mapper []
+  (get-url-mapper wiki-service))
+
+(defn screen []
+  (get-screen wiki-service))

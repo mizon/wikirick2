@@ -1,7 +1,6 @@
 (ns wikirick2.spec.screen
   (:use speclj.core
         wikirick2.types
-        wikirick2.service
         wikirick2.spec.spec-helper)
   (:require [hiccup.core :as core]
             [hiccup.page :as page]
