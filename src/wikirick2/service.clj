@@ -1,11 +1,19 @@
-(ns wikirick2.service)
+(ns wikirick2.service
+  (:use wikirick2.types)
+  (:require [wikirick2.repository :as repository]
+            [wikirick2.screen :as screen]
+            [wikirick2.url-mapper :as url-mapper]))
 
-(defprotocol Service
-  )
+(deftype WikiService [config]
+  IService
+  (get-config [self]
+    config)
 
-(defrecord WikiService [])
+  (get-repository [self]
+    (repository/create-repository (config :repository-dir)))
 
-(extend-protocol Service
-  )
+  (get-url-mapper [self]
+    (url-mapper/->URLMapper (config :base-path)))
 
-(def ^:dynamic wiki-service (WikiService.))
+  (get-screen [self]
+    (screen/->Screen self)))
