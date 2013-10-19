@@ -8,12 +8,6 @@
   (:require [clojure.java.shell :as shell]
             [wikirick2.screen :as screen]))
 
-(defn- service [getter]
-  (getter wiki-service))
-
-(defn- should-be-full-rendered [res template]
-  (should= (render-full (service get-screen) template) (res :body)))
-
 (describe "application handler"
   (after
     (cleanup-test-repo))
