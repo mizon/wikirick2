@@ -1,10 +1,6 @@
 (ns wikirick2.types)
 
 (defprotocol IService
-  (get-config [self])
-  (get-url-mapper [self]))
-
-(defprotocol IService
   (get-repository [self])
   (get-url-mapper [self])
   (get-config [self])
