@@ -16,8 +16,5 @@
   (make-wiki-service {:repository-dir test-repo
                       :base-path "/"}))
 
-(defn service [getter]
-  (getter testing-service))
-
 (defn should-be-full-rendered [res template]
   (should= (render-full (ws :screen) template) (res :body)))
