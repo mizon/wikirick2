@@ -30,7 +30,7 @@
             [:li "Source"]
             [:li "Edit"]
             [:li "History"]]]
-          [:p {:class "article-info"} [:em {:class "selected"} (h (.title fragment))] ": Latest Edited: " "19:30"]
+          [:p {:class "article-info"} [:em {:class "selected"} (h (.title fragment))] ": Last modified: " "2013/10/20 19:30"]
           (.body fragment)]]
         [:footer "Powered by Clojure Programming Language"]]]])))
 

@@ -1,10 +1,17 @@
 @import "reset";
 
-$title-color: #000;
-$theme-color: #069;
+$header-color: #333;
+$main-color: #069;
+$bg-color: #F8F8F8;
+$border-color: #CCC;
+
+@mixin smaller-font() {
+  font-size: 75%;
+}
 
 body {
   line-height: 1.4;
+  background-color: $bg-color;
 }
 
 #container {
@@ -12,14 +19,18 @@ body {
   min-width: 800px;
   margin: 1em auto;
 
+  h1, h2, h3, h4 {
+    color: $header-color;
+  }
+
   aside {
     float: left;
     width: 200px;
     margin-right: -200px;
 
     section {
-      margin: 0 2em 2em 0;
-      font-size: 75%;
+      margin-bottom: 2em;
+      @include smaller-font();
 
       h2 {
         margin-bottom: 0.5em;
@@ -27,7 +38,7 @@ body {
 
       h2:before {
         content: "■ ";
-        color: $theme-color;
+        color: $main-color;
       }
     }
   }
@@ -35,6 +46,7 @@ body {
   footer {
     clear: both;
     text-align: center;
+    @include smaller-font();
     padding: 0.5em 0;
   }
 }
@@ -44,11 +56,11 @@ body {
   width: 100%;
 
   .content {
-    margin-left: 200px;
+    margin-left: 220px;
     position: relative;
 
     .selected {
-      color: $theme-color;
+      color: $main-color;
       font-weight: bold;
     }
 
@@ -60,16 +72,16 @@ body {
         width: 100%;
 
         li {
+          @include smaller-font();
           float: left;
-          font-size: 75%;
-          padding: 0.5em;
+          padding: 0 0.5em;
         }
       }
     }
 
     p.article-info {
       font-size: 75%;
-      padding: 0.5em;
+      padding: 0 0.5em;
       position: absolute;
       top: 0;
       left: 0;
@@ -80,13 +92,14 @@ body {
     }
 
     article {
+      background-color: #FFF;
       clear: both;
       padding: 1em;
-      border: solid 1px #EEE;
+      border: solid 1px $border-color;
 
       h1 {
         font-size: 125%;
-        color: $theme-color;
+        color: $main-color;
         margin-bottom: 1em;
       }
     }
@@ -94,27 +107,6 @@ body {
 
 }
 
-#search {
-  .text-box {
-  }
-
-  .submit-button {
-  }
-}
-
-#wrapper:after {
-  height: 0;
-  clear: both;
-  display: block;
-}
-
 #main-title {
-  h1 {
-    color: $title-color;
-    padding: 0 0.5em;
-    border-left: solid 0.25em $theme-color;
-    margin-right: 1em;
-  }
-
   margin-bottom: 1em;
 }
