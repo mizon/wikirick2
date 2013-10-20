@@ -14,23 +14,24 @@
        [:link {:rel "stylesheet" :type "text/css" :href (theme-path urlm)}]]
       [:body
        [:div#container
+        [:aside
+         [:header {:id "main-title"} [:h1 (h (config :site-title))]]
+         [:section#search
+          [:form
+           [:input {:class "text-box" :type "text"}]
+           [:button {:class "submit-button" :type "submit"} "Search"]]]
+         [:section
+          [:h2 "Recent Updates"]]]
         [:div#wrapper
          [:div.content
           [:nav
-           [:p {:class "locator"} "Top > " [:em {:class "selected"} (h (.title fragment))]]
            [:ul
             [:li {:class "selected"} "Article"]
             [:li "Source"]
             [:li "Edit"]
             [:li "History"]]]
-          (.body fragment)]
-         [:aside
-          [:header {:id "main-title"} [:h1 (h (config :site-title))]]
-          [:section#search
-           [:form
-            [:input {:class "search-box" :type "text" :placeholder "Search"}]]]
-          [:section
-           [:h2 "Recent Updates"]]]]
+          [:p {:class "article-info"} [:em {:class "selected"} (h (.title fragment))] ": Latest Edited: " "19:30"]
+          (.body fragment)]]
         [:footer "Powered by Clojure Programming Language"]]]])))
 
 (defn article [article-]
