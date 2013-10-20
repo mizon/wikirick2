@@ -9,8 +9,8 @@
 (defprotocol IURLMapper
   (index-path [self])
   (article-path [self article])
-  (expand-path [self path])
-  (css-path [self]))
+  (theme-path [self])
+  (expand-path [self path]))
 
 (defprotocol IScreen
   (render-full [self template])
