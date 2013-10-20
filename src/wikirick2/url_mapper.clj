@@ -12,7 +12,7 @@
     (expand-path self ""))
 
   (article-path [self article]
-    (expand-path self (concat-paths "wiki" (.title article))))
+    (expand-path self (concat-paths "w" (.title article))))
 
   (expand-path [self path]
     (.toString (.resolve (URI. base-path) path)))

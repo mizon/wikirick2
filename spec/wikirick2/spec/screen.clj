@@ -8,7 +8,7 @@
 
 (def screen (screen/->Screen testing-service))
 
-(describe "screen componets"
+(describe "screen components"
   (describe "screen"
     (it "render template fragments as full html"
       (let [template (->Template nil [:p "foo"])
@@ -17,4 +17,8 @@
 
     (it "render template fragments"
       (let [template (->Template nil [:p "foo"])]
-        (should= (core/html (.body template)) (render-fragment screen template))))))
+        (should= (core/html (.body template)) (render-fragment screen template)))))
+
+  (describe "templates"
+    (describe "article template"
+      (it "is made from an article"))))

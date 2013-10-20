@@ -17,6 +17,6 @@
 
 (defroutes wikirick-routes
   (GET "/" [] (handle-root))
-  (GET "/:title" [title] (handle-article title))
+  (GET "/w/:title" [title] (handle-article title))
   (route/resources "/")
   (route/not-found "Not Found"))

@@ -34,7 +34,7 @@
       (post-article (ws :repository) @foo-page)
       (post-article (ws :repository) @bar-page))
 
-    (it "handles GET /FooPage"
-      (let [res (app (request :get "/FooPage"))]
+    (it "handles GET /w/FooPage"
+      (let [res (app (request :get "/w/FooPage"))]
         (should= (res :status) 200)
         (should-be-full-rendered res (screen/article @foo-page))))))

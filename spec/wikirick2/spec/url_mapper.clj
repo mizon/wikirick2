@@ -11,7 +11,7 @@
 
   (it "exapads an article path"
     (let [article (make-article "SomePage" "some content")]
-      (should= "/wiki/SomePage" (article-path urlm article))))
+      (should= "/w/SomePage" (article-path urlm article))))
 
   (it "expands some pathes"
     (should= "/foo" (expand-path urlm "foo")))

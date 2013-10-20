@@ -17,7 +17,7 @@
   (after
     (shell/sh "rm" "-rf" test-repo-name :dir "."))
 
-  (it "saves an article"
+  (it "saves articles"
     (let [foo (make-article "FooPage" "foo content")
           bar (make-article "BarPage" "bar content")]
       (post-article @repo foo)
