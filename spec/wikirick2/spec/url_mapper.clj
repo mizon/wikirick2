@@ -16,5 +16,5 @@
   (it "expands some pathes"
     (should= "/foo" (expand-path urlm "foo")))
 
-  (it "expands the css path"
-    (should= "/wikirick.css" (css-path urlm))))
+  (it "expands the theme path"
+    (should= "/theme.css" (theme-path urlm))))

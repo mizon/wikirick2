@@ -14,8 +14,8 @@
   (article-path [self article]
     (expand-path self (concat-paths "w" (.title article))))
 
-  (expand-path [self path]
-    (.toString (.resolve (URI. base-path) path)))
+  (theme-path [self]
+    (expand-path self "theme.css"))
 
-  (css-path [self]
-    (expand-path self "wikirick.css")))
+  (expand-path [self path]
+    (.toString (.resolve (URI. base-path) path))))
