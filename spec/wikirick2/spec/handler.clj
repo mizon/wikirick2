@@ -22,10 +22,15 @@
     (binding [wiki-service testing-service]
       (example)))
 
-  (it "handles GET /"
-    (let [res (app (request :get "/"))]
-      (should= (res :status) 200)
-      (should= (res :body) "<h1>Hello World</h1>")))
+  (context "with the FrontPage article"
+    (with front-page (make-article "FrontPage" "front page content"))
+    (before
+      (post-article (ws :repository) @front-page))
+
+    (it "handles GET /"
+      (let [res (app (request :get "/"))]
+        (should= (res :status) 200)
+        (should-be-full-rendered res (screen/article @front-page)))))
 
   (context "with two articles"
     (with foo-page (make-article "FooPage" "some content"))

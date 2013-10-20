@@ -6,9 +6,6 @@
             [compojure.route :as route]
             [wikirick2.screen :as screen]))
 
-(defn- handle-root []
-  "<h1>Hello World</h1>")
-
 (defn- handle-navigation [])
 
 (defn- handle-article [title]
@@ -16,7 +13,7 @@
     (render-full (ws :screen) (screen/article article))))
 
 (defroutes wikirick-routes
-  (GET "/" [] (handle-root))
+  (GET "/" [] (handle-article "FrontPage"))
   (GET "/w/:title" [title] (handle-article title))
   (route/resources "/")
   (route/not-found "Not Found"))
