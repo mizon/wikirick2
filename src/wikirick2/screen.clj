@@ -26,7 +26,7 @@
          [:div.content
           [:nav
            [:ul
-            [:li {:class "selected"} "Article"]
+            [:li {:class "selected"} "Read"]
             [:li "Source"]
             [:li "Edit"]
             [:li "History"]]]
@@ -34,12 +34,12 @@
           (.body fragment)]]
         [:footer "Powered by Clojure Programming Language"]]]])))
 
-(defn article [article-]
+(defn page [page-]
   (->Template
-   (.title article-)
+   (.title page-)
    [:article
-    [:header [:h1 (.title article-)]]
-    [:p (.source article-)]]))
+    [:header [:h1 (.title page-)]]
+    [:p (.source page-)]]))
 
 (deftype Screen [service]
   IScreen

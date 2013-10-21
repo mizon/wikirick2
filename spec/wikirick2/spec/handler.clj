@@ -22,24 +22,24 @@
     (binding [wiki-service testing-service]
       (example)))
 
-  (context "with the FrontPage article"
-    (with front-page (make-article "FrontPage" "front page content"))
+  (context "with the FrontPage page"
+    (with front-page (make-page "FrontPage" "front page content"))
     (before
-      (post-article (ws :repository) @front-page))
+      (post-page (ws :repository) @front-page))
 
     (it "handles GET /"
       (let [res (app (request :get "/"))]
         (should= (res :status) 200)
-        (should-be-full-rendered res (screen/article @front-page)))))
+        (should-be-full-rendered res (screen/page @front-page)))))
 
-  (context "with two articles"
-    (with foo-page (make-article "FooPage" "some content"))
-    (with bar-page (make-article "FooPage" "some content"))
+  (context "with two pages"
+    (with foo-page (make-page "FooPage" "some content"))
+    (with bar-page (make-page "FooPage" "some content"))
     (before
-      (post-article (ws :repository) @foo-page)
-      (post-article (ws :repository) @bar-page))
+      (post-page (ws :repository) @foo-page)
+      (post-page (ws :repository) @bar-page))
 
     (it "handles GET /w/FooPage"
       (let [res (app (request :get "/w/FooPage"))]
         (should= (res :status) 200)
-        (should-be-full-rendered res (screen/article @foo-page))))))
+        (should-be-full-rendered res (screen/page @foo-page))))))

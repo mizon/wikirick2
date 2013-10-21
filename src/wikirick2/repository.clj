@@ -10,12 +10,12 @@
         [_ rev] (re-find #"^revision \d+\.(\d+)$" message)]
     (Integer. rev)))
 
-(defn- select-article- [repo title co-args]
+(defn- select-page- [repo title co-args]
   (let [result (apply shell/sh `("co" ~@co-args :dir ~(.base-dir repo)))]
     (if (= (:exit result) 0)
       (let [rev (parse-revision (:err result))
-            article (make-article title (:out result))]
-        (assoc article :revision rev))
+            page (make-page title (:out result))]
+        (assoc page :revision rev))
       (throw (RuntimeException. (:err result))))))
 
 (defmacro with-rw-lock [lock-type & forms]
@@ -28,32 +28,32 @@
 
 (deftype Repository [base-dir rw-lock]
   IRepository
-  (select-article [self title]
+  (select-page [self title]
     (with-rw-lock readLock
-      (select-article- self title ["-p" title])))
+      (select-page- self title ["-p" title])))
 
-  (select-article-by-revision [self title rev]
+  (select-page-by-revision [self title rev]
     (with-rw-lock readLock
-      (select-article- self title [(format "-r1.%s" rev) "-p" title])))
+      (select-page- self title [(format "-r1.%s" rev) "-p" title])))
 
-  (select-all-article-titles [self]
+  (select-all-page-titles [self]
     (letfn
       [(ls-rcs-dir []
          (:out (shell/sh "ls" "-t" (format "%s/RCS" base-dir))))]
       (with-rw-lock readLock
         (for [rcs-file (string/split-lines (ls-rcs-dir)) :when (not (empty? rcs-file))]
-          (let [[_ article-name] (re-find #"(.+),v" rcs-file)]
-            article-name)))))
+          (let [[_ page-name] (re-find #"(.+),v" rcs-file)]
+            page-name)))))
 
-  (post-article [self article]
+  (post-page [self page]
     (letfn
       [(check-out-rcs-file []
-         (shell/sh "co" "-l" (.title article) :dir (.base-dir self)))]
+         (shell/sh "co" "-l" (.title page) :dir (.base-dir self)))]
       (with-rw-lock writeLock
         (check-out-rcs-file)
-        (let [path (format "%s/%s" base-dir (.title article))]
-          (spit path (.source article)))
-        (shell/sh "ci" (.title article) :in (.edit-comment article) :dir base-dir)))))
+        (let [path (format "%s/%s" base-dir (.title page))]
+          (spit path (.source page)))
+        (shell/sh "ci" (.title page) :in (.edit-comment page) :dir base-dir)))))
 
 (defn create-repository [base-dir]
   (shell/sh "mkdir" "-p" (format "%s/RCS" base-dir))

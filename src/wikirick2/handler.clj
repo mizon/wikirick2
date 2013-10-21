@@ -8,12 +8,12 @@
 
 (defn- handle-navigation [])
 
-(defn- handle-article [title]
-  (let [article (select-article (ws :repository) title)]
-    (render-full (ws :screen) (screen/article article))))
+(defn- handle-page [title]
+  (let [page (select-page (ws :repository) title)]
+    (render-full (ws :screen) (screen/page page))))
 
 (defroutes wikirick-routes
-  (GET "/" [] (handle-article "FrontPage"))
-  (GET "/w/:title" [title] (handle-article title))
+  (GET "/" [] (handle-page "FrontPage"))
+  (GET "/w/:title" [title] (handle-page title))
   (route/resources "/")
   (route/not-found "Not Found"))

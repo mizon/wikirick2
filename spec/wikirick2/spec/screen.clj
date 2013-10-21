@@ -20,5 +20,5 @@
         (should= (core/html (.body template)) (render-fragment screen template)))))
 
   (describe "templates"
-    (describe "article template"
-      (it "is made from an article"))))
+    (describe "page template"
+      (it "is made from an page"))))
