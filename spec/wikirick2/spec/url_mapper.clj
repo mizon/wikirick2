@@ -5,12 +5,14 @@
 
 (def urlm (->URLMapper "/wiki"))
 
+(defrecord MockedPage [title source])
+
 (describe "url mapper"
   (it "expands index pathes"
     (should= "/" (index-path urlm)))
 
   (it "exapads an page path"
-    (let [page (make-page "SomePage" "some content")]
+    (let [page (->MockedPage "SomePage" "some content")]
       (should= "/w/SomePage" (page-path urlm page))))
 
   (it "expands some pathes"

@@ -13,6 +13,8 @@
 (compojure/defroutes app
   (handler/site wikirick-routes))
 
+(def repo (.repository testing-service))
+
 (describe "application handler"
   (before
     (setup-test-repo))
@@ -23,9 +25,9 @@
       (example)))
 
   (context "with the FrontPage page"
-    (with front-page (make-page "FrontPage" "front page content"))
+    (with front-page (new-page repo "FrontPage" "front page content"))
     (before
-      (post-page (ws :repository) @front-page))
+      (save-page @front-page))
 
     (it "handles GET /"
       (let [res (app (request :get "/"))]
@@ -33,11 +35,11 @@
         (should-be-full-rendered res (screen/page @front-page)))))
 
   (context "with two pages"
-    (with foo-page (make-page "FooPage" "some content"))
-    (with bar-page (make-page "FooPage" "some content"))
+    (with foo-page (new-page repo "FooPage" "some content"))
+    (with bar-page (new-page repo "FooPage" "some content"))
     (before
-      (post-page (ws :repository) @foo-page)
-      (post-page (ws :repository) @bar-page))
+      (save-page @foo-page)
+      (save-page @bar-page))
 
     (it "handles GET /w/FooPage"
       (let [res (app (request :get "/w/FooPage"))]

@@ -12,7 +12,7 @@
   (let [result (apply shell/sh `("co" ~@co-args :dir ~(.base-dir repo)))]
     (if (= (:exit result) 0)
       (let [rev (parse-revision (:err result))
-            page (make-page title (:out result))]
+            page (new-page repo title (:out result))]
         (assoc page :revision rev))
       (throw (RuntimeException. (:err result))))))
 

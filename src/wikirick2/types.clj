@@ -4,7 +4,8 @@
   (select-page [self title])
   (select-page-by-revision [self title rev])
   (select-all-page-titles [self])
-  (post-page [self page]))
+  (post-page [self title source edit-comment])
+  (new-page [self title source]))
 
 (defprotocol IURLMapper
   (index-path [self])
@@ -18,9 +19,14 @@
 
 (defrecord Template [title body])
 
-(defrecord Page [title source revision edit-comment])
+(defprotocol IPage
+  (save-page [self])
+  (diff-with-other-revision [self rev])
+  (referring-titles [self])
+  (referred-titles [self]))
 
-(defn make-page [title source]
-  (->Page title source nil nil))
+(defprotocol IPageRelation
+  (update-relations [self page])
+  (do-referred-titles [self page]))
 
 (defrecord WikiService [config repository url-mapper screen])

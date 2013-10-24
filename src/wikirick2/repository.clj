@@ -6,7 +6,19 @@
             [clojure.string :as string])
   (:import java.util.concurrent.locks.ReentrantReadWriteLock))
 
-(deftype Repository [base-dir rw-lock]
+(defrecord Page [repo relation rw-lock title source revision edit-comment]
+  IPage
+  (save-page [self]
+    (post-page repo title source edit-comment))
+
+  (referring-titles [self]
+    (with-rw-lock readLock))
+
+  (referred-titles [self]
+    (with-rw-lock readLock
+      (do-referred-titles relation self))))
+
+(deftype Repository [base-dir relation rw-lock]
   IRepository
   (select-page [self title]
     (with-rw-lock readLock
@@ -25,16 +37,26 @@
           (let [[_ page-name] (re-find #"(.+),v" rcs-file)]
             page-name)))))
 
-  (post-page [self page]
+  (post-page [self title source edit-comment]
     (letfn
       [(check-out-rcs-file []
-         (shell/sh "co" "-l" (.title page) :dir base-dir))]
+         (shell/sh "co" "-l" title :dir base-dir))]
       (with-rw-lock writeLock
         (check-out-rcs-file)
-        (let [path (format "%s/%s" base-dir (.title page))]
-          (spit path (.source page)))
-        (shell/sh "ci" (.title page) :in (.edit-comment page) :dir base-dir)))))
+        (let [path (format "%s/%s" base-dir title)]
+          (spit path source))
+        (shell/sh "ci" title :in edit-comment :dir base-dir))))
+
+  (new-page [self title source]
+    (->Page self relation rw-lock title source nil nil)))
+
+(deftype PageRelation [conn rw-lock]
+  IPageRelation
+  (update-relations [self page]
+    (with-rw-lock writeLock
+      (let [dests (referring-titles page)
+            priority (/ (count dests) (count (.source page)))]))))
 
 (defn create-repository [base-dir]
   (shell/sh "mkdir" "-p" (format "%s/RCS" base-dir))
-  (Repository. base-dir (ReentrantReadWriteLock.)))
+  (Repository. base-dir nil (ReentrantReadWriteLock.)))
