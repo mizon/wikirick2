@@ -58,4 +58,9 @@
     (should= ["FooPage"] (select-all-page-titles @repo))
 
     (save-page (new-page @repo "BarPage" "bar content"))
-    (should= ["BarPage" "FooPage"] (select-all-page-titles @repo))))
+    (should= ["BarPage" "FooPage"] (select-all-page-titles @repo)))
+
+  (describe "page"
+    (it "knows itself referring titles"
+      (let [page (new-page @repo "SomePage" "[[Foo]] [[Bar]]")]
+        (should= (hash-set "Foo" "Bar") (referring-titles page))))))

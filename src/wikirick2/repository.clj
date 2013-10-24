@@ -3,7 +3,8 @@
         wikirick2.repository.helper
         wikirick2.types)
   (:require [clojure.java.shell :as shell]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [wikirick2.parsers :as parsers])
   (:import java.util.concurrent.locks.ReentrantReadWriteLock))
 
 (defrecord Page [repo relation rw-lock title source revision edit-comment]
@@ -12,7 +13,7 @@
     (post-page repo title source edit-comment))
 
   (referring-titles [self]
-    (with-rw-lock readLock))
+    (parsers/scan-wiki-links source))
 
   (referred-titles [self]
     (with-rw-lock readLock
