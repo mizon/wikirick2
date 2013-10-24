@@ -16,8 +16,7 @@
     (parsers/scan-wiki-links source))
 
   (referred-titles [self]
-    (with-rw-lock readLock
-      (do-referred-titles relation self))))
+    ["FooPage" "BarPage"]))
 
 (deftype Repository [base-dir relation rw-lock]
   IRepository

@@ -63,4 +63,22 @@
   (describe "page"
     (it "knows itself referring titles"
       (let [page (new-page @repo "SomePage" "[[Foo]] [[Bar]]")]
-        (should= (hash-set "Foo" "Bar") (referring-titles page))))))
+        (should= (hash-set "Foo" "Bar") (referring-titles page))))
+
+    (it "knows itself referred titles"
+      (let [foo-page (new-page @repo "FooPage" "[[SomePage]]")
+            bar-page (new-page @repo "BarPage" "[[SomePage]]")
+            some-page (new-page @repo "SomePage" "some content")]
+        (save-page foo-page)
+        (save-page bar-page)
+        (should= ["FooPage" "BarPage"] (referred-titles some-page))))
+
+    (it "considers the referred page priority"
+      (let [densed-page (new-page @repo "Densed" "short content [[SomePage]]")
+            linkful-page (new-page @repo "LinkFul" "[[SomePage]] [[Foo]]")
+            sparsed-page (new-page @repo "Sparsed" "blah blah blah -- long content [[SomePage]]")
+            some-page (new-page @repo "SomePage" "some content")]
+        (save-page densed-page)
+        (save-page linkful-page)
+        (save-page sparsed-page)
+        (should= ["LinkFul" "Densed" "Sparsed"] (referred-titles some-page))))))
