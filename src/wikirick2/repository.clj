@@ -3,6 +3,8 @@
         wikirick2.repository.helper
         wikirick2.types)
   (:require [clojure.java.shell :as shell]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.java.jdbc.sql :as s]
             [clojure.string :as string]
             [wikirick2.parsers :as parsers])
   (:import java.util.concurrent.locks.ReentrantReadWriteLock))
@@ -10,7 +12,7 @@
 (defrecord Page [repo relation rw-lock title source revision edit-comment]
   IPage
   (save-page [self]
-    (post-page repo title source edit-comment))
+    (post-page repo self))
 
   (referring-titles [self]
     (parsers/scan-wiki-links source))
@@ -37,15 +39,15 @@
           (let [[_ page-name] (re-find #"(.+),v" rcs-file)]
             page-name)))))
 
-  (post-page [self title source edit-comment]
+  (post-page [self page]
     (letfn
       [(check-out-rcs-file []
-         (shell/sh "co" "-l" title :dir base-dir))]
+         (shell/sh "co" "-l" (.title page) :dir base-dir))]
       (with-rw-lock writeLock
         (check-out-rcs-file)
-        (let [path (format "%s/%s" base-dir title)]
-          (spit path source))
-        (shell/sh "ci" title :in edit-comment :dir base-dir))))
+        (let [path (format "%s/%s" base-dir (.title page))]
+          (spit path (.source page)))
+        (shell/sh "ci" (.title page) :in (.edit-comment page) :dir base-dir))))
 
   (new-page [self title source]
     (->Page self relation rw-lock title source nil nil)))

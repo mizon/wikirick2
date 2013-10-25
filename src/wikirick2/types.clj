@@ -4,7 +4,7 @@
   (select-page [self title])
   (select-page-by-revision [self title rev])
   (select-all-page-titles [self])
-  (post-page [self title source edit-comment])
+  (post-page [self page])
   (new-page [self title source]))
 
 (defprotocol IURLMapper
