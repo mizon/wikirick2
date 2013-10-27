@@ -14,7 +14,8 @@
 
 (def testing-service
   (make-wiki-service {:repository-dir test-repo
-                      :base-path "/"}))
+                      :base-path "/"
+                      :sqlite-path "test.sqlite3"}))
 
 (defn should-be-full-rendered [res template]
   (should= (render-full (ws :screen) template) (res :body)))

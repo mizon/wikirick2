@@ -23,3 +23,7 @@
        ~@forms
        (finally
          (.. ~'rw-lock ~lock-type unlock)))))
+
+(defn nlinks-per-page-size [page]
+  (let [dests (referring-titles page)]
+    (Math/round (float (* (/ (count dests) (count (.source page))) 1e6)))))

@@ -1,11 +1,18 @@
 (ns wikirick2.spec.repository
   (:use speclj.core
         wikirick2.repository
+        wikirick2.spec.spec-helper
         wikirick2.types)
-  (:require [clojure.java.shell :as shell]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [clojure.java.jdbc.sql :as sql]
+            [clojure.java.shell :as shell]))
 
 (def test-repo-name "test-repo")
 (def repo (atom nil))
+(def db-spec
+  {:classname "org.sqlite.JDBC"
+   :subprotocol "sqlite"
+   :subname "test.sqlite3"})
 
 (defn- should-page= [expected actual]
   (should= (.title expected) (.title actual))
@@ -13,9 +20,10 @@
 
 (describe "page repository"
   (before
-    (reset! repo (create-repository test-repo-name)))
+    (reset! repo (create-repository test-repo-name db-spec)))
   (after
-    (shell/sh "rm" "-rf" test-repo-name :dir "."))
+    (jdbc/execute! db-spec (sql/delete :page_relation []) :multi? true)
+    (cleanup-test-repo))
 
   (it "makes new page"
     (let [page (new-page @repo "NewPage" "new page content")]
