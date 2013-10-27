@@ -84,6 +84,9 @@
         (ddl/create-table :page_relation
                           [:source "text"]
                           [:destination "text"]
-                          [:priority "integer"])))
+                          [:priority "integer"])
+        (ddl/create-index :pr_source_index :page_relation [:source])
+        (ddl/create-index :pr_destination_index :page_relation [:destination])
+        (ddl/create-index :pr_priority_index :page_relation [:priority])))
     (shell/sh "mkdir" "-p" (format "%s/RCS" base-dir))
     (Repository. base-dir db (ReentrantReadWriteLock.))))
