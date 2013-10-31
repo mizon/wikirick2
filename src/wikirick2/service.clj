@@ -15,12 +15,10 @@
       (app req))))
 
 (defn make-wiki-service [config]
-  (let [db-spec {:classname "org.sqlite.JDBC"
-                 :subprotocol "sqlite"
-                 :subname (config :sqlite-path)}
-        components {:config config
-                    :repository (repository/create-repository (config :repository-dir)
-                                                              db-spec)
-                    :url-mapper (url-mapper/->URLMapper (config :base-path))}
-        service (map->WikiService components)]
+  (let [repo (repository/create-repository (config :repository-dir)
+                                           {:classname "org.sqlite.JDBC"
+                                            :subprotocol "sqlite"
+                                            :subname (config :sqlite-path)})
+        urlm (url-mapper/->URLMapper (config :base-path))
+        service (map->WikiService {:config config :repository repo :url-mapper urlm})]
     (assoc service :screen (screen/->Screen service))))
