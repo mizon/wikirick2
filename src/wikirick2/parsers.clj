@@ -7,26 +7,24 @@
 (defn scan-wiki-links [wiki-source]
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
-(def- single-line
-  (bind [ls (many-till any-char (<|> new-line eof))]
-    (return (apply str ls))))
+(def- wiki-parser
+  (let [trim-spaces (skip-many (<|> space tab))
 
-(def- trim-spaces
-  (skip-many (<|> space tab)))
+        single-line (bind [ls (many-till any-char (<|> new-line eof))]
+                      (return (apply str ls)))
 
-(def- headline
-  (bind [level (<|> (>> (token "######") (return 6))
-                    (>> (token "#####") (return 5))
-                    (>> (token "####") (return 4))
-                    (>> (token "###") (return 3))
-                    (>> (token "##") (return 2))
-                    (>> (token "#") (return 1)))
-         content single-line]
-    (>> trim-spaces
-        (return [(keyword (str "h" level)) (h content)]))))
+        headline (bind [level (<|> (>> (token "######") (return 6))
+                                   (>> (token "#####") (return 5))
+                                   (>> (token "####") (return 4))
+                                   (>> (token "###") (return 3))
+                                   (>> (token "##") (return 2))
+                                   (>> (token "#") (return 1)))
+                        content single-line]
+                   (>> trim-spaces
+                       (return [(keyword (str "h" level)) (h content)])))
 
-(def- block-element
-  (many headline))
+        block-element headline]
+    (many block-element)))
 
 (defn render-wiki-source [wiki-source]
   (let [result (parse block-element wiki-source)]
