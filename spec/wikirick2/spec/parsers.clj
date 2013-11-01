@@ -25,8 +25,10 @@ BarPage -> [[BarPage]]
 
   (describe "render-wiki-source"
     (describe "headlines"
-      (it "expands underline style headlines"
-        (should-be-rendered [[:h1 "News"]] "
-News
-====
-")))))
+      (it "expands prefix style"
+        (should-be-rendered [[:h1 "News"]] "# News")
+        (should-be-rendered [[:h2 "News"]] "## News")
+        (should-be-rendered [[:h3 "News"]] "### News")
+        (should-be-rendered [[:h4 "News"]] "#### News")
+        (should-be-rendered [[:h5 "News"]] "##### News")
+        (should-be-rendered [[:h6 "News"]] "###### News")))))
