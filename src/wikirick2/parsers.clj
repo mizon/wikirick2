@@ -17,6 +17,12 @@
               (err-fn input more0 stack msg))]
       (parser input more err-fn0 ok-fn))))
 
+(def ^:private plain-line
+  (match? #"[^#>\s].*"))
+
+(def ^:private empty-line
+  (match? #"\s*"))
+
 (def ^:private wiki-parser
   (let [headline-prefix (let [regex #"(#+) *(.*)"]
                           (do-parser [line (match? regex)]
@@ -29,9 +35,16 @@
                                            [:h1 content]
                                            [:h2 content])))
 
+        paragraph (do-parser [lines (c/many1 plain-line)]
+                    [:p (string/join " " lines)])
+
         block (reduce <|> [headline-prefix
-                           headline-underline])]
-    (c/many block)))
+                           headline-underline
+                           paragraph])]
+    (do-parser [bs (c/many (*> (c/many empty-line) block))
+                _ (c/many empty-line)
+                _ s/end-of-input]
+      bs)))
 
 (defn render-wiki-source [wiki-source]
   (let [source (string/split-lines wiki-source)

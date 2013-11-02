@@ -37,4 +37,9 @@ BarPage -> [[BarPage]]
         (should-be-rendered [[:h1 "News"]] "News
 ==")
         (should-be-rendered [[:h2 "News"]] "News
---")))))
+--")))
+
+    (it "expands parapraphs" (should-be-rendered [[:p "foo bar"] [:p "foobar"]] "foo
+bar
+
+foobar"))))
