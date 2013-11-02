@@ -1,33 +1,57 @@
 (ns wikirick2.parsers
   (:use blancas.kern.core
-        blancas.kern.lexer.basic
         [hiccup.core :only [h]])
-  (:require [clojure.string :as string]))
+  (:require [blancas.kern.lexer.basic :as lexer]
+            [clojure.string :as string]))
 
 (defn scan-wiki-links [wiki-source]
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
-(def- wiki-parser
-  (let [trim-spaces (skip-many (<|> space tab))
+(def- special-chars " #")
 
-        single-line (bind [ls (many-till any-char (<|> new-line eof))]
+(defn- debug [msg]
+  (satisfy (fn [_]
+             (prn msg)
+             true)))
+
+;; (do (prn content) (if content
+;;                                 (>> single-line single-line)
+;;                                 (fail "in underline-h1")))
+(def wiki-parser
+  (let [eol (<|> new-line* eof)
+
+        trim-spaces (skip-many (<|> space tab))
+
+        single-line (bind [ls (many-till any-char eol)]
                       (return (apply str ls)))
 
-        headline (bind [level (<|> (>> (token "######") (return 6))
-                                   (>> (token "#####") (return 5))
-                                   (>> (token "####") (return 4))
-                                   (>> (token "###") (return 3))
-                                   (>> (token "##") (return 2))
-                                   (>> (token "#") (return 1)))
-                        content single-line]
-                   (>> trim-spaces
-                       (return [(keyword (str "h" level)) (h content)])))
+        not-special-char (not-followed-by (one-of* special-chars))
+
+        underline-h1 (bind [_ not-special-char
+                            content (look-ahead (<< single-line (many1 (sym* \=)) eol))
+                            _ (if content
+                                (do (prn "succ") (>> single-line single-line))
+                                (do (prn "failed") (fail "in underline-h1")))
+                            ]
+                       (return [:h1 (h content)]))
+
+        prefix-headline (bind [level (token* "######"
+                                             "#####"
+                                             "####"
+                                             "###"
+                                             "##"
+                                             "#")
+                               content single-line]
+                          (>> trim-spaces
+                              (return [(keyword (str "h" (count level))) (h content)])))
+
+        headline underline-h1
 
         block-element headline]
-    (many block-element)))
+    underline-h1))
 
 (defn render-wiki-source [wiki-source]
-  (let [result (parse block-element wiki-source)]
+  (let [result (parse wiki-parser wiki-source)]
     (if (:ok result)
       (:value result)
-      :error)))
+      result)))
