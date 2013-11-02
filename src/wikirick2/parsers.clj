@@ -1,57 +1,42 @@
 (ns wikirick2.parsers
-  (:use blancas.kern.core
-        [hiccup.core :only [h]])
-  (:require [blancas.kern.lexer.basic :as lexer]
-            [clojure.string :as string]))
+  (:use [hiccup.core :only [h]]
+        zetta.core)
+  (:require [clojure.string :as string]
+            [zetta.combinators :as c]
+            [zetta.parser.seq :as s]))
 
 (defn scan-wiki-links [wiki-source]
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
-(def- special-chars " #")
+(defn- match? [reg]
+  (s/satisfy? #(re-matches reg %)))
 
-(defn- debug [msg]
-  (satisfy (fn [_]
-             (prn msg)
-             true)))
+(defn- try-parser [parser]
+  (fn [input more err-fn ok-fn]
+    (letfn [(err-fn0 [_ more0 stack msg]
+              (err-fn input more0 stack msg))]
+      (parser input more err-fn0 ok-fn))))
 
-;; (do (prn content) (if content
-;;                                 (>> single-line single-line)
-;;                                 (fail "in underline-h1")))
-(def wiki-parser
-  (let [eol (<|> new-line* eof)
+(def ^:private wiki-parser
+  (let [headline-prefix (let [regex #"(#+) *(.*)"]
+                          (do-parser [line (match? regex)]
+                            (let [[_ syms content] (re-matches regex line)]
+                              [(keyword (str "h" (count syms))) content])))
 
-        trim-spaces (skip-many (<|> space tab))
+        headline-underline (try-parser (do-parser [content s/any-token
+                                                   underline (match? #"(=+|-+) *")]
+                                         (if (= (first underline) \=)
+                                           [:h1 content]
+                                           [:h2 content])))
 
-        single-line (bind [ls (many-till any-char eol)]
-                      (return (apply str ls)))
-
-        not-special-char (not-followed-by (one-of* special-chars))
-
-        underline-h1 (bind [_ not-special-char
-                            content (look-ahead (<< single-line (many1 (sym* \=)) eol))
-                            _ (if content
-                                (do (prn "succ") (>> single-line single-line))
-                                (do (prn "failed") (fail "in underline-h1")))
-                            ]
-                       (return [:h1 (h content)]))
-
-        prefix-headline (bind [level (token* "######"
-                                             "#####"
-                                             "####"
-                                             "###"
-                                             "##"
-                                             "#")
-                               content single-line]
-                          (>> trim-spaces
-                              (return [(keyword (str "h" (count level))) (h content)])))
-
-        headline underline-h1
-
-        block-element headline]
-    underline-h1))
+        block (reduce <|> [headline-prefix
+                           headline-underline])]
+    (c/many block)))
 
 (defn render-wiki-source [wiki-source]
-  (let [result (parse wiki-parser wiki-source)]
-    (if (:ok result)
-      (:value result)
+  (let [source (string/split-lines wiki-source)
+        result (parse-once wiki-parser source)
+        value (:result result)]
+    (if value
+      value
       result)))
