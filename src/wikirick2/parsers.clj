@@ -24,7 +24,7 @@
   (match? #"\s*"))
 
 (def ^:private wiki-parser
-  (let [headline-prefix (let [regex #"(#+) *(.*)"]
+  (let [headline-prefix (let [regex #"(#+) *(.*?) *#*"]
                           (do-parser [line (match? regex)]
                             (let [[_ syms content] (re-matches regex line)]
                               [(keyword (str "h" (count syms))) content])))
