@@ -1,10 +1,14 @@
 (defproject wikirick2 "0.1.0-SNAPSHOT"
   :description "A wiki software for my site."
   :url "http://mizondev.net/wiki/wikirick2"
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 [compojure "1.1.5"]
-                 [org.clojure/clojurescript "0.0-1934"]
+  :dependencies [[compojure "1.1.5"]
                  [hiccup "1.0.4"]
+                 [org.clojure/algo.monads "0.1.4"]
+                 [org.clojure/java.jdbc "0.3.0-alpha5"]
+                 [org.clojure/clojure "1.5.1"]
+                 [org.clojure/clojurescript "0.0-1934"]
+                 [org.van-clj/zetta-parser "0.0.4"]
+                 [org.xerial/sqlite-jdbc "3.7.2"]
                  [slingshot "0.10.3"]]
   :plugins [[lein-ring "0.8.5"]
             [speclj "2.5.0"]
