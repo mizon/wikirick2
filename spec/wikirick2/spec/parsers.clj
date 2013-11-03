@@ -15,7 +15,7 @@ BarPage -> [[BarPage]]
 [[SomePage]] is funny.
 ")
 
-(defn- should-be-rendered [expected source]
+(defn- should-render [expected source]
   (should= expected (parsers/render-wiki-source source)))
 
 (describe "parsers"
@@ -26,72 +26,94 @@ BarPage -> [[BarPage]]
   (describe "render-wiki-source"
     (describe "header"
       (it "expands atx style"
-        (should-be-rendered [[:h1 "News"]] "# News")
-        (should-be-rendered [[:h2 "News"]] "## News")
-        (should-be-rendered [[:h3 "News"]] "### News")
-        (should-be-rendered [[:h4 "News"]] "#### News")
-        (should-be-rendered [[:h5 "News"]] "##### News")
-        (should-be-rendered [[:h6 "News"]] "###### News")
+        (should-render [[:h1 "News"]] "# News")
+        (should-render [[:h2 "News"]] "## News")
+        (should-render [[:h3 "News"]] "### News")
+        (should-render [[:h4 "News"]] "#### News")
+        (should-render [[:h5 "News"]] "##### News")
+        (should-render [[:h6 "News"]] "###### News")
 
-        (should-be-rendered [[:h1 "News"]] "# News #")
-        (should-be-rendered [[:h2 "News"]] "## News ##")
-        (should-be-rendered [[:h3 "News"]] "### News ###")
-        (should-be-rendered [[:h4 "News"]] "#### News ####")
-        (should-be-rendered [[:h5 "News"]] "##### News #####")
-        (should-be-rendered [[:h6 "News"]] "###### News ######"))
+        (should-render [[:h1 "News"]] "# News #")
+        (should-render [[:h2 "News"]] "## News ##")
+        (should-render [[:h3 "News"]] "### News ###")
+        (should-render [[:h4 "News"]] "#### News ####")
+        (should-render [[:h5 "News"]] "##### News #####")
+        (should-render [[:h6 "News"]] "###### News ######"))
 
       (it "should not output too low-level header elements"
-        (should-be-rendered [[:h6 "# News"]] "####### News"))
+        (should-render [[:h6 "# News"]] "####### News"))
 
       (it "expands settext style"
-        (should-be-rendered [[:h1 "News"]] "News
-==")
-        (should-be-rendered [[:h2 "News"]] "News
---")))
+        (should-render [[:h1 "News"]] "
+News
+====
+")
+        (should-render [[:h2 "News"]] "
+News
+----
+")))
 
-    (it "expands parapraphs" (should-be-rendered [[:p "foo\nbar"] [:p "foobar"]] "foo
+    (it "expands parapraphs" (should-render [[:p "foo\nbar"] [:p "foobar"]] "
+foo
 bar
 
-foobar"))
+foobar
+"))
 
     (describe "unordered list"
       (it "expands basic style items"
-        (should-be-rendered [[:ul
-                              [:li "foo"]
-                              [:li "bar"]
-                              [:li "foobar"]]] "
+        (should-render [[:ul
+                         [:li "foo"]
+                         [:li "bar"]
+                         [:li "foobar"]]] "
 * foo
 + bar
 - foobar
-"))
+"
+))
 
-      (it "expands rest style items"
-        (should-be-rendered [[:ul
-                              [:li "foo
-bar
-foobar"]
-                              [:li "bar"]
-                              [:li "foo
-bar"]]] "* foo
+      (it "expands lazy style items"
+        (should-render [[:ul
+                         [:li "foo\nbar\nfoobar"]
+                         [:li "bar"]
+                         [:li "foo\nbar"]]] "
+* foo
 bar
 foobar
 * bar
 * foo
-  bar"
-)))
+  bar
+")))
 
     (it "expands code blocks"
-      (should-be-rendered [[:pre [:code
-         "#include <stdio.h>
-
-int main(void)
-{
-    return 0;
-}"]]] "
+      (should-render [[:pre
+                       [:code
+                        "#include <stdio.h>\n\nint main(void)\n{\n    return 0;\n}"]]] "
     #include <stdio.h>
 
     int main(void)
     {
         return 0;
     }
-"))))
+"))
+
+    (describe "blockquote"
+      (it "expands from strict style markups"
+        (should-render [[:blockquote [:p "foo bar\nfoobar"]]] "
+> foo bar
+> foobar"))
+
+      (it "expands from from lazy style markups"
+        (should-render [[:blockquote [:p "foo bar\nfoobar"]]] "
+> foo bar
+foobar
+"))
+
+      (it "expands some paragraphs"
+        (should-render [[:blockquote [:p "foo\nbar"] [:p "foo\nbar"]]] "
+> foo
+bar
+
+> foo
+bar
+")))))
