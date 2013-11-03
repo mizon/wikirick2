@@ -84,8 +84,7 @@
 (def- code
   (let [regex #"(\t|    )(.+)"]
     (do-parser [first* (match? regex)
-                rest* (c/many (<|> (match? regex)
-                                   (*> empty-line (always "    "))))]
+                rest* (c/many (<|> (match? regex) empty-line))]
       (let [code-lines (cons first* rest*)
             trim-left #(.replaceAll % "^(\t|    )" "")
             trim-right #(.replaceAll % "\\s*$" "")]
