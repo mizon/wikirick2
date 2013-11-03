@@ -30,19 +30,19 @@
               (err-fn input more0 stack msg))]
       (parser input more err-fn0 ok-fn))))
 
-(def- plain-line
-  (match? #"[^#>\s].*"))
+(def- special-prefix-chars
+  "#>\\*\\+\\-")
 
 (def- empty-line
   (match? #"\s*"))
 
-(def- headline-prefix
+(def- atx-header
   (let [regex #"(#+) *(.*?) *#*"]
     (do-parser [line (match? regex)]
       (let [[_ syms content] (re-matches regex line)]
         [(keyword (str "h" (count syms))) content]))))
 
-(def- headline-underline
+(def- settext-header
   (try-parser (do-parser [content s/any-token
                           underline (match? #"(=+|-+) *")]
                 (case (first underline)
@@ -51,12 +51,31 @@
                   (assert false "must not happen")))))
 
 (def- paragraph
-  (do-parser [lines (c/many1 plain-line)]
-    [:p (string/join " " lines)]))
+  (let [regex (re-pattern (format "[^%s\\s].+" special-prefix-chars))]
+    (do-parser [lines (c/many1 (match? regex))]
+      [:p (string/join "\n" lines)])))
+
+(def- li-rest-line
+  (let [regex (re-pattern (format "[^%s]\\s*[^\\s\\*\\+\\-].+" special-prefix-chars))]
+    (do-parser [line (match? regex)]
+      (.trim line))))
+
+(def- ul-item
+  (let [regex #"(\s*)[\*\+\-]\s+(.+)"]
+    (do-parser [first* (match? regex)
+                rest* (c/many li-rest-line)]
+      (let [[_ spaces first**] (re-matches regex first*)]
+        [(count spaces) (string/join "\n" (cons first** rest*))]))))
+
+(def- unordered-list
+  (do-parser [items (c/many1 ul-item)]
+    `[:ul ~@(for [[_ content] items]
+              [:li content])]))
 
 (def- block
-  (reduce <|> [headline-prefix
-               headline-underline
+  (reduce <|> [atx-header
+               settext-header
+               unordered-list
                paragraph]))
 
 (def- wiki

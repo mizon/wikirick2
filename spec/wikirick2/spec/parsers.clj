@@ -46,7 +46,32 @@ BarPage -> [[BarPage]]
         (should-be-rendered [[:h2 "News"]] "News
 --")))
 
-    (it "expands parapraphs" (should-be-rendered [[:p "foo bar"] [:p "foobar"]] "foo
+    (it "expands parapraphs" (should-be-rendered [[:p "foo\nbar"] [:p "foobar"]] "foo
 bar
 
-foobar"))))
+foobar"))
+
+    (describe "unordered list"
+      (it "expands basic style items"
+        (should-be-rendered [[:ul
+                              [:li "foo"]
+                              [:li "bar"]
+                              [:li "foobar"]]] "
+* foo
++ bar
+- foobar
+"))
+      (it "expands rest style items"
+        (should-be-rendered [[:ul
+                              [:li "foo
+bar
+foobar"]
+                              [:li "bar"]
+                              [:li "foo
+bar"]]] "* foo
+bar
+foobar
+* bar
+* foo
+  bar"
+)))))
