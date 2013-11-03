@@ -20,12 +20,12 @@ BarPage -> [[BarPage]]
 
 (describe "parsers"
   (describe "scan-wiki-links"
-    (it "scans wiki links from wiki sources"
+    (it "scans wiki links from a wiki source"
       (should= #{"SomePage" "FooPage" "BarPage"} (parsers/scan-wiki-links wiki-source))))
 
   (describe "render-wiki-source"
-    (describe "headlines"
-      (it "expands prefix style"
+    (describe "header"
+      (it "expands atx style"
         (should-be-rendered [[:h1 "News"]] "# News")
         (should-be-rendered [[:h2 "News"]] "## News")
         (should-be-rendered [[:h3 "News"]] "### News")
@@ -40,7 +40,7 @@ BarPage -> [[BarPage]]
         (should-be-rendered [[:h5 "News"]] "##### News #####")
         (should-be-rendered [[:h6 "News"]] "###### News ######"))
 
-      (it "expands underline style"
+      (it "expands settext style"
         (should-be-rendered [[:h1 "News"]] "News
 ==")
         (should-be-rendered [[:h2 "News"]] "News
