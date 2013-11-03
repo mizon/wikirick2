@@ -116,4 +116,28 @@ bar
 
 > foo
 bar
-")))))
+"))
+
+      (it "expands some elements"
+        (should-render [[:blockquote [:h1 "Section"] [:h2 "Subsection"] [:p "foobar"]]] "
+> Section
+> =======
+>
+> Subsection
+> ----------
+>
+> foobar
+"
+)))
+
+    (it "expands some elements"
+      (should-render [[:h1 "Section"] [:h2 "Subsection"] [:p "foobar"]] "
+Section
+=======
+
+Subsection
+----------
+
+foobar
+"
+))))

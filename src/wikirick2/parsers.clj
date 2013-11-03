@@ -94,24 +94,32 @@
           (trim-right (string/join "\n" (map trim-left code-lines)))]]))))
 
 (def- bq-marked-line
-  (let [regex #"\s*> ?(.+)"]
+  (let [regex #"\s*> ?(.*)"]
     (do-parser [line (match? regex)]
       ((re-matches regex line) 1))))
 
 (def- bq-no-marked-line
-  (let [regex #"\s*"]
-    nil))
+  (not-followed-by empty-line))
+
+(def- bq-fragment
+  (do-parser [first* bq-marked-line
+              rest* (c/many (<|> bq-marked-line bq-no-marked-line))
+              _ (c/skip-many empty-line)]
+    `(~first* ~@rest* "")))
 
 (def- blockquote
-  (let [regex #">(.*)"]
-    (do-parser [lines (c/many1 (match? regex))]
-      nil)))
+  (do-parser [fragments (c/many1 bq-fragment)]
+    (let [inners (parse-once wiki (apply concat fragments))]
+      (if (:result inners)
+        `[:blockquote ~@(:result inners)]
+        (assert false "blockquote: must not happen")))))
 
 (def- block
   (reduce <|> [unordered-list
                code
                atx-header
                settext-header
+               blockquote
                paragraph]))
 
 (def- wiki
