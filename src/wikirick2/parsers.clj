@@ -72,10 +72,23 @@
     `[:ul ~@(for [[_ content] items]
               [:li content])]))
 
+(def- code
+  (let [regex #"(\t|    )(.+)"]
+    (do-parser [first* (match? regex)
+                rest* (c/many (<|> (match? regex)
+                                   (*> empty-line (always "    "))))]
+      (let [code-lines (cons first* rest*)
+            trim-left #(.replaceAll % "^(\t|    )" "")
+            trim-right #(.replaceAll % "\\s*$" "")]
+        [:pre
+         [:code
+          (trim-right (string/join "\n" (map trim-left code-lines)))]]))))
+
 (def- block
   (reduce <|> [atx-header
                settext-header
                unordered-list
+               code
                paragraph]))
 
 (def- wiki

@@ -61,6 +61,7 @@ foobar"))
 + bar
 - foobar
 "))
+
       (it "expands rest style items"
         (should-be-rendered [[:ul
                               [:li "foo
@@ -74,4 +75,20 @@ foobar
 * bar
 * foo
   bar"
-)))))
+)))
+
+    (it "expands code blocks"
+      (should-be-rendered [[:pre [:code
+         "#include <stdio.h>
+
+int main(void)
+{
+    return 0;
+}"]]] "
+    #include <stdio.h>
+
+    int main(void)
+    {
+        return 0;
+    }
+"))))
