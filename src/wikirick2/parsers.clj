@@ -30,6 +30,15 @@
               (err-fn input more0 stack msg))]
       (parser input more err-fn0 ok-fn))))
 
+(defn- not-followed-by [parser]
+  (fn [input more err-fn ok-fn]
+    (letfn [(ok-fn* [_ more* result]
+              (err-fn input more* [] "not followed by"))
+
+            (err-fn* [_ more* _ _]
+              (s/any-token input more* err-fn ok-fn))]
+      (parser input more err-fn* ok-fn*))))
+
 (def- special-prefix-chars
   "#>\\*\\+\\-")
 
@@ -83,6 +92,20 @@
         [:pre
          [:code
           (trim-right (string/join "\n" (map trim-left code-lines)))]]))))
+
+(def- bq-marked-line
+  (let [regex #"\s*> ?(.+)"]
+    (do-parser [line (match? regex)]
+      ((re-matches regex line) 1))))
+
+(def- bq-no-marked-line
+  (let [regex #"\s*"]
+    nil))
+
+(def- blockquote
+  (let [regex #">(.*)"]
+    (do-parser [lines (c/many1 (match? regex))]
+      nil)))
 
 (def- block
   (reduce <|> [unordered-list
