@@ -6,4 +6,5 @@
   (after 0)
   (around 0)
   (db-transaction 1)
-  (db-do-commands 1))
+  (db-do-commands 1)
+  (cond 0))

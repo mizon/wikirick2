@@ -45,9 +45,10 @@
 (def- headline-underline
   (try-parser (do-parser [content s/any-token
                           underline (match? #"(=+|-+) *")]
-                (if (= (first underline) \=)
-                  [:h1 content]
-                  [:h2 content]))))
+                (case (first underline)
+                  \= [:h1 content]
+                  \- [:h2 content]
+                  (assert false "must not happen")))))
 
 (def- paragraph
   (do-parser [lines (c/many1 plain-line)]
