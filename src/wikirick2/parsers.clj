@@ -37,7 +37,7 @@
   (match? #"\s*"))
 
 (def- atx-header
-  (let [regex #"(#+) *(.*?) *#*"]
+  (let [regex #"(#{1,6}) *(.*?) *#*"]
     (do-parser [line (match? regex)]
       (let [[_ syms content] (re-matches regex line)]
         [(keyword (str "h" (count syms))) content]))))
@@ -85,10 +85,10 @@
           (trim-right (string/join "\n" (map trim-left code-lines)))]]))))
 
 (def- block
-  (reduce <|> [atx-header
-               settext-header
-               unordered-list
+  (reduce <|> [unordered-list
                code
+               atx-header
+               settext-header
                paragraph]))
 
 (def- wiki

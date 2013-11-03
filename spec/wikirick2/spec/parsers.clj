@@ -40,6 +40,9 @@ BarPage -> [[BarPage]]
         (should-be-rendered [[:h5 "News"]] "##### News #####")
         (should-be-rendered [[:h6 "News"]] "###### News ######"))
 
+      (it "should not output too low-level header elements"
+        (should-be-rendered [[:h6 "# News"]] "####### News"))
+
       (it "expands settext style"
         (should-be-rendered [[:h1 "News"]] "News
 ==")
