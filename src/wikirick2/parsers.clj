@@ -5,18 +5,19 @@
             [zetta.combinators :as c]
             [zetta.parser.seq :as s]))
 
-(declare wiki)
+(declare wiki li-level)
 
 (defn scan-wiki-links [wiki-source]
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
 (defn render-wiki-source [wiki-source]
-  (let [source (string/split-lines wiki-source)
-        result (parse-once wiki source)
-        value (:result result)]
-    (if value
-      value
-      result)))
+  (binding [li-level (atom 0)]
+    (let [source (string/split-lines wiki-source)
+          result (parse-once wiki source)
+          value (:result result)]
+      (if value
+        value
+        result))))
 
 (defmacro def- [& forms]
   `(def ^:private ~@forms))
@@ -26,9 +27,9 @@
 
 (defn- try-parser [parser]
   (fn [input more err-fn ok-fn]
-    (letfn [(err-fn0 [_ more0 stack msg]
-              (err-fn input more0 stack msg))]
-      (parser input more err-fn0 ok-fn))))
+    (letfn [(err-fn* [_ more* stack msg]
+              (err-fn input more* stack msg))]
+      (parser input more err-fn* ok-fn))))
 
 (defn- not-followed-by [parser]
   (fn [input more err-fn ok-fn]
@@ -41,6 +42,8 @@
 
 (def- special-prefix-chars
   "#>\\*\\+\\-")
+
+(def- ^:dynamic li-level nil)
 
 (def- empty-line
   (match? #"\s*"))
@@ -68,6 +71,26 @@
   (let [regex (re-pattern (format "[^%s]\\s*[^\\s\\*\\+\\-].+" special-prefix-chars))]
     (do-parser [line (match? regex)]
       (.trim line))))
+
+;; (def- ul-item-start
+;;   (let [regex #"( {0,3})[*+-]\s+(.*)"]
+;;     (do-parser [[spaces content] (match? regex)]
+;;       [(count spaces) content])))
+
+;; (def ul-item-marked-line
+;;   (letfn [(make-regex [level]
+;;             (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" level)))]
+;;     (do-parser [line (match? (make-regex @li-level))]
+;;       ((re-matches (make-regex @li-level) line) 1))))
+
+;; (defn- ul-item-unmarked-line []
+;;   (do-parser [content (not-followed-by (<|> ul-item-marked-line empty-line))]
+;;     (.replaceAll content "^(\t|    )" "")))
+
+;; (def- unordered-list*
+;;   (do-parser [first* ul-item-marked-line
+;;               rest* (c/many ul-item-unmarked-line)]
+;;     nil))
 
 (def- ul-item
   (let [regex #"(\s*)[\*\+\-]\s+(.+)"]
