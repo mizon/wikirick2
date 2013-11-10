@@ -19,6 +19,9 @@
         value
         result))))
 
+(defmacro def- [name value]
+  (list `def (with-meta name {:private true}) value))
+
 (defmacro def- [& forms]
   `(def ^:private ~@forms))
 
@@ -162,7 +165,7 @@
         (assert false "blockquote: must not happen")))))
 
 (def- block
-  (reduce <|> [ul
+  (reduce <|> [unordered-list
                code
                atx-header
                settext-header
