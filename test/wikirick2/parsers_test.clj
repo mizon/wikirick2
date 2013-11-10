@@ -86,6 +86,17 @@ foobar
 * bar
 * foo
   bar
+")))
+
+    (testing "expands paragraph style"
+      (is (render? [[:ul
+                     [:li [:p "foo\nbar"]]
+                     [:li [:p "foobar\nfoobar"]]]] "
+* foo
+bar
+
+* foobar
+foobar
 "))))
 
   (testing "code block"
