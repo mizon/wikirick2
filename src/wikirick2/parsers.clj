@@ -39,9 +39,6 @@
               (s/any-token input more* err-fn ok-fn))]
       (parser input more err-fn* ok-fn*))))
 
-(def- special-prefix-chars
-  "#>\\*\\+\\-")
-
 (def- empty-line
   (match? #"\s*"))
 
@@ -58,11 +55,6 @@
                   \= [:h1 content]
                   \- [:h2 content]
                   (assert false "must not happen")))))
-
-(def- paragraph
-  (let [regex (re-pattern (format "[^%s\\s].+" special-prefix-chars))]
-    (do-parser [lines (c/many1 (match? regex))]
-      [:p (string/join "\n" lines)])))
 
 (declare ul-item-cont)
 
@@ -152,6 +144,15 @@
       (if (:result inners)
         `[:blockquote ~@(:result inners)]
         (assert false "blockquote: must not happen")))))
+
+(def- paragraph
+  (do-parser [ls (c/many1 (not-followed-by (reduce <|> [unordered-list
+                                                        code
+                                                        atx-header
+                                                        settext-header
+                                                        blockquote
+                                                        empty-line])))]
+    [:p (string/join "\n" (map #(.trim %) ls))]))
 
 (def- block
   (reduce <|> [unordered-list
