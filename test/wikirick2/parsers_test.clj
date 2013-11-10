@@ -88,6 +88,20 @@ foobar
   bar
 ")))
 
+    (testing "expands nested elements"
+      (is (render? [[:ul
+                     [:li
+                      "foo"
+                      [:ul
+                       [:li "bar"]
+                       [:li "foobar"]]]
+                     [:li "bar"]]] "
++ foo
+  - bar
+  - foobar
++ bar
+")))
+
     (testing "expands paragraph style"
       (is (render? [[:ul
                      [:li [:p "foo\nbar"]]
@@ -97,6 +111,17 @@ bar
 
 * foobar
 foobar
+")))
+
+    (testing "expands paragraphs in each item"
+      (is (render? [[:ul
+                     [:li [:p "foobar\nfoobar"] [:p "foobar"]]
+                     [:li [:p "foobar"]]]] "
+-   foobar
+    foobar
+
+    foobar
+-   foobar
 "))))
 
   (testing "code block"
