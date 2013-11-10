@@ -66,7 +66,7 @@
 
 (declare ul-item-cont)
 
-(def- ul-indented-rest-line
+(def- ul-indented-cont-line
   (let [regex #" {4}(.+)"]
     (try-parser (do-parser [es (c/many empty-line)
                             line (match? regex)]
@@ -75,7 +75,7 @@
                       content
                       ["" content]))))))
 
-(defn- ul-no-indended-rest-line [level]
+(defn- ul-no-indended-cont-line [level]
   (do-parser [line (not-followed-by (<|> (ul-item-cont level)
                                          empty-line))]
     line))
@@ -86,24 +86,24 @@
                   (let [[_ spaces content] (re-matches regex line)]
                     [(count spaces) content])))]
     (do-parser [[level l] start
-                ls (c/many (<|> ul-indented-rest-line
-                                   (ul-no-indended-rest-line level)))
+                ls (c/many (<|> ul-indented-cont-line
+                                (ul-no-indended-cont-line level)))
                 blanks (c/many empty-line)]
       [level (flatten (if (empty? blanks)
                         (cons l ls)
-                        (cons "" (cons l ls))))])))
+                        (list* "" l ls)))])))
 
 (defn- ul-item-cont [level]
   (let [start (let [regex (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" level))]
                 (do-parser [line (match? regex)]
                   (second (re-matches regex line))))]
     (do-parser [l start
-                ls (c/many (<|> ul-indented-rest-line
-                                (ul-no-indended-rest-line level)))
+                ls (c/many (<|> ul-indented-cont-line
+                                (ul-no-indended-cont-line level)))
                 blanks (c/many empty-line)]
       (flatten (if (empty? blanks)
                  (cons l ls)
-                 (cons "" (cons l ls)))))))
+                 (list* "" l ls))))))
 
 (declare unordered-list)
 
