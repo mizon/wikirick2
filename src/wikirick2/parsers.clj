@@ -11,19 +11,15 @@
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
 (defn render-wiki-source [wiki-source]
-  (binding [li-level (atom 0)]
-    (let [source (string/split-lines wiki-source)
-          result (parse-once wiki source)
-          value (:result result)]
-      (if value
-        value
-        result))))
+  (let [source (string/split-lines wiki-source)
+        result (parse-once wiki source)
+        value (:result result)]
+    (if value
+      value
+      result)))
 
 (defmacro def- [name value]
   (list `def (with-meta name {:private true}) value))
-
-(defmacro def- [& forms]
-  `(def ^:private ~@forms))
 
 (defn- match? [reg]
   (s/satisfy? #(re-matches reg %)))
@@ -45,8 +41,6 @@
 
 (def- special-prefix-chars
   "#>\\*\\+\\-")
-
-(def- ^:dynamic li-level nil)
 
 (def- empty-line
   (match? #"\s*"))
