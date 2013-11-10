@@ -14,9 +14,8 @@
             [speclj "2.5.0"]
             [lein-cljsbuild "0.3.4"]]
   :ring {:handler wikirick2.main/application}
-  :profiles {:dev {:dependencies [[ring-mock "0.1.5"]
-                                  [speclj "2.5.0"]]}}
-  :test-paths ["spec"]
+  :profiles {:dev {:dependencies [[ring-mock "0.1.5"]]}}
+  :test-paths ["test"]
   :cljsbuild {:builds [{:source-paths ["src-cljs"]
                         :compiler {:output-to "resources/public/js/index.js"
                                    :optimizations :whitespace
