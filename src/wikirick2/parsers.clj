@@ -66,19 +66,16 @@
 
 (declare ul-item-cont)
 
-(def- ul-indented-cont-line
-  (let [regex #" {4}(.+)"]
-    (try-parser (do-parser [es (c/many empty-line)
-                            line (match? regex)]
-                  (let [content (second (re-matches regex line))]
-                    (if (empty? es)
-                      content
-                      ["" content]))))))
-
-(defn- ul-no-indended-cont-line [level]
-  (do-parser [line (not-followed-by (<|> (ul-item-cont level)
-                                         empty-line))]
-    line))
+(defn- ul-item-cont-lines [level]
+  (let [indented (let [regex #" {4}(.+)"]
+                   (try-parser (do-parser [es (c/many empty-line)
+                                           line (match? regex)]
+                                 (let [content (second (re-matches regex line))]
+                                   (if (empty? es)
+                                     content
+                                     ["" content])))))
+        no-indented (not-followed-by (<|> (ul-item-cont level) empty-line))]
+    (c/many (<|> indented no-indented))))
 
 (def- ul-item
   (let [start (let [regex #"( {0,3})[\*\+\-]\s+(.*)"]
@@ -86,8 +83,7 @@
                   (let [[_ spaces content] (re-matches regex line)]
                     [(count spaces) content])))]
     (do-parser [[level l] start
-                ls (c/many (<|> ul-indented-cont-line
-                                (ul-no-indended-cont-line level)))
+                ls (ul-item-cont-lines level)
                 blanks (c/many empty-line)]
       [level (flatten (if (empty? blanks)
                         (cons l ls)
@@ -98,8 +94,7 @@
                 (do-parser [line (match? regex)]
                   (second (re-matches regex line))))]
     (do-parser [l start
-                ls (c/many (<|> ul-indented-cont-line
-                                (ul-no-indended-cont-line level)))
+                ls (ul-item-cont-lines level)
                 blanks (c/many empty-line)]
       (flatten (if (empty? blanks)
                  (cons l ls)
