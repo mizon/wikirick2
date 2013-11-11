@@ -43,10 +43,10 @@
   (match? #"\s*"))
 
 (def- atx-header
-  (let [regex #"(#{1,6}) *(.*?) *#*"]
-    (do-parser [line (match? regex)]
-      (let [[_ syms content] (re-matches regex line)]
-        [(keyword (str "h" (count syms))) content]))))
+  (do-parser [:let [regex #"(#{1,6}) *(.*?) *#*"]
+              line (match? regex)
+              :let [[_ syms content] (re-matches regex line)]]
+    [(keyword (str "h" (count syms))) content]))
 
 (def- settext-header
   (try-parser (do-parser [content s/any-token
@@ -59,21 +59,21 @@
 (declare ul-item-cont)
 
 (defn- ul-item-cont-lines [level]
-  (let [indented (let [regex #" {4}(.+)"]
-                   (try-parser (do-parser [es (c/many empty-line)
-                                           line (match? regex)]
-                                 (let [content (second (re-matches regex line))]
-                                   (if (empty? es)
-                                     content
-                                     ["" content])))))
+  (let [indented (try-parser (do-parser [:let [regex #" {4}(.+)"]
+                                         es (c/many empty-line)
+                                         line (match? regex)
+                                         :let [content (second (re-matches regex line))]]
+                               (if (empty? es)
+                                 content
+                                 ["" content])))
         no-indented (not-followed-by (<|> (ul-item-cont level) empty-line))]
     (c/many (<|> indented no-indented))))
 
 (def- ul-item
-  (let [start (let [regex #"( {0,3})[\*\+\-]\s+(.*)"]
-                (do-parser [line (match? regex)]
-                  (let [[_ spaces content] (re-matches regex line)]
-                    [(count spaces) content])))]
+  (let [start (do-parser [:let [regex #"( {0,3})[\*\+\-]\s+(.*)"]
+                          line (match? regex)
+                          :let [[_ spaces content] (re-matches regex line)]]
+                [(count spaces) content])]
     (do-parser [[level l] start
                 ls (ul-item-cont-lines level)
                 blanks (c/many empty-line)]
@@ -82,9 +82,9 @@
                         (list* "" l ls)))])))
 
 (defn- ul-item-cont [level]
-  (let [start (let [regex (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" level))]
-                (do-parser [line (match? regex)]
-                  (second (re-matches regex line))))]
+  (let [start (do-parser [:let [regex (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" level))]
+                          line (match? regex)]
+                (second (re-matches regex line)))]
     (do-parser [l start
                 ls (ul-item-cont-lines level)
                 blanks (c/many empty-line)]
@@ -107,27 +107,27 @@
             (for [lines liness]
               `[:li ~@(:result (parse-once wiki lines))]))]
     (do-parser [[level ls] ul-item
-                lss (c/many (ul-item-cont level))]
-      (let [liness (cons ls lss)]
-        `[:ul ~@(if (empty? (filter #(= % "") (flatten liness)))
-                  (plain-mode liness)
-                  (paragraph-mode liness))]))))
+                lss (c/many (ul-item-cont level))
+                :let [liness (cons ls lss)]]
+      `[:ul ~@(if (empty? (filter #(= % "") (flatten liness)))
+                (plain-mode liness)
+                (paragraph-mode liness))])))
 
 (def- code
-  (let [regex #"(\t|    )(.+)"]
-    (do-parser [l (match? regex)
-                ls (c/many (<|> (match? regex) empty-line))]
-      (let [code-lines (cons l ls)
-            trim-left #(.replaceAll % "^(\t|    )" "")
-            trim-right #(.replaceAll % "\\s*$" "")]
-        [:pre
-         [:code
-          (trim-right (string/join "\n" (map trim-left code-lines)))]]))))
+  (do-parser [:let [regex #"(\t|    )(.+)"]
+              l (match? regex)
+              ls (c/many (<|> (match? regex) empty-line))]
+    (let [code-lines (cons l ls)
+          trim-left #(.replaceAll % "^(\t|    )" "")
+          trim-right #(.replaceAll % "\\s*$" "")]
+      [:pre
+       [:code
+        (trim-right (string/join "\n" (map trim-left code-lines)))]])))
 
 (def- bq-marked-line
-  (let [regex #"\s*> ?(.*)"]
-    (do-parser [line (match? regex)]
-      ((re-matches regex line) 1))))
+  (do-parser [:let [regex #"\s*> ?(.*)"]
+              line (match? regex)]
+    ((re-matches regex line) 1)))
 
 (def- bq-no-marked-line
   (not-followed-by empty-line))
@@ -139,11 +139,11 @@
     `(~l ~@ls "")))
 
 (def- blockquote
-  (do-parser [fragments (c/many1 bq-fragment)]
-    (let [inners (parse-once wiki (apply concat fragments))]
-      (if (:result inners)
-        `[:blockquote ~@(:result inners)]
-        (assert false "blockquote: must not happen")))))
+  (do-parser [fragments (c/many1 bq-fragment)
+              :let [inners (parse-once wiki (apply concat fragments))]]
+    (if (:result inners)
+      `[:blockquote ~@(:result inners)]
+      (assert false "blockquote: must not happen"))))
 
 (def- paragraph
   (do-parser [ls (c/many1 (not-followed-by (reduce <|> [unordered-list
