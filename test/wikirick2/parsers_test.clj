@@ -88,7 +88,7 @@ foobar
   bar
 ")))
 
-    (testing "expands nested elements"
+    (testing "expands nested items"
       (is (render? [[:ul
                      [:li
                       "foo"
@@ -122,6 +122,26 @@ foobar
 
     foobar
 -   foobar
+"))))
+
+  (testing "ordered list"
+    (testing "expands items"
+      (is (render? [[:ol
+                     [:li "foo"]
+                     [:li "bar"]
+                     [:li "foobar"]]] "
+1. foo
+2. bar
+3. foobar
+")))
+
+    (testing "expands nested items"
+      (is (render? [[:ol
+                     [:li "foo"
+                      [:ol
+                       [:li "bar"]]]]] "
+1. foo
+  2. bar
 "))))
 
   (testing "code block"

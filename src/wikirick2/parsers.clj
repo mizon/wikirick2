@@ -112,6 +112,12 @@
                  [(count spaces) content])
                #(match-line (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" %)))))
 
+(def- ordered-list
+  (list-parser :ol
+               (do-parser [[_ spaces content] (match-line #"( {0,3})\d+\.\s+(.*)")]
+                 [(count spaces) content])
+               #(match-line (re-pattern (format " {%s}\\d+\\.\\s+(.*)" %)))))
+
 (def- code
   (do-parser [:let [code-line (<$> first (match-line #"(\t|    )(.+)"))]
               l code-line
@@ -137,22 +143,21 @@
   (do-parser [fragments (c/many1 bq-fragment)]
     `[:blockquote ~@(exec-parser wiki (apply concat fragments))]))
 
-(def- paragraph
-  (do-parser [ls (c/many1 (not-followed-by (reduce <|> [unordered-list
-                                                        code
-                                                        atx-header
-                                                        settext-header
-                                                        blockquote
-                                                        empty-line])))]
-    [:p (unlines (map #(.trim %) ls))]))
-
-(def- block
+(def- special
   (reduce <|> [unordered-list
+               ordered-list
                code
                atx-header
                settext-header
                blockquote
-               paragraph]))
+               empty-line]))
+
+(def- paragraph
+  (do-parser [ls (c/many1 (not-followed-by special))]
+    [:p (unlines (map #(.trim %) ls))]))
+
+(def- block
+  (<|> special paragraph))
 
 (def- wiki
   (do-parser [bs (c/many (*> (c/many empty-line) block))
