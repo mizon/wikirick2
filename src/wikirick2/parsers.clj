@@ -142,13 +142,15 @@
                ul-start
                #(match-line (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" %)))))
 
+(def- code-line
+  (<$> first (match-line #"(\t|    )(.+)")))
+
 (def- code
-  (do-parser [:let [code-line (<$> first (match-line #"(\t|    )(.+)"))]
+  (do-parser [:let [trim-left #(.replaceAll % "^(\t|    )" "")
+                    trim-right #(.replaceAll % "\\s*$" "")]
               l code-line
               ls (c/many (<|> code-line empty-line))
-              :let [code-lines (cons l ls)
-                    trim-left #(.replaceAll % "^(\t|    )" "")
-                    trim-right #(.replaceAll % "\\s*$" "")]]
+              :let [code-lines (cons l ls)]]
     [:pre [:code (trim-right (unlines (map trim-left code-lines)))]]))
 
 (def- bq-marked-line
