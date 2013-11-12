@@ -96,12 +96,12 @@
   (c/many (<|> (list-parser tag-name item-start item-cont-start)
                (li-plain-lines item-start))))
 
-(defn- list-parser [tag-name item-start item-cont-start]
-  (do-parser [[level ls] (list-item item-start item-cont-start)
-              lss (c/many (list-item-cont (item-cont-start level)))
+(defn- list-parser [tag-name li-start li-cont-start]
+  (do-parser [[level ls] (list-item li-start li-cont-start)
+              lss (c/many (list-item-cont (li-cont-start level)))
               :let [liness (cons ls lss)
                     extractor (if (empty? (filter #(= % "") (flatten liness)))
-                                (plain-list tag-name item-start item-cont-start)
+                                (plain-list tag-name li-start li-cont-start)
                                 wiki)]]
     `[~tag-name ~@(for [lines liness]
                     `[:li ~@(exec-parser extractor lines)])]))
