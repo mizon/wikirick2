@@ -5,7 +5,7 @@
             [zetta.combinators :as c]
             [zetta.parser.seq :as s]))
 
-(declare wiki li-level exec-parser)
+(declare wiki exec-parser)
 
 (defn scan-wiki-links [wiki-source]
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
