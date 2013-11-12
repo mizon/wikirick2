@@ -5,18 +5,17 @@
             [zetta.combinators :as c]
             [zetta.parser.seq :as s]))
 
-(declare wiki li-level)
+(declare wiki li-level do-parse)
 
 (defn scan-wiki-links [wiki-source]
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
 (defn render-wiki-source [wiki-source]
-  (let [source (string/split-lines wiki-source)
-        result (parse-once wiki source)
-        value (:result result)]
-    (if value
-      value
-      result)))
+  (do-parse wiki (string/split-lines wiki-source)))
+
+(defn- do-parse [parser lines]
+  (or (:result (parse-once parser lines))
+      (assert false "do-parse: must not happen")))
 
 (defn- unlines [lines]
   (string/join "\n" lines))
@@ -62,55 +61,56 @@
                   \- [:h2 content]
                   (assert false "must not happen")))))
 
-(declare ul-item-cont)
-
-(defn- ul-item-cont-lines [level]
+(defn- li-cont-lines [li-cont-start]
   (let [indented (try-parser (do-parser [es (c/many empty-line)
                                          [_ content] (match-line #" {4}(.+)")]
                                (if (empty? es)
                                  content
                                  ["" content])))
-        no-indented (not-followed-by (<|> (ul-item-cont level) empty-line))]
+        no-indented (not-followed-by (<|> li-cont-start empty-line))]
     (c/many (<|> indented no-indented))))
 
-(defn- ul-item-cont [level]
-  (do-parser [[_ l] (match-line (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" level)))
-              ls (ul-item-cont-lines level)
+(defn- list-item [li-start li-cont-start]
+  (do-parser [[level l] li-start
+              ls (li-cont-lines (li-cont-start level))
+              blanks (c/many empty-line)]
+    [level (flatten (if (empty? blanks)
+                      (cons l ls)
+                      (list* "" l ls)))]))
+
+(defn- list-item-cont [li-cont-start]
+  (do-parser [[_ l] li-cont-start
+              ls (li-cont-lines li-cont-start)
               blanks (c/many empty-line)]
     (flatten (if (empty? blanks)
                (cons l ls)
                (list* "" l ls)))))
 
-(def- ul-item
-  (let [start (do-parser [[_ spaces content] (match-line #"( {0,3})[\*\+\-]\s+(.*)")]
-                [(count spaces) content])]
-    (do-parser [[level l] start
-                ls (ul-item-cont-lines level)
-                blanks (c/many empty-line)]
-      [level (flatten (if (empty? blanks)
-                        (cons l ls)
-                        (list* "" l ls)))])))
+(defn- li-plain-lines [li-start]
+  (do-parser [lines (c/many1 (not-followed-by li-start))]
+    (unlines (map #(.trim %) lines))))
 
-(declare ul-plain-lines)
+(declare list-parser)
+
+(defn- plain-list [tag-name item-start item-cont-start]
+  (c/many (<|> (list-parser tag-name item-start item-cont-start)
+               (li-plain-lines item-start))))
+
+(defn- list-parser [tag-name item-start item-cont-start]
+  (do-parser [[level ls] (list-item item-start item-cont-start)
+              lss (c/many (list-item-cont (item-cont-start level)))
+              :let [liness (cons ls lss)
+                    extractor (if (empty? (filter #(= % "") (flatten liness)))
+                                (plain-list tag-name item-start item-cont-start)
+                                wiki)]]
+    `[~tag-name ~@(for [lines liness]
+                    `[:li ~@(do-parse extractor lines)])]))
 
 (def- unordered-list
-  (letfn [(plain-mode [liness]
-            (for [lines liness]
-              `[:li ~@(:result (parse-once (c/many (<|> unordered-list ul-plain-lines)) lines))]))
-
-          (paragraph-mode [liness]
-            (for [lines liness]
-              `[:li ~@(:result (parse-once wiki lines))]))]
-    (do-parser [[level ls] ul-item
-                lss (c/many (ul-item-cont level))
-                :let [liness (cons ls lss)]]
-      `[:ul ~@(if (empty? (filter #(= % "") (flatten liness)))
-                (plain-mode liness)
-                (paragraph-mode liness))])))
-
-(def- ul-plain-lines
-  (do-parser [lines (c/many1 (not-followed-by unordered-list))]
-    (unlines (map #(.trim %) lines))))
+  (list-parser :ul
+               (do-parser [[_ spaces content] (match-line #"( {0,3})[\*\+\-]\s+(.*)")]
+                 [(count spaces) content])
+               #(match-line (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" %)))))
 
 (def- code
   (do-parser [:let [code-line (<$> first (match-line #"(\t|    )(.+)"))]
@@ -134,11 +134,8 @@
     `(~l ~@ls "")))
 
 (def- blockquote
-  (do-parser [fragments (c/many1 bq-fragment)
-              :let [inners (parse-once wiki (apply concat fragments))]]
-    (if (:result inners)
-      `[:blockquote ~@(:result inners)]
-      (assert false "blockquote: must not happen"))))
+  (do-parser [fragments (c/many1 bq-fragment)]
+    `[:blockquote ~@(do-parse wiki (apply concat fragments))]))
 
 (def- paragraph
   (do-parser [ls (c/many1 (not-followed-by (reduce <|> [unordered-list
