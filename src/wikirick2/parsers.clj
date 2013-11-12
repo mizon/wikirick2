@@ -88,37 +88,43 @@
                (cons l ls)
                (list* "" l ls)))))
 
-(defn- li-plain-lines [li-start]
-  (do-parser [lines (c/many1 (not-followed-by li-start))]
+(declare list-parser ol-start ul-start ordered-list unordered-list)
+
+(def- li-plain-lines
+  (do-parser [lines (c/many1 (not-followed-by (<|> ol-start ul-start)))]
     (unlines (map #(.trim %) lines))))
 
-(declare list-parser)
-
-(defn- plain-list [tag-name item-start item-cont-start]
-  (c/many (<|> (list-parser tag-name item-start item-cont-start)
-               (li-plain-lines item-start))))
+(def- plain-list
+  (c/many (<|> (<|> ordered-list unordered-list)
+               li-plain-lines)))
 
 (defn- list-parser [tag-name li-start li-cont-start]
   (do-parser [[level ls] (list-item li-start li-cont-start)
               lss (c/many (list-item-cont (li-cont-start level)))
               :let [liness (cons ls lss)
                     extractor (if (empty? (filter #(= % "") (flatten liness)))
-                                (plain-list tag-name li-start li-cont-start)
+                                plain-list
                                 wiki)]]
     `[~tag-name ~@(for [lines liness]
                     `[:li ~@(exec-parser extractor lines)])]))
 
-(def- unordered-list
-  (list-parser :ul
-               (do-parser [[_ spaces content] (match-line #"( {0,3})[\*\+\-]\s+(.*)")]
-                 [(count spaces) content])
-               #(match-line (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" %)))))
+(def- ol-start
+  (do-parser [[_ spaces content] (match-line #"( {0,3})\d+\.\s+(.*)")]
+    [(count spaces) content]))
 
 (def- ordered-list
   (list-parser :ol
-               (do-parser [[_ spaces content] (match-line #"( {0,3})\d+\.\s+(.*)")]
-                 [(count spaces) content])
+               ol-start
                #(match-line (re-pattern (format " {%s}\\d+\\.\\s+(.*)" %)))))
+
+(def- ul-start
+  (do-parser [[_ spaces content] (match-line #"( {0,3})[\*\+\-]\s+(.*)")]
+    [(count spaces) content]))
+
+(def- unordered-list
+  (list-parser :ul
+               ul-start
+               #(match-line (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" %)))))
 
 (def- code
   (do-parser [:let [code-line (<$> first (match-line #"(\t|    )(.+)"))]
@@ -146,8 +152,8 @@
     `[:blockquote ~@(exec-parser wiki (apply concat fragments))]))
 
 (def- special
-  (reduce <|> [unordered-list
-               ordered-list
+  (reduce <|> [ordered-list
+               unordered-list
                code
                atx-header
                settext-header

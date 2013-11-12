@@ -142,6 +142,16 @@ foobar
                        [:li "bar"]]]]] "
 1. foo
   2. bar
+")))
+
+    (testing "expands mixed with ul items"
+      (is (render? [[:ol
+                     [:li
+                      "foo"
+                      [:ul
+                       [:li "foobar"]]]]] "
+1. foo
+  * foobar
 "))))
 
   (testing "code block"
