@@ -22,11 +22,18 @@ BarPage -> [[BarPage]]
 (defn- render? [sxml source]
   (= (parsers/render-wiki-source source) sxml))
 
+(defn- render-inline? [sxml source]
+  (= (render? `[[:p ~@sxml]] source)))
+
 (deftest scan-wiki-links
   (testing "scans wiki links from the wiki source"
     (is (= (parsers/scan-wiki-links wiki-source) #{"SomePage" "FooPage" "BarPage"}))))
 
-(deftest render-wiki-source
+(deftest render-wiki-source-inline-level
+  (testing "text"
+    (is (render-inline? ["text"] "text"))))
+
+(deftest render-wiki-source-block-level
   (testing "header"
     (testing "atx style"
       (is (render? [[:h1 "News"]] "# News"))

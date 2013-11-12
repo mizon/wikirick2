@@ -13,15 +13,19 @@
 (defn render-wiki-source [wiki-source]
   (exec-parser wiki (string/split-lines wiki-source)))
 
-(defn- exec-parser [parser lines]
+;;; Utilities
+
+(defn- exec-parser [parser input]
   {:post [(not= % nil)]}
-  (:result (parse-once parser lines)))
+  (:result (parse-once parser input)))
 
 (defn- unlines [lines]
   (string/join "\n" lines))
 
 (defmacro def- [name value]
   (list `def (with-meta name {:private true}) value))
+
+;;; Universal combinators
 
 (defn- match-line [regex]
   (fn [input more err-fn ok-fn]
@@ -45,6 +49,17 @@
             (err-fn* [_ more* _ _]
               (s/any-token input more* err-fn ok-fn))]
       (parser input more err-fn* ok-fn*))))
+
+;;; Inline elements
+
+(def- inline-parser
+  (do-parser [cs (c/many s/any-token)]
+    (apply str cs)))
+
+(defn- inline [text]
+  (exec-parser inline-parser (h text)))
+
+;;; Block elements
 
 (def- empty-line
   (match-line #"\s*"))
@@ -88,38 +103,39 @@
                (cons l ls)
                (list* "" l ls)))))
 
-(declare list-parser ol-start ul-start ordered-list unordered-list)
+(def- ol-start
+  (do-parser [[_ spaces content] (match-line #"( {0,3})\d+\.\s+(.*)")]
+    [(count spaces) content]))
+
+(def- ul-start
+  (do-parser [[_ spaces content] (match-line #"( {0,3})[\*\+\-]\s+(.*)")]
+    [(count spaces) content]))
 
 (def- li-plain-lines
   (do-parser [lines (c/many1 (not-followed-by (<|> ol-start ul-start)))]
     (unlines (map #(.trim %) lines))))
 
+(declare ordered-list unordered-list)
+
 (def- plain-list
-  (c/many (<|> (<|> ordered-list unordered-list)
-               li-plain-lines)))
+  (delay (c/many (c/choice [li-plain-lines
+                            ordered-list
+                            unordered-list]))))
 
 (defn- list-parser [tag-name li-start li-cont-start]
   (do-parser [[level ls] (list-item li-start li-cont-start)
               lss (c/many (list-item-cont (li-cont-start level)))
               :let [liness (cons ls lss)
                     extractor (if (empty? (filter #(= % "") (flatten liness)))
-                                plain-list
+                                @plain-list
                                 wiki)]]
     `[~tag-name ~@(for [lines liness]
                     `[:li ~@(exec-parser extractor lines)])]))
-
-(def- ol-start
-  (do-parser [[_ spaces content] (match-line #"( {0,3})\d+\.\s+(.*)")]
-    [(count spaces) content]))
 
 (def- ordered-list
   (list-parser :ol
                ol-start
                #(match-line (re-pattern (format " {%s}\\d+\\.\\s+(.*)" %)))))
-
-(def- ul-start
-  (do-parser [[_ spaces content] (match-line #"( {0,3})[\*\+\-]\s+(.*)")]
-    [(count spaces) content]))
 
 (def- unordered-list
   (list-parser :ul
@@ -152,17 +168,17 @@
     `[:blockquote ~@(exec-parser wiki (apply concat fragments))]))
 
 (def- special
-  (reduce <|> [ordered-list
-               unordered-list
-               code
-               atx-header
-               settext-header
-               blockquote
-               empty-line]))
+  (c/choice [ordered-list
+             unordered-list
+             code
+             atx-header
+             settext-header
+             blockquote
+             empty-line]))
 
 (def- paragraph
   (do-parser [ls (c/many1 (not-followed-by special))]
-    [:p (unlines (map #(.trim %) ls))]))
+    [:p (unlines (map #(inline (.trim %)) ls))]))
 
 (def- block
   (<|> special paragraph))
