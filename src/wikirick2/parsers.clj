@@ -31,7 +31,7 @@
         (ok-fn (rest input) more matched)
         (err-fn input more [] "match-line")))))
 
-(defn- try-parser [parser]
+(defn- trying [parser]
   (fn [input more err-fn ok-fn]
     (letfn [(err-fn* [_ more* stack msg]
               (err-fn input more* stack msg))]
@@ -54,21 +54,23 @@
     [(keyword (str "h" (count syms))) content]))
 
 (def- settext-header
-  (try-parser (do-parser [content s/any-token
-                          [_ underline] (match-line #"(=+|-+) *")]
-                (case (first underline)
-                  \= [:h1 content]
-                  \- [:h2 content]
-                  (assert false "must not happen")))))
+  (trying (do-parser [content s/any-token
+                      [_ underline] (match-line #"(=+|-+) *")]
+            (case (first underline)
+              \= [:h1 content]
+              \- [:h2 content]
+              (assert false "must not happen")))))
+
+(def- li-indented-cont-line
+  (trying (do-parser [es (c/many empty-line)
+                      [_ content] (match-line #" {4}(.+)")]
+            (if (empty? es)
+              content
+              ["" content]))))
 
 (defn- li-cont-lines [li-cont-start]
-  (let [indented (try-parser (do-parser [es (c/many empty-line)
-                                         [_ content] (match-line #" {4}(.+)")]
-                               (if (empty? es)
-                                 content
-                                 ["" content])))
-        no-indented (not-followed-by (<|> li-cont-start empty-line))]
-    (c/many (<|> indented no-indented))))
+  (let [no-indented (not-followed-by (<|> li-cont-start empty-line))]
+    (c/many (<|> li-indented-cont-line no-indented))))
 
 (defn- list-item [li-start li-cont-start]
   (do-parser [[level l] li-start
