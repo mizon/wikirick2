@@ -14,8 +14,8 @@
   (exec-parser wiki (string/split-lines wiki-source)))
 
 (defn- exec-parser [parser lines]
-  (or (:result (parse-once parser lines))
-      (assert false "exec-parser: must not happen")))
+  {:post [(not= % nil)]}
+  (:result (parse-once parser lines)))
 
 (defn- unlines [lines]
   (string/join "\n" lines))
