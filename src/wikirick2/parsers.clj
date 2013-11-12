@@ -73,6 +73,14 @@
         no-indented (not-followed-by (<|> (ul-item-cont level) empty-line))]
     (c/many (<|> indented no-indented))))
 
+(defn- ul-item-cont [level]
+  (do-parser [[_ l] (match-line (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" level)))
+              ls (ul-item-cont-lines level)
+              blanks (c/many empty-line)]
+    (flatten (if (empty? blanks)
+               (cons l ls)
+               (list* "" l ls)))))
+
 (def- ul-item
   (let [start (do-parser [[_ spaces content] (match-line #"( {0,3})[\*\+\-]\s+(.*)")]
                 [(count spaces) content])]
@@ -83,19 +91,7 @@
                         (cons l ls)
                         (list* "" l ls)))])))
 
-(defn- ul-item-cont [level]
-  (do-parser [[_ l] (match-line (re-pattern (format " {%s}[\\*\\+\\-]\\s+(.*)" level)))
-              ls (ul-item-cont-lines level)
-              blanks (c/many empty-line)]
-    (flatten (if (empty? blanks)
-               (cons l ls)
-               (list* "" l ls)))))
-
-(declare unordered-list)
-
-(def- ul-plain-lines
-  (do-parser [lines (c/many1 (not-followed-by unordered-list))]
-    (unlines (map #(.trim %) lines))))
+(declare ul-plain-lines)
 
 (def- unordered-list
   (letfn [(plain-mode [liness]
@@ -111,6 +107,10 @@
       `[:ul ~@(if (empty? (filter #(= % "") (flatten liness)))
                 (plain-mode liness)
                 (paragraph-mode liness))])))
+
+(def- ul-plain-lines
+  (do-parser [lines (c/many1 (not-followed-by unordered-list))]
+    (unlines (map #(.trim %) lines))))
 
 (def- code
   (do-parser [:let [code-line (<$> first (match-line #"(\t|    )(.+)"))]
