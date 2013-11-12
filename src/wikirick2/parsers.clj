@@ -5,17 +5,17 @@
             [zetta.combinators :as c]
             [zetta.parser.seq :as s]))
 
-(declare wiki li-level do-parse)
+(declare wiki li-level exec-parser)
 
 (defn scan-wiki-links [wiki-source]
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
 (defn render-wiki-source [wiki-source]
-  (do-parse wiki (string/split-lines wiki-source)))
+  (exec-parser wiki (string/split-lines wiki-source)))
 
-(defn- do-parse [parser lines]
+(defn- exec-parser [parser lines]
   (or (:result (parse-once parser lines))
-      (assert false "do-parse: must not happen")))
+      (assert false "exec-parser: must not happen")))
 
 (defn- unlines [lines]
   (string/join "\n" lines))
@@ -104,7 +104,7 @@
                                 (plain-list tag-name item-start item-cont-start)
                                 wiki)]]
     `[~tag-name ~@(for [lines liness]
-                    `[:li ~@(do-parse extractor lines)])]))
+                    `[:li ~@(exec-parser extractor lines)])]))
 
 (def- unordered-list
   (list-parser :ul
@@ -135,7 +135,7 @@
 
 (def- blockquote
   (do-parser [fragments (c/many1 bq-fragment)]
-    `[:blockquote ~@(do-parse wiki (apply concat fragments))]))
+    `[:blockquote ~@(exec-parser wiki (apply concat fragments))]))
 
 (def- paragraph
   (do-parser [ls (c/many1 (not-followed-by (reduce <|> [unordered-list
