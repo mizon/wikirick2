@@ -84,11 +84,16 @@
                       ref-id (surround (s/char \[) (s/char \]))]
             [:a {:href (h ref-id)} (h title)])))
 
+(def- inline-code
+  (do-parser [content (surround (s/char\`) (s/char \`))]
+    [:code (h content)]))
+
 (def- text
   (do-parser [cs (c/many1 (not-followed-by (c/choice [inline-link
                                                       reference-link
                                                       strong
-                                                      emphasis])))]
+                                                      emphasis
+                                                      inline-code])))]
     (h (apply str cs))))
 
 (def- inline-parser
@@ -96,7 +101,8 @@
                      inline-link
                      reference-link
                      strong
-                     emphasis])))
+                     emphasis
+                     inline-code])))
 
 (defn- inline [text]
   (exec-parser inline-parser text))
@@ -187,7 +193,7 @@
 (def- code-line
   (<$> first (match-line #"(\t|    )(.+)")))
 
-(def- code
+(def- block-code
   (do-parser [:let [trim-left #(.replaceAll % "^(\t|    )" "")
                     trim-right #(.replaceAll % "\\s*$" "")]
               l code-line
@@ -214,7 +220,7 @@
 (def- special
   (c/choice [ordered-list
              unordered-list
-             code
+             block-code
              atx-header
              settext-header
              blockquote

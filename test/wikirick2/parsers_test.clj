@@ -41,7 +41,10 @@ BarPage -> [[BarPage]]
 
   (testing "emphasis"
     (is (render-inline? [[:em "important"]] "*important*"))
-    (is (render-inline? [[:em "important"]] "_important_"))))
+    (is (render-inline? [[:em "important"]] "_important_")))
+
+  (testing "code"
+    (is (render-inline? [[:code "printf(&quot;hello&quot;);"]] "`printf(\"hello\");`"))))
 
 (deftest render-wiki-source-block-level
   (testing "header"
