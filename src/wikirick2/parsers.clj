@@ -50,14 +50,56 @@
               (s/any-token input more* err-fn ok-fn))]
       (parser input more err-fn* ok-fn*))))
 
+(defn- surround [start end]
+  (trying (do-parser [_ start
+                      cs (c/many (not-followed-by end))
+                      _ end]
+            (apply str cs))))
+
 ;;; Inline elements
 
+(def- link-title
+  (surround (s/char \[) (s/char \])))
+
+(def- inline-link
+  (trying (do-parser [title link-title
+                      _ (s/char \()
+                      url (c/many (not-followed-by (<|> (s/char \)) (s/char \"))))
+                      _ (c/option nil (surround (s/char \") (s/char \")))
+                      _ (s/char \))]
+            [:a {:href (h (.trim (apply str url)))} (h title)])))
+
+(def- strong
+  (do-parser [content (<|> (surround (s/string "**") (s/string "**"))
+                           (surround (s/string "__") (s/string "__")))]
+    [:strong (h content)]))
+
+(def- emphasis
+  (do-parser [content (<|> (surround (s/char \*) (s/char \*))
+                           (surround (s/char \_) (s/char\_)))]
+    [:em (h content)]))
+
+(def- reference-link
+  (trying (do-parser [title link-title
+                      ref-id (surround (s/char \[) (s/char \]))]
+            [:a {:href (h ref-id)} (h title)])))
+
+(def- text
+  (do-parser [cs (c/many1 (not-followed-by (c/choice [inline-link
+                                                      reference-link
+                                                      strong
+                                                      emphasis])))]
+    (h (apply str cs))))
+
 (def- inline-parser
-  (do-parser [cs (c/many s/any-token)]
-    (apply str cs)))
+  (c/many (c/choice [text
+                     inline-link
+                     reference-link
+                     strong
+                     emphasis])))
 
 (defn- inline [text]
-  (exec-parser inline-parser (h text)))
+  (exec-parser inline-parser text))
 
 ;;; Block elements
 
@@ -66,14 +108,14 @@
 
 (def- atx-header
   (do-parser [[_ syms content] (match-line #"(#{1,6}) *(.*?) *#*")]
-    [(keyword (str "h" (count syms))) content]))
+    `[~(keyword (str "h" (count syms))) ~@(inline content)]))
 
 (def- settext-header
   (trying (do-parser [content s/any-token
                       [_ underline] (match-line #"(=+|-+) *")]
             (case (first underline)
-              \= [:h1 content]
-              \- [:h2 content]
+              \= `[:h1 ~@(inline content)]
+              \- `[:h2 ~@(inline content)]
               (assert false "must not happen")))))
 
 (def- li-indented-cont-line
@@ -113,14 +155,14 @@
 
 (def- li-plain-lines
   (do-parser [lines (c/many1 (not-followed-by (<|> ol-start ul-start)))]
-    (unlines (map #(.trim %) lines))))
+    (inline (unlines (map #(.trim %) lines)))))
 
 (declare ordered-list unordered-list)
 
 (def- plain-list
-  (delay (c/many (c/choice [li-plain-lines
-                            ordered-list
-                            unordered-list]))))
+  (delay (c/many (<|> li-plain-lines
+                      (<$> list (<|> ordered-list
+                                     unordered-list))))))
 
 (defn- list-parser [tag-name li-start li-cont-start]
   (do-parser [[level ls] (list-item li-start li-cont-start)
@@ -128,9 +170,9 @@
               :let [liness (cons ls lss)
                     extractor (if (empty? (filter #(= % "") (flatten liness)))
                                 @plain-list
-                                wiki)]]
+                                (<$> list wiki))]]
     `[~tag-name ~@(for [lines liness]
-                    `[:li ~@(exec-parser extractor lines)])]))
+                    `[:li ~@(apply concat (exec-parser extractor lines))])]))
 
 (def- ordered-list
   (list-parser :ol
@@ -151,7 +193,7 @@
               l code-line
               ls (c/many (<|> code-line empty-line))
               :let [code-lines (cons l ls)]]
-    [:pre [:code (trim-right (unlines (map trim-left code-lines)))]]))
+    [:pre [:code (h (trim-right (unlines (map trim-left code-lines))))]]))
 
 (def- bq-marked-line
   (<$> second (match-line #"\s*> ?(.*)")))
@@ -180,7 +222,7 @@
 
 (def- paragraph
   (do-parser [ls (c/many1 (not-followed-by special))]
-    [:p (unlines (map #(inline (.trim %)) ls))]))
+    `[:p ~@(inline (unlines ls))]))
 
 (def- block
   (<|> special paragraph))

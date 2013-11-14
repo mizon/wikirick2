@@ -15,15 +15,11 @@ BarPage -> [[BarPage]]
 [[SomePage]] is funny.
 ")
 
-(use-fixtures :each
-  (fn [example]
-    (example)))
-
 (defn- render? [sxml source]
   (= (parsers/render-wiki-source source) sxml))
 
 (defn- render-inline? [sxml source]
-  (= (render? `[[:p ~@sxml]] source)))
+  (render? `[[:p ~@sxml]] source))
 
 (deftest scan-wiki-links
   (testing "scans wiki links from the wiki source"
@@ -31,7 +27,21 @@ BarPage -> [[BarPage]]
 
 (deftest render-wiki-source-inline-level
   (testing "text"
-    (is (render-inline? ["text"] "text"))))
+    (is (render-inline? ["text &amp; text"] "text & text")))
+
+  (testing "inline link"
+    (is (render-inline? [[:a {:href "http://www.w3.org/"} "W3C"]]
+                        "[W3C](http://www.w3.org/)"))
+    (is (render-inline? [[:a {:href "http://www.w3.org/"} "W3C"]]
+                        "[W3C](http://www.w3.org/ \"World Wide Web Consortium\")")))
+
+  (testing "strong"
+    (is (render-inline? [[:strong "important!"]] "**important!**"))
+    (is (render-inline? [[:strong "important!"]] "__important!__")))
+
+  (testing "emphasis"
+    (is (render-inline? [[:em "important"]] "*important*"))
+    (is (render-inline? [[:em "important"]] "_important_"))))
 
 (deftest render-wiki-source-block-level
   (testing "header"
@@ -164,7 +174,7 @@ foobar
   (testing "code block"
     (is (render? [[:pre
                    [:code
-                    "#include <stdio.h>\n\nint main(void)\n{\n    return 0;\n}"]]] "
+                    "#include &lt;stdio.h&gt;\n\nint main(void)\n{\n    return 0;\n}"]]] "
     #include <stdio.h>
 
     int main(void)
