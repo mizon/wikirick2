@@ -241,12 +241,15 @@ bar
 "))))
 
   (testing "expands some elements"
-    (is (render? [[:h1 "Section"] [:h2 "Subsection"] [:p "foobar"]] "
+    (is (render? [[:h1 "Section"] [:h2 "Subsection"] [:ul [:li "foo"] [:li "bar"]] [:p "foobar"]] "
 Section
 =======
 
 Subsection
 ----------
+
+* foo
+* bar
 
 foobar
 "))))

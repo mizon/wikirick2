@@ -151,7 +151,7 @@
 
 ;;; Block elements
 
-(def- empty-line
+(def- blank-line
   (match-line #"\s*"))
 
 (def- atx-header
@@ -167,28 +167,25 @@
               (assert false "must not happen")))))
 
 (def- li-indented-cont-line
-  (trying (do-parser [es (c/many empty-line)
+  (trying (do-parser [es (c/many blank-line)
                       [_ content] (match-line #" {4}(.+)")]
             (if (empty? es)
               content
               ["" content]))))
 
 (defn- li-cont-lines [li-cont-start]
-  (let [no-indented (not-followed-by (<|> li-cont-start empty-line))]
+  (let [no-indented (not-followed-by (<|> li-cont-start blank-line))]
     (c/many (<|> li-indented-cont-line no-indented))))
 
 (defn- list-item [li-start li-cont-start]
   (do-parser [[level l] li-start
-              ls (li-cont-lines (li-cont-start level))
-              blanks (c/many empty-line)]
-    [level (flatten (if (empty? blanks)
-                      (cons l ls)
-                      (list* "" l ls)))]))
+              ls (li-cont-lines (li-cont-start level))]
+    [level (flatten (cons l ls))]))
 
 (defn- list-item-cont [li-cont-start]
-  (do-parser [[_ l] li-cont-start
-              ls (li-cont-lines li-cont-start)
-              blanks (c/many empty-line)]
+  (do-parser [blanks (c/many blank-line)
+              [_ l] li-cont-start
+              ls (li-cont-lines li-cont-start)]
     (flatten (if (empty? blanks)
                (cons l ls)
                (list* "" l ls)))))
@@ -239,7 +236,7 @@
   (do-parser [:let [trim-left #(.replaceAll % "^(\t|    )" "")
                     trim-right #(.replaceAll % "\\s*$" "")]
               l code-line
-              ls (c/many (<|> code-line empty-line))
+              ls (c/many (<|> code-line blank-line))
               :let [code-lines (cons l ls)]]
     [:pre [:code (h (trim-right (unlines (map trim-left code-lines))))]]))
 
@@ -247,12 +244,12 @@
   (<$> second (match-line #"\s*> ?(.*)")))
 
 (def- bq-no-marked-line
-  (not-followed-by empty-line))
+  (not-followed-by blank-line))
 
 (def- bq-fragment
   (do-parser [l bq-marked-line
               ls (c/many (<|> bq-marked-line bq-no-marked-line))
-              _ (c/skip-many empty-line)]
+              _ (c/skip-many blank-line)]
     `(~l ~@ls "")))
 
 (def- blockquote
@@ -266,7 +263,7 @@
              atx-header
              settext-header
              blockquote
-             empty-line]))
+             blank-line]))
 
 (def- paragraph
   (do-parser [ls (c/many1 (not-followed-by special))]
@@ -276,7 +273,7 @@
   (<|> special paragraph))
 
 (def- wiki
-  (do-parser [bs (c/many (*> (c/many empty-line) block))
-              _ (c/many empty-line)
+  (do-parser [bs (c/many (*> (c/many blank-line) block))
+              _ (c/many blank-line)
               _ s/end-of-input]
     bs))
