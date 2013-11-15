@@ -86,6 +86,10 @@
 (def- link-body
   (surround (s/char \[) (s/char \])))
 
+(def- inline-link-url
+  (do-parser [cs (c/many (not-followed-by (<|> (s/char \)) (s/char \"))))]
+    (.trim (apply str cs))))
+
 (def- inline-link-title
   (c/option nil (do-parser [_ (s/char \")
                             cs (c/many (not-followed-by (s/char \")))
@@ -95,13 +99,12 @@
 (def- inline-link
   (trying (do-parser [body link-body
                       _ (s/char \()
-                      url (c/many (not-followed-by (<|> (s/char \)) (s/char \"))))
+                      url inline-link-url
                       title inline-link-title
                       _ (s/char \))]
-            (let [href (.trim (apply str url))
-                  attrs (if title
-                          {:href href :title title}
-                          {:href href})]
+            (let [attrs (if title
+                          {:href url :title title}
+                          {:href url})]
               [:a attrs (h body)]))))
 
 (def- reference-link
