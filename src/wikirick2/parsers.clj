@@ -50,13 +50,16 @@
               (s/any-token input more* err-fn ok-fn))]
       (parser input more err-fn* ok-fn*))))
 
+;;; Inline elements
+
+(def- escaped
+  (trying (>> (s/char \\) s/any-token)))
+
 (defn- surround [start end]
   (trying (do-parser [_ start
-                      cs (c/many (not-followed-by end))
+                      cs (c/many (<|> escaped (not-followed-by end)))
                       _ end]
             (apply str cs))))
-
-;;; Inline elements
 
 (def- link-title
   (surround (s/char \[) (s/char \])))
@@ -89,11 +92,12 @@
     [:code (h content)]))
 
 (def- text
-  (do-parser [cs (c/many1 (not-followed-by (c/choice [inline-link
-                                                      reference-link
-                                                      strong
-                                                      emphasis
-                                                      inline-code])))]
+  (do-parser [cs (c/many1 (<|> escaped
+                               (not-followed-by (c/choice [inline-link
+                                                           reference-link
+                                                           strong
+                                                           emphasis
+                                                           inline-code]))))]
     (h (apply str cs))))
 
 (def- inline-parser

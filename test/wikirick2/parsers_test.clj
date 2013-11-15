@@ -27,7 +27,9 @@ BarPage -> [[BarPage]]
 
 (deftest render-wiki-source-inline-level
   (testing "text"
-    (is (render-inline? ["text &amp; text"] "text & text")))
+    (is (render-inline? ["text &amp; text"] "text & text"))
+    (is (render-inline? ["text ** __ * _"] "text \\*\\* \\_\\_ \\* \\_"))
+    (is (render-inline? ["text\\text"] "text\\\\text")))
 
   (testing "inline link"
     (is (render-inline? [[:a {:href "http://www.w3.org/"} "W3C"]]
@@ -37,11 +39,13 @@ BarPage -> [[BarPage]]
 
   (testing "strong"
     (is (render-inline? [[:strong "important!"]] "**important!**"))
-    (is (render-inline? [[:strong "important!"]] "__important!__")))
+    (is (render-inline? [[:strong "important!"]] "__important!__"))
+    (is (render-inline? [[:strong "**important!**"]] "**\\*\\*important!\\*\\***")))
 
   (testing "emphasis"
     (is (render-inline? [[:em "important"]] "*important*"))
-    (is (render-inline? [[:em "important"]] "_important_")))
+    (is (render-inline? [[:em "important"]] "_important_"))
+    (is (render-inline? [[:em "_important_"]] "_\\_important\\__")))
 
   (testing "code"
     (is (render-inline? [[:code "printf(&quot;hello&quot;);"]] "`printf(\"hello\");`"))))
