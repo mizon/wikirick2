@@ -34,8 +34,26 @@ BarPage -> [[BarPage]]
   (testing "inline link"
     (is (render-inline? [[:a {:href "http://www.w3.org/"} "W3C"]]
                         "[W3C](http://www.w3.org/)"))
-    (is (render-inline? [[:a {:href "http://www.w3.org/"} "W3C"]]
+    (is (render-inline? [[:a {:href "http://www.w3.org/" :title "World Wide Web Consortium"} "W3C"]]
                         "[W3C](http://www.w3.org/ \"World Wide Web Consortium\")")))
+
+  (testing "reference link"
+    (is (render-inline? [[:a {:href "http://www.w3.org/"} "W3C"]] "
+[W3C][]
+
+[W3C]: http://www.w3.org/
+"))
+    (is (render-inline? [[:a {:href "http://www.w3.org/"} "W3C"]] "
+[W3C][1]
+
+  [1]:http://www.w3.org/ 
+"))
+    (is (render-inline? ["[W3C][]"] "[W3C][]"))
+    (is (render-inline? [[:a {:href "http://www.w3.org/" :title "World Wide Web Consortium"} "W3C"]] "
+[W3C][]
+
+[w3c]: http://www.w3.org/ \"World Wide Web Consortium\"
+")))
 
   (testing "strong"
     (is (render-inline? [[:strong "important!"]] "**important!**"))

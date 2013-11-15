@@ -5,15 +5,19 @@
             [zetta.combinators :as c]
             [zetta.parser.seq :as s]))
 
-(declare wiki exec-parser)
+(declare wiki exec-parser collect-references)
 
 (defn scan-wiki-links [wiki-source]
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
-(defn render-wiki-source [wiki-source]
-  (exec-parser wiki (string/split-lines wiki-source)))
+(def ^:dynamic reference-map {})
 
-;;; Utilities
+(defn render-wiki-source [wiki-source]
+  (let [[refs lines] (collect-references (string/split-lines wiki-source))]
+    (binding [reference-map refs]
+      (exec-parser wiki lines))))
+
+;;; Helpers
 
 (defn- exec-parser [parser input]
   {:post [(not= % nil)]}
@@ -24,6 +28,24 @@
 
 (defmacro def- [name value]
   (list `def (with-meta name {:private true}) value))
+
+(def- reference-definition-re #"\s*\[(.*)\]:\s*(.+?)\s*(\".*\")?\s*")
+
+(defn- strip-double-quotes [s]
+  (second (re-matches #"\"(.*)\"" s)))
+
+(defn- collect-references [lines]
+  (reduce (fn [[map ls] l]
+            (let [[_ key href title] (re-matches reference-definition-re l)]
+              (if key
+                (let [key- (.toLowerCase key)
+                      ref (if title
+                            {:href (h href) :title (h (strip-double-quotes title))}
+                            {:href (h href)})]
+                  [(assoc map key- ref) ls])
+                [map (conj ls l)])))
+          [{} []]
+          lines))
 
 ;;; Universal combinators
 
@@ -61,16 +83,20 @@
                       _ end]
             (apply str cs))))
 
-(def- link-title
+(def- link-body
   (surround (s/char \[) (s/char \])))
 
 (def- inline-link
-  (trying (do-parser [title link-title
+  (trying (do-parser [body link-body
                       _ (s/char \()
                       url (c/many (not-followed-by (<|> (s/char \)) (s/char \"))))
-                      _ (c/option nil (surround (s/char \") (s/char \")))
+                      title (c/option nil (surround (s/char \") (s/char \")))
                       _ (s/char \))]
-            [:a {:href (h (.trim (apply str url)))} (h title)])))
+            (let [href (h (.trim (apply str url)))
+                  attrs (if title
+                          {:href href :title (h title)}
+                          {:href href})]
+              [:a attrs (h body)]))))
 
 (def- strong
   (do-parser [content (<|> (surround (s/string "**") (s/string "**"))
@@ -83,9 +109,15 @@
     [:em (h content)]))
 
 (def- reference-link
-  (trying (do-parser [title link-title
-                      ref-id (surround (s/char \[) (s/char \]))]
-            [:a {:href (h ref-id)} (h title)])))
+  (trying (do-parser [body link-body
+                      key (surround (s/char \[) (s/char \]))
+                      :let [key- (.toLowerCase (if (empty? key)
+                                                 body
+                                                 key))
+                            ref (reference-map key-)]
+                      :cond [ref []
+                             :else [_ (fail-parser "No reference definition is found")]]]
+            [:a ref (h body)])))
 
 (def- inline-code
   (do-parser [content (surround (s/char\`) (s/char \`))]
