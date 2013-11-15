@@ -165,7 +165,7 @@
 
 (declare ordered-list unordered-list)
 
-(def- plain-list
+(def- li-plain
   (delay (c/many (<|> li-plain-lines
                       (<$> list (<|> ordered-list
                                      unordered-list))))))
@@ -175,7 +175,7 @@
               lss (c/many (list-item-cont (li-cont-start level)))
               :let [liness (cons ls lss)
                     extractor (if (empty? (filter #(= % "") (flatten liness)))
-                                @plain-list
+                                @li-plain
                                 (<$> list wiki))]]
     `[~tag-name ~@(for [lines liness]
                     `[:li ~@(apply concat (exec-parser extractor lines))])]))
