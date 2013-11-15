@@ -27,7 +27,6 @@ BarPage -> [[BarPage]]
 
 (deftest render-wiki-source-inline-level
   (testing "text"
-    (is (render-inline? ["text &amp; text"] "text & text"))
     (is (render-inline? ["text ** __ * _"] "text \\*\\* \\_\\_ \\* \\_"))
     (is (render-inline? ["text\\text"] "text\\\\text")))
 
@@ -66,7 +65,20 @@ BarPage -> [[BarPage]]
     (is (render-inline? [[:em "_important_"]] "_\\_important\\__")))
 
   (testing "code"
-    (is (render-inline? [[:code "printf(&quot;hello&quot;);"]] "`printf(\"hello\");`"))))
+    (is (render-inline? [[:code "printf(&quot;hello&quot;);"]] "`printf(\"hello\");`")))
+
+  (testing "html escapes"
+    (is (render-inline? ["foo&amp;bar"] "foo&bar"))
+    (is (render-inline? [[:em "foo&amp;bar"]] "*foo&bar*"))
+    (is (render-inline? [[:strong "foo&amp;bar"]] "**foo&bar**"))
+    (is (render-inline? [[:code "foo&amp;bar"]] "`foo&bar`"))
+    (is (render-inline? [[:a {:href "http://www.w3.org/?k0=v0&k1=v1" :title "W3C&"} "W3C&amp;"]]
+                        "[W3C&](http://www.w3.org/?k0=v0&k1=v1 \"W3C&\")"))
+    (is (render-inline? [[:a {:href "http://www.w3.org/?k0=v0&k1=v1" :title "W3C&"} "W3C&amp;"]] "
+[W3C&][]
+
+[W3C&]: http://www.w3.org/?k0=v0&k1=v1 \"W3C&\"
+"))))
 
 (deftest render-wiki-source-block-level
   (testing "header"

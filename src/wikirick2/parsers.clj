@@ -40,8 +40,8 @@
               (if key
                 (let [key- (.toLowerCase key)
                       ref (if title
-                            {:href (h href) :title (h (strip-double-quotes title))}
-                            {:href (h href)})]
+                            {:href href :title (strip-double-quotes title)}
+                            {:href href})]
                   [(assoc map key- ref) ls])
                 [map (conj ls l)])))
           [{} []]
@@ -98,9 +98,9 @@
                       url (c/many (not-followed-by (<|> (s/char \)) (s/char \"))))
                       title inline-link-title
                       _ (s/char \))]
-            (let [href (h (.trim (apply str url)))
+            (let [href (.trim (apply str url))
                   attrs (if title
-                          {:href href :title (h title)}
+                          {:href href :title title}
                           {:href href})]
               [:a attrs (h body)]))))
 
