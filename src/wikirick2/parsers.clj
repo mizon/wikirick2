@@ -86,27 +86,23 @@
 (def- link-body
   (surround (s/char \[) (s/char \])))
 
+(def- inline-link-title
+  (c/option nil (do-parser [_ (s/char \")
+                            cs (c/many (not-followed-by (s/char \")))
+                            _ (s/char \")]
+                  (apply str cs))))
+
 (def- inline-link
   (trying (do-parser [body link-body
                       _ (s/char \()
                       url (c/many (not-followed-by (<|> (s/char \)) (s/char \"))))
-                      title (c/option nil (surround (s/char \") (s/char \")))
+                      title inline-link-title
                       _ (s/char \))]
             (let [href (h (.trim (apply str url)))
                   attrs (if title
                           {:href href :title (h title)}
                           {:href href})]
               [:a attrs (h body)]))))
-
-(def- strong
-  (do-parser [content (<|> (surround (s/string "**") (s/string "**"))
-                           (surround (s/string "__") (s/string "__")))]
-    [:strong (h content)]))
-
-(def- emphasis
-  (do-parser [content (<|> (surround (s/char \*) (s/char \*))
-                           (surround (s/char \_) (s/char\_)))]
-    [:em (h content)]))
 
 (def- reference-link
   (trying (do-parser [body link-body
@@ -118,6 +114,16 @@
                       :cond [ref []
                              :else [_ (fail-parser "No reference definition is found")]]]
             [:a ref (h body)])))
+
+(def- strong
+  (do-parser [content (<|> (surround (s/string "**") (s/string "**"))
+                           (surround (s/string "__") (s/string "__")))]
+    [:strong (h content)]))
+
+(def- emphasis
+  (do-parser [content (<|> (surround (s/char \*) (s/char \*))
+                           (surround (s/char \_) (s/char\_)))]
+    [:em (h content)]))
 
 (def- inline-code
   (do-parser [content (surround (s/char\`) (s/char \`))]
