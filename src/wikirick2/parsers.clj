@@ -13,20 +13,17 @@
 (def ^:dynamic *reference-map* {})
 (def ^:dynamic *expand-wiki-page-link* nil)
 
-(defn render-wiki-source [wiki-source]
-  (let [[refs lines] (collect-references (string/split-lines wiki-source))]
-    (binding [*reference-map* refs]
-      (exec-parser wiki lines))))
+(defn make-wiki-source-renderer [expand-wiki-page-link]
+  (fn [wiki-source]
+    (let [[refs lines] (collect-references (string/split-lines wiki-source))]
+      (binding [*reference-map* refs
+                *expand-wiki-page-link* expand-wiki-page-link]
+        (exec-parser wiki lines)))))
 
 (defn valid-page-name? [name]
   (and (not (empty? name))
        (not (re-find #"([\.\t\[\]<>\|\?\r\n]|  )" name))
        (= (.trim name) name)))
-
-(defn make-wiki-source-renderer [expand-wiki-page-link]
-  (fn [wiki-source]
-    (binding [*expand-wiki-page-link* expand-wiki-page-link]
-      (render-wiki-source wiki-source))))
 
 ;;; Helpers
 
