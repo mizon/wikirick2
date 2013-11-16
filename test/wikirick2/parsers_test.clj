@@ -15,8 +15,10 @@ BarPage -> [[BarPage]]
 [[SomePage]] is funny.
 ")
 
+(def render-wiki-source (parsers/make-wiki-source-renderer #(format "/wiki/%s" %)))
+
 (defn- render? [sxml source]
-  (= (parsers/render-wiki-source source) sxml))
+  (= (render-wiki-source source) sxml))
 
 (defn- render-inline? [sxml source]
   (render? `[[:p ~@sxml]] source))
@@ -31,6 +33,7 @@ BarPage -> [[BarPage]]
          "foobar"
          "foo bar")
     (are [wiki-link-name] (not (parsers/valid-page-name? wiki-link-name))
+         ""
          " foobar"
          "foobar "
          "foo  bar"
@@ -73,6 +76,10 @@ BarPage -> [[BarPage]]
 [w3c]: http://www.w3.org/ \"World Wide Web Consortium\"
 ")))
 
+  (testing "wiki page link"
+    (is (render-inline? [[:a {:href "/wiki/FooPage" :title "FooPage"} "FooPage"]] "[[FooPage]]"))
+    (is (render-inline? ["[[Foo.Page]]"] "[[Foo.Page]]")))
+
   (testing "strong"
     (is (render-inline? [[:strong "important!"]] "**important!**"))
     (is (render-inline? [[:strong "important!"]] "__important!__"))
@@ -97,7 +104,8 @@ BarPage -> [[BarPage]]
 [W3C&][]
 
 [W3C&]: http://www.w3.org/?k0=v0&k1=v1 \"W3C&\"
-"))))
+"))
+    (is (render-inline? [[:a {:href "/wiki/foo&" :title "foo&"} "foo&amp;"]] "[[foo&]]"))))
 
 (deftest render-wiki-source-block-level
   (testing "header"

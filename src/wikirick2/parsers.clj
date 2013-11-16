@@ -11,6 +11,7 @@
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
 (def ^:dynamic *reference-map* {})
+(def ^:dynamic *expand-wiki-page-link* nil)
 
 (defn render-wiki-source [wiki-source]
   (let [[refs lines] (collect-references (string/split-lines wiki-source))]
@@ -18,8 +19,14 @@
       (exec-parser wiki lines))))
 
 (defn valid-page-name? [name]
-  (and (not (re-find #"([\.\t\[\]<>\|\?\r\n]|  )" name))
+  (and (not (empty? name))
+       (not (re-find #"([\.\t\[\]<>\|\?\r\n]|  )" name))
        (= (.trim name) name)))
+
+(defn make-wiki-source-renderer [expand-wiki-page-link]
+  (fn [wiki-source]
+    (binding [*expand-wiki-page-link* expand-wiki-page-link]
+      (render-wiki-source wiki-source))))
 
 ;;; Helpers
 
@@ -122,6 +129,16 @@
                              :else [_ (fail-parser "No reference definition is found")]]]
             [:a ref (h body)])))
 
+(def- wiki-page-link
+  (trying (do-parser [_ (s/string "[[")
+                      cs (c/many1 (not-followed-by (s/string "]]")))
+                      :let [page-name (apply str cs)]
+                      :cond [(valid-page-name? page-name) []
+                             :else [_ (fail-parser "Invalid wiki page name")]]
+                      _ (s/string "]]")]
+            [:a {:href (*expand-wiki-page-link* page-name) :title page-name}
+             (h page-name)])))
+
 (def- strong
   (do-parser [content (<|> (surround (s/string "**") (s/string "**"))
                            (surround (s/string "__") (s/string "__")))]
@@ -140,6 +157,7 @@
   (do-parser [cs (c/many1 (<|> escaped
                                (not-followed-by (c/choice [inline-link
                                                            reference-link
+                                                           wiki-page-link
                                                            strong
                                                            emphasis
                                                            inline-code]))))]
@@ -149,6 +167,7 @@
   (c/many (c/choice [text
                      inline-link
                      reference-link
+                     wiki-page-link
                      strong
                      emphasis
                      inline-code])))
