@@ -22,7 +22,7 @@
 
 (defn valid-page-name? [name]
   (and (not (empty? name))
-       (not (re-find #"([\.\t\[\]<>\|\?\r\n]|  )" name))
+       (not (re-find #"([/\.\t\[\]<>\|\?\r\n]|  )" name))
        (= (.trim name) name)))
 
 ;;; Helpers

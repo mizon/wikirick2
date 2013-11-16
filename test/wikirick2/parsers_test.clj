@@ -34,6 +34,7 @@ BarPage -> [[BarPage]]
          "foo bar")
     (are [wiki-link-name] (not (parsers/valid-page-name? wiki-link-name))
          ""
+         "foo/bar"
          " foobar"
          "foobar "
          "foo  bar"
