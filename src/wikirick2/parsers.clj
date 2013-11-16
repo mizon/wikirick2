@@ -17,6 +17,10 @@
     (binding [*reference-map* refs]
       (exec-parser wiki lines))))
 
+(defn valid-wiki-link-name? [name]
+  (and (not (re-find #"([\.\t\[\]<>\|\?\r\n]|  )" name))
+       (= (.trim name) name)))
+
 ;;; Helpers
 
 (defn- exec-parser [parser input]

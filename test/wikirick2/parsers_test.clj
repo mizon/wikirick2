@@ -25,6 +25,25 @@ BarPage -> [[BarPage]]
   (testing "scans wiki links from the wiki source"
     (is (= (parsers/scan-wiki-links wiki-source) #{"SomePage" "FooPage" "BarPage"}))))
 
+(deftest valid-wiki-link-name?
+  (testing "check whether the wiki name is valid or not"
+    (are [wiki-link-name] (parsers/valid-wiki-link-name? wiki-link-name)
+         "foobar"
+         "foo bar")
+    (are [wiki-link-name] (not (parsers/valid-wiki-link-name? wiki-link-name))
+         " foobar"
+         "foobar "
+         "foo  bar"
+         "foo\tbar"
+         "foo[bar"
+         "foo]bar"
+         "foo<bar"
+         "foo>bar"
+         "foo?bar"
+         "foo\rbar"
+         "foo\nbar"
+         "foo.bar")))
+
 (deftest render-wiki-source-inline-level
   (testing "text"
     (is (render-inline? ["text ** __ * _"] "text \\*\\* \\_\\_ \\* \\_"))
