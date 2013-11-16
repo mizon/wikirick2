@@ -11,8 +11,8 @@
   (index-path [self]
     (expand-path self ""))
 
-  (page-path [self page]
-    (expand-path self (concat-paths "w" (.title page))))
+  (page-path [self page-title]
+    (expand-path self (concat-paths "w" page-title)))
 
   (theme-path [self]
     (expand-path self "theme.css"))

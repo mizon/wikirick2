@@ -13,7 +13,7 @@
 
   (testing "expands an page path"
     (let [page (->MockedPage "SomePage" "some content")]
-      (is (= (page-path urlm page) "/w/SomePage"))))
+      (is (= (page-path urlm "SomePage") "/w/SomePage"))))
 
   (testing "expands some pathes"
     (is (= (expand-path urlm "foo") "/foo")))
