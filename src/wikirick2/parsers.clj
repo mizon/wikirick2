@@ -10,11 +10,11 @@
 (defn scan-wiki-links [wiki-source]
   (set (map second (re-seq #"\[\[(.+?)\]\]" wiki-source))))
 
-(def ^:dynamic reference-map {})
+(def ^:dynamic *reference-map* {})
 
 (defn render-wiki-source [wiki-source]
   (let [[refs lines] (collect-references (string/split-lines wiki-source))]
-    (binding [reference-map refs]
+    (binding [*reference-map* refs]
       (exec-parser wiki lines))))
 
 ;;; Helpers
@@ -113,7 +113,7 @@
                       :let [key- (.toLowerCase (if (empty? key)
                                                  body
                                                  key))
-                            ref (reference-map key-)]
+                            ref (*reference-map* key-)]
                       :cond [ref []
                              :else [_ (fail-parser "No reference definition is found")]]]
             [:a ref (h body)])))
