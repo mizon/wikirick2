@@ -11,16 +11,34 @@
   (:import java.sql.SQLException
            java.util.concurrent.locks.ReentrantReadWriteLock))
 
-(defrecord Page [repo db rw-lock title source revision edit-comment]
+(defrecord Page [repo rw-lock title source revision edit-comment]
   IPage
   (save-page [self]
-    (post-page repo self))
+    (letfn [(check-out-rcs-file []
+              (shell/sh "co" "-l" title :dir (.base-dir repo)))
+
+            (update-page-relation []
+              (let [priority (nlinks-per-page-size self)]
+                (jdbc/delete! (.db repo) :page_relation (sql/where {:source title}))
+                (doseq [d (referring-titles self)]
+                  (jdbc/insert! (.db repo)
+                                :page_relation
+                                {:source title
+                                 :destination d
+                                 :priority priority}))))]
+      (jdbc/db-transaction [db (.db repo)]
+        (with-rw-lock writeLock
+          (update-page-relation)
+          (check-out-rcs-file)
+          (let [path (format "%s/%s" (.base-dir repo) title)]
+            (spit path source))
+          (shell/sh "ci" title :in edit-comment :dir (.base-dir repo))))))
 
   (referring-titles [self]
     (parsers/scan-wiki-links source))
 
   (referred-titles [self]
-    (jdbc/query db
+    (jdbc/query (.db repo)
                 (sql/select [:source]
                             :page_relation
                             (sql/where {:destination title})
@@ -45,29 +63,8 @@
           (let [[_ page-name] (re-find #"(.+),v" rcs-file)]
             page-name)))))
 
-  (post-page [self page]
-    (letfn [(check-out-rcs-file []
-              (shell/sh "co" "-l" (.title page) :dir base-dir))
-
-            (update-page-relation []
-              (let [priority (nlinks-per-page-size page)]
-                (jdbc/delete! db :page_relation (sql/where {:source (.title page)}))
-                (doseq [d (referring-titles page)]
-                  (jdbc/insert! db
-                                :page_relation
-                                {:source (.title page)
-                                 :destination d
-                                 :priority priority}))))]
-      (jdbc/db-transaction [_ db]
-        (with-rw-lock writeLock
-          (update-page-relation)
-          (check-out-rcs-file)
-          (let [path (format "%s/%s" base-dir (.title page))]
-            (spit path (.source page)))
-          (shell/sh "ci" (.title page) :in (.edit-comment page) :dir base-dir)))))
-
   (new-page [self title source]
-    (->Page self db rw-lock title source nil nil)))
+    (->Page self rw-lock title source nil nil)))
 
 (defn create-repository [base-dir db]
   (letfn [(table-exists? []
