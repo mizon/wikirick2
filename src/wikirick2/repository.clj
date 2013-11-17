@@ -51,6 +51,7 @@
 
             (update-page-relation []
               (let [priority (nlinks-per-page-size page)]
+                (jdbc/delete! db :page_relation (sql/where {:source (.title page)}))
                 (doseq [d (referring-titles page)]
                   (jdbc/insert! db
                                 :page_relation

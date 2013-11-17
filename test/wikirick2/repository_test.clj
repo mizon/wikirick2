@@ -87,6 +87,15 @@
       (save-page bar-page)
       (is (= (referred-titles some-page) ["FooPage" "BarPage"]))))
 
+  (testing-repo "forgots old referred titles"
+    (let [foo-page (new-page repo "FooPage" "[[BarPage]]")
+          bar-page (new-page repo "BarPage" "some content")]
+      (save-page foo-page)
+      (is (= (referred-titles bar-page) ["FooPage"]))
+      (save-page (assoc foo-page :source "some content"))
+      (prn (referred-titles bar-page))
+      (is (= (referred-titles bar-page) []))))
+
   (testing-repo "considers the referred page priority"
     (let [densed-page (new-page repo "Densed" "short content [[TargetPage]]")
           linkful-page (new-page repo "LinkFul" "[[TargetPage]] [[Foo]]")
