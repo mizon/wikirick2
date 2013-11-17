@@ -93,7 +93,6 @@
       (save-page foo-page)
       (is (= (referred-titles bar-page) ["FooPage"]))
       (save-page (assoc foo-page :source "some content"))
-      (prn (referred-titles bar-page))
       (is (= (referred-titles bar-page) []))))
 
   (testing-repo "considers the referred page priority"
