@@ -111,19 +111,20 @@ BarPage -> [[BarPage]]
 (deftest render-wiki-source-block-level
   (testing "header"
     (testing "atx style"
-      (is (render? [[:h1 "News"]] "# News"))
-      (is (render? [[:h2 "News"]] "## News"))
-      (is (render? [[:h3 "News"]] "### News"))
-      (is (render? [[:h4 "News"]] "#### News"))
-      (is (render? [[:h5 "News"]] "##### News"))
-      (is (render? [[:h6 "News"]] "###### News"))
+      (are [elem input] (is (render? [elem] input))
+           [:h1 "News"] "# News"
+           [:h2 "News"] "## News"
+           [:h3 "News"] "### News"
+           [:h4 "News"] "#### News"
+           [:h5 "News"] "##### News"
+           [:h6 "News"] "###### News"
 
-      (is (render? [[:h1 "News"]] "# News #"))
-      (is (render? [[:h2 "News"]] "## News ##"))
-      (is (render? [[:h3 "News"]] "### News ###"))
-      (is (render? [[:h4 "News"]] "#### News ####"))
-      (is (render? [[:h5 "News"]] "##### News #####"))
-      (is (render? [[:h6 "News"]] "###### News ######"))
+           [:h1 "News"] "# News #"
+           [:h2 "News"] "## News ##"
+           [:h3 "News"] "### News ###"
+           [:h4 "News"] "#### News ####"
+           [:h5 "News"] "##### News #####"
+           [:h6 "News"] "###### News ######")
 
       (testing "don't output h7"
         (is (render? [[:h6 "# News"]] "####### News"))))
