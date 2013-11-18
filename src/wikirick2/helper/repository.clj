@@ -1,4 +1,4 @@
-(ns wikirick2.repository.helper
+(ns wikirick2.helper.repository
   (:use wikirick2.types)
   (:require [clojure.java.shell :as shell]
             [clojure.string :as string]))

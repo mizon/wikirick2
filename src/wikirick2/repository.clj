@@ -1,6 +1,6 @@
 (ns wikirick2.repository
   (:use slingshot.slingshot
-        wikirick2.repository.helper
+        wikirick2.helper.repository
         wikirick2.types)
   (:require [clojure.java.shell :as shell]
             [clojure.java.jdbc :as jdbc]
