@@ -6,14 +6,19 @@
             [compojure.route :as route]
             [wikirick2.screen :as screen]))
 
-(defn- handle-navigation [])
+(defn- open-read-view [title]
+  (with-wiki-service
+    (let [page (select-page repository title)]
+      (read-view screen page))))
 
-(defn- handle-page [title]
-  (let [page (select-page (ws :repository) title)]
-    (render-full (ws :screen) (screen/page page))))
+(defn- open-edit-view [title]
+  (with-wiki-service
+    (let [page (select-page repository title)]
+      (edit-view screen page))))
 
 (defroutes wikirick-routes
-  (GET "/" [] (handle-page "FrontPage"))
-  (GET "/w/:title" [title] (handle-page title))
+  (GET "/" [] (open-read-view "FrontPage"))
+  (GET "/w/:title" [title] (open-read-view title))
+  (GET "/w/:title/edit" [title] (open-edit-view title))
   (route/resources "/")
   (route/not-found "Not Found"))

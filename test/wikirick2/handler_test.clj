@@ -23,8 +23,7 @@
 
     (testing "handles GET /"
       (let [res (app (request :get "/"))]
-        (is (= (res :status) 200))
-        (is (render-full? res (screen/page front-page))))))
+        (is (= (res :status) 200)))))
 
   (let [foo-page (new-page repo "FooPage" "some content")
         bar-page (new-page repo "FooPage" "some content")]
@@ -33,5 +32,4 @@
 
     (testing "handles GET /w/FooPage"
       (let [res (app (request :get "/w/FooPage"))]
-        (is (= (res :status) 200))
-        (is (render-full? res (screen/page foo-page)))))))
+        (is (= (res :status) 200))))))

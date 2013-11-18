@@ -7,13 +7,16 @@
 
 (def ^:dynamic *wiki-service* nil)
 
-(defn ws [key]
-  (key *wiki-service*))
-
 (defn wrap-with-wiki-service [app service]
   (fn [req]
     (binding [*wiki-service* service]
       (app req))))
+
+(defmacro with-wiki-service [& forms]
+  (list* `let '[repository (.repository *wiki-service*)
+                screen (.screen *wiki-service*)
+                url-mapper (.url-mapper *wiki-service*)]
+         forms))
 
 (defn make-wiki-service [config]
   (let [repo (repository/create-repository (config :repository-dir)
