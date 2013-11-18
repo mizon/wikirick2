@@ -16,9 +16,6 @@
                       :base-path "/"
                       :sqlite-path "test.sqlite3"}))
 
-(defn render-full? [res template]
-  (= (render-full (ws :screen) template) (res :body)))
-
 (defn with-repository [testcase]
   (try
     (setup-test-repo)
@@ -27,5 +24,5 @@
       (cleanup-test-repo))))
 
 (defn with-testing-service [testcase]
-  (binding [wiki-service testing-service]
+  (binding [*wiki-service* testing-service]
     (testcase)))
