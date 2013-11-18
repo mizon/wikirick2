@@ -14,6 +14,9 @@
   (page-path [self page-title]
     (expand-path self (concat-paths "w" page-title)))
 
+  (page-action-path [self page-title action-name]
+    (expand-path self (concat-paths "w" page-title (.toLowerCase action-name))))
+
   (theme-path [self]
     (expand-path self "theme.css"))
 

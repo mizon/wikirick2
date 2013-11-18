@@ -11,9 +11,12 @@
   (testing "expands index pathes"
     (is (= (index-path urlm) "/")))
 
-  (testing "expands an page path"
-    (let [page (->MockedPage "SomePage" "some content")]
-      (is (= (page-path urlm "SomePage") "/w/SomePage"))))
+  (testing "expands page pathes"
+    (is (= (page-path urlm "SomePage") "/w/SomePage")))
+
+  (testing "expands page action pathes"
+    (is (= (page-action-path urlm "SomePage" "Edit") "/w/SomePage/edit"))
+    (is (= (page-action-path urlm "SomePage" "Source") "/w/SomePage/source")))
 
   (testing "expands some pathes"
     (is (= (expand-path urlm "foo") "/foo")))
