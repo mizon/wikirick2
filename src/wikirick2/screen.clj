@@ -31,5 +31,8 @@
                 (page-info page)
                 `[:article
                   [:header [:h1 ~(h (format "Edit: %s" (.title page)))]]
-                  [:textarea ~(h (.source page))]
-                  [:button {:type "submit"} "Submit"]]])))
+                  [:section
+                   {:class "edit"}
+                   [:textarea ~(h (.source page))]
+                   [:button {:type "submit"} "Preview"]
+                   [:button {:type "submit"} "Submit"]]]])))
