@@ -22,7 +22,7 @@
 
 (defn page-info [page]
   [:p
-   {:class "article-info"}
+   {:class "page-info"}
    [:em (h (.title page))]
    ": Last modified: "
    "2013/10/20 19:30"])
@@ -33,20 +33,22 @@
     (page/html5 [:head
                  [:meta {:charset "UTF-8"}]
                  [:title (h (format "%s - %s" title (config :site-title)))]
-                 [:link {:rel "stylesheet" :type "text/css" :href (h (theme-path url-mapper))}]]
+                 [:link {:rel "stylesheet"
+                         :type "text/css"
+                         :href (h (theme-path url-mapper))}]]
                 [:body
                  [:div#container
-                  [:aside
-                   [:header {:id "main-title"} [:h1 (h (config :site-title))]]
-                   [:section#search
-                    [:form
-                     [:input {:class "text-box" :type "text"}]
-                     [:button {:class "submit-button" :type "submit"} "Search"]]]
-                   [:section
-                    [:h2 "Recent Updates"]]]
                   [:div#wrapper
                    `[:div.content
                      ~@content]]
+                  [:aside
+                   [:header [:h1 (h (config :site-title))]]
+                   [:section#search
+                    [:form
+                     [:input {:type "text"}]
+                     [:button {:type "submit"} "Search"]]]
+                   [:section
+                    [:h2 "Recent Updates"]]]
                   [:footer "Made with Clojure Programming Language"]]])))
 
 (defn title-to-li [screen title]

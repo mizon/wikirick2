@@ -1,12 +1,17 @@
 @import "reset";
 
 $header-color: #333;
-$main-color: #069;
+$em-color: #069;
 $bg-color: #F8F8F8;
 $border-color: #CCC;
+$disabled-color: #999;
 
 @mixin smaller-font() {
   font-size: 75%;
+}
+
+@mixin border() {
+  border: solid 1px $border-color;
 }
 
 body {
@@ -15,7 +20,7 @@ body {
 }
 
 #container {
-  width: 80%;
+  width: 95%;
   min-width: 800px;
   margin: 1em auto;
 
@@ -25,8 +30,12 @@ body {
 
   aside {
     float: left;
-    width: 200px;
-    margin-right: -200px;
+    width: 10em;
+    margin-right: -10em;
+
+    header {
+      margin-bottom: 1em;
+    }
 
     section {
       margin-bottom: 2em;
@@ -38,7 +47,7 @@ body {
 
       h2:before {
         content: "■ ";
-        color: $main-color;
+        color: $em-color;
       }
     }
   }
@@ -56,38 +65,44 @@ body {
   width: 100%;
 
   .content {
-    margin-left: 220px;
+    margin-left: 11.4em;
     position: relative;
-
-    .selected {
-      color: $main-color;
-      font-weight: bold;
-    }
 
     nav {
       margin-bottom: 0.5em;
       float: right;
+      @include smaller-font();
+      color: $disabled-color;
 
       ul {
         width: 100%;
 
         li {
-          @include smaller-font();
           float: left;
           padding: 0 0.5em;
         }
       }
+
+      a:link, a:visited {
+        color: $em-color;
+      }
+
+      .selected {
+        color: $em-color;
+        font-weight: bold;
+      }
     }
 
-    p.article-info {
-      font-size: 75%;
+    p.page-info {
+      @include smaller-font();
       padding: 0 0.5em;
       position: absolute;
       top: 0;
       left: 0;
 
       em {
-        text-decoration: none !important;
+        color: $em-color;
+        font-weight: bold;
       }
     }
 
@@ -95,18 +110,63 @@ body {
       background-color: #FFF;
       clear: both;
       padding: 1em;
-      border: solid 1px $border-color;
+      margin-bottom: 1em;
+      @include border();
 
       h1 {
         font-size: 125%;
-        color: $main-color;
+        color: $em-color;
+        padding-bottom: 0.25em;
         margin-bottom: 1em;
+        border-bottom: solid 1px $border-color;
+      }
+
+      h2, h3, h4, h5, h6 {
+        margin-bottom: 0.5em;
+      }
+
+      p, ul, ol, pre {
+        margin-bottom: 1em;
+      }
+
+      ul, ol {
+        li {
+          margin-left: 1.5em;
+        }
+      }
+
+      pre {
+        padding: 0.5em;
+        background-color: $bg-color;
+        overflow: auto;
+        @include border();
+      }
+
+      code {
+        margin: 0 0.25em;
+      }
+    }
+
+    .edit {
+      text-align:right;
+
+      textarea {
+        width: 100%;
+        height: 30em;
+      }
+
+      button {
+        width: 10em;
       }
     }
   }
-
 }
 
-#main-title {
-  margin-bottom: 1em;
+#search {
+  padding: 0.5em;
+  background-color: #EEE;
+
+  input {
+    width: 100%;
+  }
 }
