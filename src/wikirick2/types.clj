@@ -4,18 +4,19 @@
   (select-page [self title])
   (select-page-by-revision [self title rev])
   (select-all-page-titles [self])
-  (post-page [self page])
   (new-page [self title source]))
 
 (defprotocol IURLMapper
   (index-path [self])
   (page-path [self page])
+  (page-action-path [self page-title action-name])
   (theme-path [self])
   (expand-path [self path]))
 
 (defprotocol IScreen
-  (render-full [self template])
-  (render-fragment [self template]))
+  (read-view [self page])
+  (edit-view [self page])
+  (source-view [self page]))
 
 (defrecord Template [title body])
 
