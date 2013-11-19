@@ -16,7 +16,6 @@
   (save-page [self]
     (letfn [(check-out-rcs-file []
               (shell/sh "co" "-l" title :dir (.base-dir repo)))
-
             (update-page-relation []
               (let [priority (nlinks-per-page-size self)]
                 (jdbc/delete! (.db repo) :page_relation (sql/where {:source title}))
@@ -26,6 +25,7 @@
                                 {:source title
                                  :destination d
                                  :priority priority}))))]
+      (validate-page-title title)
       (jdbc/db-transaction [db (.db repo)]
         (with-rw-lock writeLock
           (update-page-relation)
@@ -48,10 +48,12 @@
 (deftype Repository [base-dir db rw-lock]
   IRepository
   (select-page [self title]
+    (validate-page-title title)
     (with-rw-lock readLock
       (select-page- self title ["-p" title])))
 
   (select-page-by-revision [self title rev]
+    (validate-page-title title)
     (with-rw-lock readLock
       (select-page- self title [(format "-r1.%s" rev) "-p" title])))
 
@@ -64,6 +66,7 @@
             page-name)))))
 
   (new-page [self title source]
+    (validate-page-title title)
     (->Page self rw-lock title source nil nil)))
 
 (defn create-repository [base-dir db]
