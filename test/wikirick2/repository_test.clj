@@ -30,6 +30,53 @@
                         (cleanup-page-relation (fn []
                                                  ~@forms))))))
 
+(deftest page-repository
+  (testing "new-page"
+    (testing "makes new page"
+      (let [page (new-page repo "NewPage" "new page content")]
+        (is (= (.title page) "NewPage"))
+        (is (= (.source page) "new page content"))))
+
+    (testing "failes to make a invalid title page"
+      (throw+? (new-page repo "New/Page" "new page content") [:type :invalid-page-title])))
+
+  (testing "select-page"
+    (testing-repo "selects a page"
+      (let [page (new-page repo "SomePage" "some content")]
+        (save-page page)
+        (is (page= (select-page repo "SomePage") page))))
+
+    (testing-repo "failes to select non-existed page"
+      (is (throw+? (select-page repo "FooPage") [:type :page-not-found])))
+
+    (testing-repo "failes to select with a invalid title"
+      (is (throw+? (select-page repo "Foo/Page") [:type :invalid-page-title]))))
+
+  (testing "select-page-by-revision"
+    (testing-repo "selects some revision"
+      (let [rev1 (new-page repo "RevPage" "some content rev 1")
+            rev2 (new-page repo "RevPage" "some content rev 2")]
+        (save-page rev1)
+        (save-page rev2)
+        (is (page= (select-page-by-revision repo "RevPage" 1) rev1))
+        (is (page= (select-page-by-revision repo "RevPage" 2) rev2))))
+
+    (testing-repo "failes to select non-existed page"
+      (is (throw+? (select-page-by-revision repo "FooPage" 1) [:type :page-not-found])))
+
+    (testing-repo "failes to select with a invalid title"
+      (is (throw+? (select-page-by-revision repo "Foo/Page" 1) [:type :invalid-page-title]))))
+
+  (testing "select-all-page-titles"
+    (testing-repo "selects all saved page titles"
+      (is (= (select-all-page-titles repo) []))
+
+      (save-page (new-page repo "FirstPage" "first content"))
+      (is (= (select-all-page-titles repo) ["FirstPage"]))
+
+      (save-page (new-page repo "SencondPage" "sencond content"))
+      (is (= (select-all-page-titles repo) ["SencondPage" "FirstPage"])))))
+
 (deftest pape
   (testing "save-page"
     (testing-repo "saves some pages"
@@ -84,50 +131,3 @@
         (save-page linkful-page)
         (save-page sparsed-page)
         (is (= (referred-titles target-page) ["LinkFul" "Densed" "Sparsed"]))))))
-
-(deftest page-repository
-  (testing "new-page"
-    (testing "makes new page"
-      (let [page (new-page repo "NewPage" "new page content")]
-        (is (= (.title page) "NewPage"))
-        (is (= (.source page) "new page content"))))
-
-    (testing "failes to make a invalid title page"
-      (throw+? (new-page repo "New/Page" "new page content") [:type :invalid-page-title])))
-
-  (testing "select-page"
-    (testing-repo "selects a page"
-      (let [page (new-page repo "SomePage" "some content")]
-        (save-page page)
-        (is (page= (select-page repo "SomePage") page))))
-
-    (testing-repo "failes to select non-existed page"
-      (is (throw+? (select-page repo "FooPage") [:type :page-not-found])))
-
-    (testing-repo "failes to select with a invalid title"
-      (is (throw+? (select-page repo "Foo/Page") [:type :invalid-page-title]))))
-
-  (testing "select-page-by-revision"
-    (testing-repo "selects some revision"
-      (let [rev1 (new-page repo "RevPage" "some content rev 1")
-            rev2 (new-page repo "RevPage" "some content rev 2")]
-        (save-page rev1)
-        (save-page rev2)
-        (is (page= (select-page-by-revision repo "RevPage" 1) rev1))
-        (is (page= (select-page-by-revision repo "RevPage" 2) rev2))))
-
-    (testing-repo "failes to select non-existed page"
-      (is (throw+? (select-page-by-revision repo "FooPage" 1) [:type :page-not-found])))
-
-    (testing-repo "failes to select with a invalid title"
-      (is (throw+? (select-page-by-revision repo "Foo/Page" 1) [:type :invalid-page-title]))))
-
-  (testing "select-all-page-titles"
-    (testing-repo "selects all saved page titles"
-      (is (= (select-all-page-titles repo) []))
-
-      (save-page (new-page repo "FirstPage" "first content"))
-      (is (= (select-all-page-titles repo) ["FirstPage"]))
-
-      (save-page (new-page repo "SencondPage" "sencond content"))
-      (is (= (select-all-page-titles repo) ["SencondPage" "FirstPage"])))))
