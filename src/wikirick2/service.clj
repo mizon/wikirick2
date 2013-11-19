@@ -13,10 +13,10 @@
       (app req))))
 
 (defmacro with-wiki-service [& forms]
-  (list* `let '[repository (.repository *wiki-service*)
-                screen (.screen *wiki-service*)
-                url-mapper (.url-mapper *wiki-service*)]
-         forms))
+  `(let [~'repository (.repository *wiki-service*)
+         ~'screen (.screen *wiki-service*)
+         ~'url-mapper (.url-mapper *wiki-service*)]
+     ~@forms))
 
 (defn make-wiki-service [config]
   (let [repo (repository/create-repository (config :repository-dir)
