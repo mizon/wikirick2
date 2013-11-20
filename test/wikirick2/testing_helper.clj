@@ -1,5 +1,6 @@
 (ns wikirick2.testing-helper
-  (:use wikirick2.service
+  (:use slingshot.slingshot
+        wikirick2.service
         wikirick2.types)
   (:require [clojure.java.shell :as shell]))
 
@@ -26,3 +27,8 @@
 (defn with-testing-service [testcase]
   (binding [*wiki-service* testing-service]
     (testcase)))
+
+(defmacro throw+? [try-form catch-form]
+  `(try+
+     ~try-form
+     (catch ~catch-form {} true)))
