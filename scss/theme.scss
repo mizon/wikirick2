@@ -84,7 +84,13 @@ body {
       }
 
       a:link, a:visited {
-        color: $em-color;
+        color: $header-color;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-weight: bold;
+        text-decoration: underline;
       }
 
       .selected {
