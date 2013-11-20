@@ -27,11 +27,11 @@
 
   (select-all-page-titles [self]
     (letfn [(ls-rcs-dir []
-              (:out (shell/sh "ls" "-t" (format "%s/RCS" base-dir))))]
+              (let [result (shell/sh "ls" "-t" (format "%s/RCS" base-dir))]
+                (string/split-lines (:out result))))]
       (with-rw-lock readLock
-        (for [rcs-file (string/split-lines (ls-rcs-dir)) :when (not (empty? rcs-file))]
-          (let [[_ page-name] (re-find #"(.+),v" rcs-file)]
-            page-name)))))
+        (let [rcs-files (filter #(not (empty? %)) (ls-rcs-dir))]
+          (map #(second (re-find #"(.+),v" %)) rcs-files)))))
 
   (new-page [self title source]
     (validate-page-title title)
