@@ -11,6 +11,8 @@
   (:import java.sql.SQLException
            java.util.concurrent.locks.ReentrantReadWriteLock))
 
+(declare ->Page)
+
 (deftype Repository [base-dir db rw-lock]
   IRepository
   (select-page [self title]
