@@ -7,37 +7,30 @@
             [clojure.java.jdbc.ddl :as ddl]
             [clojure.java.jdbc.sql :as sql]
             [clojure.string :as string]
-            [wikirick2.parsers :as parsers])
+            [wikirick2.parsers :as parsers]
+            [wikirick2.shell :as wshell])
   (:import java.sql.SQLException
            java.util.concurrent.locks.ReentrantReadWriteLock))
 
 (declare ->Page)
 
-(deftype Repository [base-dir db rw-lock]
+(deftype Repository [base-dir db rw-lock shell]
   IRepository
   (select-page [self title]
-    (validate-page-title title)
-    (with-rw-lock readLock
-      (select-page- self title ["-p" title])))
+    (new-page self title nil))
 
   (select-page-by-revision [self title rev]
-    (validate-page-title title)
-    (with-rw-lock readLock
-      (select-page- self title [(format "-r1.%s" rev) "-p" title])))
+    (assoc (new-page self title nil) :revision rev))
 
   (select-all-page-titles [self]
-    (letfn [(ls-rcs-dir []
-              (let [result (shell/sh "ls" "-t" (format "%s/RCS" base-dir))]
-                (string/split-lines (:out result))))]
-      (with-rw-lock readLock
-        (let [rcs-files (filter #(not (empty? %)) (ls-rcs-dir))]
-          (map #(second (re-find #"(.+),v" %)) rcs-files)))))
+    (with-rw-lock readLock
+      (wshell/ls-rcs-files shell)))
 
   (new-page [self title source]
     (validate-page-title title)
-    (->Page self rw-lock title source nil nil)))
+    (->Page self rw-lock title source nil nil shell)))
 
-(defrecord Page [repo rw-lock title source revision edit-comment]
+(defrecord Page [repo rw-lock title source revision edit-comment shell]
   IPage
   (save-page [self]
     (letfn [(check-out-rcs-file []
@@ -59,6 +52,14 @@
           (let [path (format "%s/%s" (.base-dir repo) title)]
             (spit path source))
           (shell/sh "ci" title :in edit-comment :dir (.base-dir repo))))))
+
+  (page-source [self]
+    (or source (with-rw-lock readLock
+                 (wshell/co-p shell title (page-revision self)))))
+
+  (page-revision [self]
+    (or revision (with-rw-lock readLock
+                   (wshell/head-version shell title))))
 
   (referring-titles [self]
     (parsers/scan-wiki-links source))
@@ -88,4 +89,4 @@
         (ddl/create-index :pr_destination_index :page_relation [:destination])
         (ddl/create-index :pr_priority_index :page_relation [:priority])))
     (shell/sh "mkdir" "-p" (format "%s/RCS" base-dir))
-    (Repository. base-dir db (ReentrantReadWriteLock.))))
+    (Repository. base-dir db (ReentrantReadWriteLock.) (wshell/->Shell base-dir))))

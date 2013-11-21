@@ -6,32 +6,13 @@
             [clojure.string :as string]
             [wikirick2.parsers :as parsers]))
 
-(defn- parse-revision [text]
-  (let [[_ message] (string/split-lines text)
-        [_ rev] (re-find #"^revision \d+\.(\d+)$" message)]
-    (Integer. rev)))
-
-(defn- parse-co-error [error-result]
-  (match (re-matches #"co: RCS/(.+),v: (.*)" (.trim error-result))
-    [_ page-name "No such file or directory"] {:type :page-not-found}
-    err {:type :unknown-error :message (str err)}
-    :else (assert false "must not happen: parse-co-error")))
-
-(defn select-page- [repo title co-args]
-  (let [result (apply shell/sh `("co" ~@co-args :dir ~(.base-dir repo)))]
-    (if (= (:exit result) 0)
-      (let [rev (parse-revision (:err result))
-            page (new-page repo title (:out result))]
-        (assoc page :revision rev))
-      (throw+ (parse-co-error (:err result))))))
-
-(defmacro with-rw-lock [lock-type & forms]
+(defmacro with-rw-lock [repo lock-type & forms]
   `(do
-     (.. ~'rw-lock ~lock-type lock)
+     (.. ~repo ~'rw-lock ~lock-type lock)
      (try
        ~@forms
        (finally
-         (.. ~'rw-lock ~lock-type unlock)))))
+         (.. ~repo ~'rw-lock ~lock-type unlock)))))
 
 (defn nlinks-per-page-size [page]
   (let [dests (referring-titles page)]

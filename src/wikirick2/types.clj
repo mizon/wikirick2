@@ -1,10 +1,10 @@
 (ns wikirick2.types)
 
 (defprotocol IRepository
+  (new-page [self title source])
   (select-page [self title])
-  (select-page-by-revision [self title rev])
-  (select-all-page-titles [self])
-  (new-page [self title source]))
+  (select-page-by-version [self title ver])
+  (select-all-pages [self]))
 
 (defprotocol IURLMapper
   (index-path [self])
@@ -23,7 +23,9 @@
 
 (defprotocol IPage
   (save-page [self])
-  (diff-with-other-revision [self rev])
+  (page-source [self])
+  (page-version [self])
+  (diff-with-other-version [self ver])
   (referring-titles [self])
   (referred-titles [self]))
 
