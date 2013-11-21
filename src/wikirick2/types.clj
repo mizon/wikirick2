@@ -15,6 +15,7 @@
 
 (defprotocol IScreen
   (read-view [self page])
+  (new-view [self page])
   (edit-view [self page])
   (source-view [self page]))
 

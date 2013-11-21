@@ -11,9 +11,9 @@
     (base-view self
                (.title page)
                [(navigation self page {:read {:enabled? true :selected? true}
-                                       :source {:enabled? false :selected? false}
+                                       :source {:enabled? true :selected? false}
                                        :edit {:enabled? true :selected? false}
-                                       :history {:enabled? false :selected? false}})
+                                       :history {:enabled? true :selected? false}})
                 (page-info page)
                 `[:article
                   [:header [:h1 ~(h (.title page))]]
@@ -21,18 +21,38 @@
                   [:h2 "Related Pages"]
                   [:ul ~@(map #(title-to-li self %) (referred-titles page))]]]))
 
+  (new-view [self page]
+    (base-view self
+               (.title page)
+               [(navigation self page {:read {:enabled? false :selected? false}
+                                       :source {:enabled? false :selected? false}
+                                       :edit {:enabled? true :selected? true}
+                                       :history {:enabled? false :selected? false}})
+                [:p {:class "page-info"} [:em (h (.title page))] ": (new page)"]
+                `[:article
+                  [:header [:h1 ~(h (format "%s: New" (.title page)))]]
+                  [:section
+                   {:class "edit"}
+                   [:textarea {:placeholder ~(.source page)}]
+                   [:button {:type "submit"} "Preview"]
+                   [:button {:type "submit"} "Submit"]]]]))
+
   (edit-view [self page]
     (base-view self
                (.title page)
                [(navigation self page {:read {:enabled? true :selected? false}
-                                       :source {:enabled? false :selected? false}
+                                       :source {:enabled? true :selected? false}
                                        :edit {:enabled? true :selected? true}
-                                       :history {:enabled? false :selected? false}})
+                                       :history {:enabled? true :selected? false}})
                 (page-info page)
                 `[:article
-                  [:header [:h1 ~(h (format "Edit: %s" (.title page)))]]
-                  [:section
-                   {:class "edit"}
-                   [:textarea ~(h (.source page))]
+                  [:header [:h1 ~(h (format "%s: Edit" (.title page)))]]
+                  [:form {:class "edit"
+                          :method "post"
+                          :action ~(page-action-path url-mapper (.title page) "edit")}
+                   [:input {:type "hidden"
+                            :name "base-rev"
+                            :value ~(str (.revision page))}]
+                   [:textarea {:name "source"} ~(h (.source page))]
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]])))
