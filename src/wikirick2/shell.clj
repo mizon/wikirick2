@@ -6,7 +6,7 @@
             [clojure.string :as string]
             [wikirick2.parsers :as parsers]))
 
-(declare parse-co-error rcs-dir)
+(declare parse-co-error rcs-file rcs-dir)
 
 (deftype Shell [base-dir])
 
@@ -22,15 +22,14 @@
                          :in edit-comment
                          :dir (.base-dir shell))]
     (when (not= (:exit result) 0)
-      (throw+ {:type :ci}))))
+      (throw+ {:type :ci-failed}))))
 
 (defn head-version [shell title]
-  (let [rcs-file (format "%s,v" title)
-        result (shell/sh "head" rcs-file :dir (rcs-dir shell))
+  (let [result (shell/sh "head" (rcs-file title) :dir (rcs-dir shell))
         parse-version #(Integer/parseInt (second (re-find #"head\s+\d+\.(\d+);" %)))]
     (if (= (:exit result) 0)
       (parse-version (first (string/split-lines (:out result))))
-      (throw+ {:type :head-version-error}))))
+      (throw+ {:type :head-version-failed}))))
 
 (defn ls-rcs-files [shell]
   (let [result (shell/sh "ls" "-t" (rcs-dir shell))
@@ -44,11 +43,18 @@
 (defn make-rcs-dir [shell]
   (shell/sh "mkdir" "-p" (rcs-dir shell)))
 
+(defn test-f [shell title]
+  (let [result (shell/sh "test" "-f" (rcs-file title) :dir (rcs-dir shell))]
+    (= (:exit result) 0)))
+
 (defn- parse-co-error [error-result]
   (match (re-matches #"co: RCS/(.+),v: (.*)" (.trim error-result))
     [_ page-name "No such file or directory"] {:type :page-not-found}
     err {:type :unknown-error :message (str err)}
     :else (assert false "must not happen: parse-co-error")))
+
+(defn- rcs-file [title]
+  (format "%s,v" title))
 
 (defn- rcs-dir [shell]
   (format "%s/RCS" (.base-dir shell)))

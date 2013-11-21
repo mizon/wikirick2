@@ -31,4 +31,5 @@
 (defmacro throw+? [try-form catch-form]
   `(try+
      ~try-form
+     false
      (catch ~catch-form {} true)))

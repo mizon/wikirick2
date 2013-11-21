@@ -102,6 +102,13 @@
             invalid-page (assoc page :title "Foo/Page")]
         (throw+? (save-page invalid-page) [:type :invalid-page-title]))))
 
+  (testing "page-exists?"
+    (testing-repo "knows if page exists"
+      (let [page (create-page repo "SomePage" "some content")]
+        (is (not (page-exists? page)))
+        (save-page page)
+        (is (page-exists? page)))))
+
   (testing "referring-titles"
     (testing-repo "gets referring titles"
       (let [page (create-page repo "SomePage" "[[Foo]] [[Bar]]")]

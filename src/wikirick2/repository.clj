@@ -20,10 +20,13 @@
     (map->Page {:repo self :title title}))
 
   (select-page [self title]
-    (new-page self title))
+    (let [page (new-page self title)]
+      (if (not (page-exists? page))
+        (throw+ {:type :page-not-found})
+        page)))
 
   (select-page-by-version [self title ver]
-    (assoc (new-page self title) :version ver))
+    (assoc (select-page self title) :version ver))
 
   (select-all-pages [self]
     (with-rw-lock self readLock
@@ -46,7 +49,7 @@
         (with-rw-lock repo writeLock
           (update-page-relation)
           (shell/lock-rcs-file (.shell repo) title)
-          (shell/ci (.shell repo) title source (or edit-comment ""))))))
+          (shell/ci (.shell repo) title (page-source self) (or edit-comment ""))))))
 
   (page-source [self]
     (or source (with-rw-lock repo readLock
@@ -56,8 +59,12 @@
     (or version (with-rw-lock repo readLock
                   (shell/head-version (.shell repo) title))))
 
+  (page-exists? [self]
+    (with-rw-lock repo readLock
+      (shell/test-f (.shell repo) title)))
+
   (referring-titles [self]
-    (parsers/scan-wiki-links source))
+    (parsers/scan-wiki-links (page-source self)))
 
   (referred-titles [self]
     (jdbc/query (.db repo)

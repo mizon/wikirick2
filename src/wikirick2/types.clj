@@ -6,6 +6,19 @@
   (select-page-by-version [self title ver])
   (select-all-pages [self]))
 
+(defprotocol IPage
+  (save-page [self])
+  (page-source [self])
+  (page-version [self])
+  (page-exists? [self])
+  (diff-with-other-version [self ver])
+  (referring-titles [self])
+  (referred-titles [self]))
+
+(defprotocol IPageRelation
+  (update-relations [self page])
+  (do-referred-titles [self page]))
+
 (defprotocol IURLMapper
   (index-path [self])
   (page-path [self page])
@@ -20,17 +33,5 @@
   (source-view [self page]))
 
 (defrecord Template [title body])
-
-(defprotocol IPage
-  (save-page [self])
-  (page-source [self])
-  (page-version [self])
-  (diff-with-other-version [self ver])
-  (referring-titles [self])
-  (referred-titles [self]))
-
-(defprotocol IPageRelation
-  (update-relations [self page])
-  (do-referred-titles [self page]))
 
 (defrecord WikiService [config repository url-mapper screen])
