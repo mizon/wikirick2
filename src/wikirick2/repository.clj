@@ -17,7 +17,7 @@
   IRepository
   (new-page [self title source]
     (validate-page-title title)
-    (->Page self rw-lock title source nil nil))
+    (->Page self title source nil nil))
 
   (select-page [self title]
     (new-page self title nil))
@@ -29,7 +29,7 @@
     (with-rw-lock self readLock
       (map #(new-page self % nil) (shell/ls-rcs-files shell)))))
 
-(defrecord Page [repo rw-lock title source version edit-comment]
+(defrecord Page [repo title source version edit-comment]
   IPage
   (save-page [self]
     (letfn [(update-page-relation []
