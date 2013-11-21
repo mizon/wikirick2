@@ -1,7 +1,7 @@
 (ns wikirick2.types)
 
 (defprotocol IRepository
-  (new-page [self title source])
+  (new-page [self title])
   (select-page [self title])
   (select-page-by-version [self title ver])
   (select-all-pages [self]))

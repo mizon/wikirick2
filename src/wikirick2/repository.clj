@@ -11,23 +11,23 @@
   (:import java.sql.SQLException
            java.util.concurrent.locks.ReentrantReadWriteLock))
 
-(declare ->Page)
+(declare map->Page)
 
 (deftype Repository [shell db rw-lock]
   IRepository
-  (new-page [self title source]
+  (new-page [self title]
     (validate-page-title title)
-    (->Page self title source nil nil))
+    (map->Page {:repo self :title title}))
 
   (select-page [self title]
-    (new-page self title nil))
+    (new-page self title))
 
   (select-page-by-version [self title ver]
-    (assoc (new-page self title nil) :version ver))
+    (assoc (new-page self title) :version ver))
 
   (select-all-pages [self]
     (with-rw-lock self readLock
-      (map #(new-page self % nil) (shell/ls-rcs-files shell)))))
+      (map #(new-page self %) (shell/ls-rcs-files shell)))))
 
 (defrecord Page [repo title source version edit-comment]
   IPage
