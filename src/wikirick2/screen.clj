@@ -17,7 +17,7 @@
                 (page-info page)
                 `[:article
                   [:header [:h1 ~(h (.title page))]]
-                  ~@(render-wiki-source (.source page))
+                  ~@(render-wiki-source (page-source page))
                   [:h2 "Related Pages"]
                   [:ul ~@(map #(title-to-li self %) (referred-titles page))]]]))
 
@@ -33,7 +33,7 @@
                   [:header [:h1 ~(h (format "%s: New" (.title page)))]]
                   [:section
                    {:class "edit"}
-                   [:textarea {:placeholder ~(.source page)}]
+                   [:textarea {:placeholder ~(page-source page)}]
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]]))
 
@@ -51,8 +51,8 @@
                           :method "post"
                           :action ~(page-action-path url-mapper (.title page) "edit")}
                    [:input {:type "hidden"
-                            :name "base-rev"
-                            :value ~(str (.revision page))}]
-                   [:textarea {:name "source"} ~(h (.source page))]
+                            :name "base-ver"
+                            :value ~(str (page-version page))}]
+                   [:textarea {:name "source"} ~(h (page-source page))]
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]])))
