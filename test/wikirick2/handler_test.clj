@@ -57,7 +57,6 @@
     (testing "redirects when GET /w/SomePage"
       (let [res (app (request :get "/w/SomePage"))]
         (is (= (res :status) 302))
-        (prn res)
         (is (= ((res :headers) "Location") "/w/SomePage/new"))))
 
     (testing "redirects when GET /w/SomePage/edit"

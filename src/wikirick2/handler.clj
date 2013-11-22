@@ -11,10 +11,10 @@
 (defn- open-read-view [title]
   (with-wiki-service
     (try+
-     (let [page (select-page repository title)]
-       (read-view screen page))
-     (catch [:type :page-not-found] _
-       (response/redirect (page-action-path url-mapper title "new"))))))
+      (let [page (select-page repository title)]
+        (read-view screen page))
+      (catch [:type :page-not-found] _
+        (response/redirect (page-action-path url-mapper title "new"))))))
 
 (defn- open-new-view [title]
   (with-wiki-service
@@ -23,10 +23,10 @@
 (defn- open-edit-view [title]
   (with-wiki-service
     (try+
-     (let [page (select-page repository title)]
-       (edit-view screen page))
-     (catch [:type :page-not-found] _
-       (response/redirect (page-action-path url-mapper title "new"))))))
+      (let [page (select-page repository title)]
+        (edit-view screen page))
+      (catch [:type :page-not-found] _
+        (response/redirect (page-action-path url-mapper title "new"))))))
 
 (defn- register-new-page [{:keys [title source]}]
   (with-wiki-service
