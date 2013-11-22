@@ -35,11 +35,11 @@
 (defrecord Page [repo title source version edit-comment]
   IPage
   (save-page [self]
-    (letfn [(update-page-relation []
+    (letfn [(update-page-relation [db]
               (let [priority (nlinks-per-page-size self)]
-                (jdbc/delete! (.db repo) :page_relation (sql/where {:source title}))
+                (jdbc/delete! db :page_relation (sql/where {:source title}))
                 (doseq [d (referring-titles self)]
-                  (jdbc/insert! (.db repo)
+                  (jdbc/insert! db
                                 :page_relation
                                 {:source title
                                  :destination d
@@ -47,8 +47,8 @@
       (validate-page-title title)
       (jdbc/db-transaction [db (.db repo)]
         (with-rw-lock repo writeLock
-          (update-page-relation)
-          (shell/lock-rcs-file (.shell repo) title)
+          (update-page-relation db)
+          (shell/co-l (.shell repo) title)
           (shell/ci (.shell repo) title (page-source self) (or edit-comment ""))))))
 
   (page-source [self]

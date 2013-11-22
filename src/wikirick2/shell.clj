@@ -37,7 +37,7 @@
     (for [fname fnames :when (not (empty? fname))]
       (second (re-find #"(.+),v" fname)))))
 
-(defn lock-rcs-file [shell title]
+(defn co-l [shell title]
   (shell/sh "co" "-l" title :dir (.base-dir shell)))
 
 (defn make-rcs-dir [shell]
