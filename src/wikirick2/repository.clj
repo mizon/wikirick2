@@ -25,14 +25,14 @@
         (throw+ {:type :page-not-found})
         page)))
 
-  (select-page-by-version [self title ver]
-    (assoc (select-page self title) :version ver))
+  (select-page-by-revision [self title rev]
+    (assoc (select-page self title) :revision rev))
 
   (select-all-pages [self]
     (with-rw-lock self readLock
       (map #(new-page self %) (shell/ls-rcs-files shell)))))
 
-(defrecord Page [repo title source version edit-comment]
+(defrecord Page [repo title source revision edit-comment]
   IPage
   (save-page [self]
     (letfn [(update-page-relation [db]
@@ -53,11 +53,11 @@
 
   (page-source [self]
     (or source (with-rw-lock repo readLock
-                 (shell/co-p (.shell repo) title (page-version self)))))
+                 (shell/co-p (.shell repo) title (page-revision self)))))
 
-  (page-version [self]
-    (or version (with-rw-lock repo readLock
-                  (shell/head-version (.shell repo) title))))
+  (page-revision [self]
+    (or revision (with-rw-lock repo readLock
+                   (shell/head-revision (.shell repo) title))))
 
   (page-exists? [self]
     (with-rw-lock repo readLock

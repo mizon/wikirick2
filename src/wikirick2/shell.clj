@@ -24,12 +24,12 @@
     (when (not= (:exit result) 0)
       (throw+ {:type :ci-failed}))))
 
-(defn head-version [shell title]
+(defn head-revision [shell title]
   (let [result (shell/sh "head" (rcs-file title) :dir (rcs-dir shell))
-        parse-version #(Integer/parseInt (second (re-find #"head\s+\d+\.(\d+);" %)))]
+        parse-revision #(Integer/parseInt (second (re-find #"head\s+\d+\.(\d+);" %)))]
     (if (= (:exit result) 0)
-      (parse-version (first (string/split-lines (:out result))))
-      (throw+ {:type :head-version-failed}))))
+      (parse-revision (first (string/split-lines (:out result))))
+      (throw+ {:type :head-revision-failed}))))
 
 (defn ls-rcs-files [shell]
   (let [result (shell/sh "ls" "-t" (rcs-dir shell))

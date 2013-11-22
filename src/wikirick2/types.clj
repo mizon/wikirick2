@@ -3,15 +3,15 @@
 (defprotocol IRepository
   (new-page [self title])
   (select-page [self title])
-  (select-page-by-version [self title ver])
+  (select-page-by-revision [self title rev])
   (select-all-pages [self]))
 
 (defprotocol IPage
   (save-page [self])
   (page-source [self])
-  (page-version [self])
+  (page-revision [self])
   (page-exists? [self])
-  (diff-with-other-version [self ver])
+  (diff-with-other-revision [self rev])
   (referring-titles [self])
   (referred-titles [self]))
 

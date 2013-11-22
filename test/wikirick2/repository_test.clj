@@ -54,20 +54,20 @@
     (testing-repo "failes to select with a invalid title"
       (is (throw+? (select-page repo "Foo/Page") [:type :invalid-page-title]))))
 
-  (testing "select-page-by-version"
-    (testing-repo "selects some version"
-      (let [ver1 (create-page repo "VerPage" "some content ver 1")
-            ver2 (create-page repo "VerPage" "some content ver 2")]
-        (save-page ver1)
-        (save-page ver2)
-        (is (page= (select-page-by-version repo "VerPage" 1) ver1))
-        (is (page= (select-page-by-version repo "VerPage" 2) ver2))))
+  (testing "select-page-by-revision"
+    (testing-repo "selects some revision"
+      (let [rev1 (create-page repo "RevPage" "some content rev 1")
+            rev2 (create-page repo "RevPage" "some content rev 2")]
+        (save-page rev1)
+        (save-page rev2)
+        (is (page= (select-page-by-revision repo "RevPage" 1) rev1))
+        (is (page= (select-page-by-revision repo "RevPage" 2) rev2))))
 
     (testing-repo "failes to select non-existed page"
-      (is (throw+? (select-page-by-version repo "FooPage" 1) [:type :page-not-found])))
+      (is (throw+? (select-page-by-revision repo "FooPage" 1) [:type :page-not-found])))
 
     (testing-repo "failes to select with a invalid title"
-      (is (throw+? (select-page-by-version repo "Foo/Page" 1) [:type :invalid-page-title]))))
+      (is (throw+? (select-page-by-revision repo "Foo/Page" 1) [:type :invalid-page-title]))))
 
   (testing "select-all-pages"
     (testing-repo "select all pages"
@@ -89,13 +89,13 @@
         (is (page= (select-page repo "FooPage") foo))
         (is (page= (select-page repo "BarPage") bar))))
 
-    (testing-repo "increments versions of a saved page"
-      (let [ver1 (create-page repo "FooBar" "some content ver 1")
-            ver2 (create-page repo "FooBar" "some content ver 2")]
-        (save-page ver1)
-        (is (= (page-version (select-page repo "FooBar")) 1))
-        (save-page ver2)
-        (is (= (page-version (select-page repo "FooBar")) 2))))
+    (testing-repo "increments revisions of a saved page"
+      (let [rev1 (create-page repo "FooBar" "some content rev 1")
+            rev2 (create-page repo "FooBar" "some content rev 2")]
+        (save-page rev1)
+        (is (= (page-revision (select-page repo "FooBar")) 1))
+        (save-page rev2)
+        (is (= (page-revision (select-page repo "FooBar")) 2))))
 
     (testing-repo "fails to save an invalid title page"
       (let [page (create-page repo "FooBar" "some content")

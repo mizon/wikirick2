@@ -68,7 +68,7 @@
       (let [page-content "some content"
             res (app (request :post "/w/FooPage/edit"
                               {:source page-content
-                               :base-ver "1"}))]
+                               :base-rev "1"}))]
         (is (= (res :status)))
         (let [foo-page (select-page repo "FooPage")]
           (is (= (page-source foo-page) page-content))

@@ -32,10 +32,10 @@
   (with-wiki-service
     (save-page (assoc (new-page repository title) :source source))))
 
-(defn- update-page [{:keys [title source base-ver]}]
+(defn- update-page [{:keys [title source base-rev]}]
   (with-wiki-service
-    (let [base-ver- (Integer/parseInt base-ver)
-          page (select-page-by-version repository title base-ver-)]
+    (let [base-rev- (Integer/parseInt base-rev)
+          page (select-page-by-revision repository title base-rev-)]
       (save-page (assoc page :source source))
       (response/redirect-after-post (page-path url-mapper title)))))
 
