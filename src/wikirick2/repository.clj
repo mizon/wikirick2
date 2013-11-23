@@ -63,6 +63,10 @@
     (with-rw-lock repo readLock
       (shell/test-f (.shell repo) title)))
 
+  (modified-at [self]
+    (with-rw-lock repo readLock
+      (shell/rlog-date (.shell repo) title (page-revision self))))
+
   (referring-titles [self]
     (parsers/scan-wiki-links (page-source self)))
 

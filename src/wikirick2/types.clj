@@ -11,6 +11,7 @@
   (page-source [self])
   (page-revision [self])
   (page-exists? [self])
+  (modified-at [self])
   (diff-with-other-revision [self rev])
   (referring-titles [self])
   (referred-titles [self]))

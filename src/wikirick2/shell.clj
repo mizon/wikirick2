@@ -1,7 +1,9 @@
 (ns wikirick2.shell
   (:use slingshot.slingshot
         wikirick2.types)
-  (:require [clojure.core.match :refer [match]]
+  (:require [clj-time.core :as clj-time]
+            [clj-time.format :as format]
+            [clojure.core.match :refer [match]]
             [clojure.java.shell :as shell]
             [clojure.string :as string]
             [wikirick2.parsers :as parsers]))
@@ -46,6 +48,14 @@
 (defn test-f [shell title]
   (let [result (shell/sh "test" "-f" (rcs-file title) :dir (rcs-dir shell))]
     (= (:exit result) 0)))
+
+(defn rlog-date [shell title rev]
+  (let [rev-opt (format "-r1.%s" rev)
+        result (shell/sh "rlog" rev-opt title :dir (.base-dir shell))]
+    (if (= (:exit result) 0)
+      (let [[_ date-str] (re-find #"(?m)^date: (.+?);" (:out result))]
+        (format/parse (format/formatter "yy/MM/dd hh:mm:ss") date-str))
+      (throw+ {:type :rlog-date-failed}))))
 
 (defn- parse-co-error [error-result]
   (match (re-matches #"co: RCS/(.+),v: (.*)" (.trim error-result))

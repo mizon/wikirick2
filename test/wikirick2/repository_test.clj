@@ -3,9 +3,11 @@
         wikirick2.repository
         wikirick2.testing-helper
         wikirick2.types)
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [clj-time.core :as time]
+            [clojure.java.jdbc :as jdbc]
             [clojure.java.jdbc.sql :as sql]
-            [clojure.java.shell :as shell]))
+            [clojure.java.shell :as shell])
+  (:import org.joda.time.DateTime))
 
 (def test-repo-name "test-repo")
 (def repo (.repository testing-service))
@@ -108,6 +110,18 @@
         (is (not (page-exists? page)))
         (save-page page)
         (is (page-exists? page)))))
+
+  (testing "modified-at"
+    (testing-repo "tells when it be modified"
+      (let [page (create-page repo "SomePage" "some content")
+            before (DateTime/now)]
+        (save-page page)
+        (time/after? (modified-at page) before)
+        (time/before? (modified-at page) (DateTime/now))))
+
+    (testing-repo "throws exception when called before saved"
+      (let [page (create-page repo "SomePage" "some content")]
+        (throw+? (modified-at page) [:type :head-revision-failed]))))
 
   (testing "referring-titles"
     (testing-repo "gets referring titles"
