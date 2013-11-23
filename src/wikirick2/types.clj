@@ -4,7 +4,8 @@
   (new-page [self title])
   (select-page [self title])
   (select-page-by-revision [self title rev])
-  (select-all-pages [self]))
+  (select-all-pages [self])
+  (search-pages [self word]))
 
 (defprotocol IPage
   (save-page [self])

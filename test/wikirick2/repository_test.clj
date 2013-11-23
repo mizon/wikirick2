@@ -79,7 +79,27 @@
       (is (= (map :title (select-all-pages repo)) ["FirstPage"]))
 
       (save-page (create-page repo "SencondPage" "sencond content"))
-      (is (= (map :title (select-all-pages repo)) ["SencondPage" "FirstPage"])))))
+      (is (= (map :title (select-all-pages repo)) ["SencondPage" "FirstPage"]))))
+
+  (testing-repo "search-pages"
+    (save-page (create-page repo "FooPage" "
+some foo
+some bar
+some 'foo
+"))
+    (save-page (create-page repo "BarPage" "
+some foo
+some bar
+"))
+
+    (testing "returns a empty set when matched no pages"
+      (is (= (search-pages repo "foobar") #{})))
+
+    (testing "returns the first matched line in each page"
+      (is (= (search-pages repo "some") #{["FooPage" "some foo"] ["BarPage" "some foo"]})))
+
+    (testing "accepts words containing single quotes"
+      (is (= (search-pages repo "'foo")  #{["FooPage" "some 'foo"]})))))
 
 (deftest pape
   (testing "save-page"

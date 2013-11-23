@@ -30,7 +30,11 @@
 
   (select-all-pages [self]
     (with-rw-lock self readLock
-      (map #(new-page self %) (shell/ls-rcs-files shell)))))
+      (map #(new-page self %) (shell/ls-rcs-files shell))))
+
+  (search-pages [self word]
+    (with-rw-lock self readLock
+      (shell/grep-iF shell word))))
 
 (defrecord Page [repo title source revision edit-comment]
   IPage
