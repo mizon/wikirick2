@@ -20,5 +20,8 @@
   (theme-path [self]
     (expand-path self "theme.css"))
 
+  (search-path [self word]
+    (expand-path self (format "search?word=%s" word)))
+
   (expand-path [self path]
     (.toString (.resolve (URI. base-path) path))))

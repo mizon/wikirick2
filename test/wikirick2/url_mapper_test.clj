@@ -21,5 +21,8 @@
   (testing "expands some pathes"
     (is (= (expand-path urlm "foo") "/foo")))
 
+  (testing "expands search pathes"
+    (is (= (search-path urlm "foobar") "/search?word=foobar")))
+
   (testing "expands the theme path"
     (is (= (theme-path urlm) "/theme.css"))))
