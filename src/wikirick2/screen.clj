@@ -55,4 +55,23 @@
                             :value ~(str (page-revision page))}]
                    [:textarea {:name "source"} ~(h (page-source page))]
                    [:button {:type "submit"} "Preview"]
-                   [:button {:type "submit"} "Submit"]]]])))
+                   [:button {:type "submit"} "Submit"]]]]))
+
+  (search-view [self word result]
+    (base-view self
+               "Search"
+               [[:nav
+                 [:ul
+                  [:li "Read"]
+                  [:li "Source"]
+                  [:li "Edit"]
+                  [:li "History"]]]
+                [:p {:class "page-info"} [:em "Search"] ": " (h word)]
+                `[:article
+                  [:header [:h1 "Search"]]
+                  [:form ]
+                  [:table
+                   ~@(for [[title content] result]
+                       [:tr
+                        [:td [:a {:href (page-path url-mapper title)} (h title)]]
+                        [:td (h content)]])]]])))

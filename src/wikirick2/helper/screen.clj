@@ -2,7 +2,8 @@
   (:use hiccup.core
         wikirick2.parsers
         wikirick2.types)
-  (:require [hiccup.page :as page]))
+  (:require [clj-time.format :as format]
+            [hiccup.page :as page]))
 
 (defn- nav-item [screen action-name action-path spec]
   (let [url-mapper (.url-mapper screen)
@@ -20,12 +21,15 @@
        ~(nav-item screen "Edit" (page-action-path urls (.title page) "edit") spec)
        ~(nav-item screen "History" (page-action-path urls (.title page) "history") spec)]]))
 
+(defn show-modified-at [page]
+  (format/unparse (format/formatter "yyyy/MM/dd HH:mm") (modified-at page)))
+
 (defn page-info [page]
   [:p
    {:class "page-info"}
    [:em (h (.title page))]
    ": Last modified: "
-   "2013/10/20 19:30"])
+   (show-modified-at page)])
 
 (defn base-view [screen title content]
   (let [url-mapper (.url-mapper screen)
@@ -45,7 +49,8 @@
                    [:header [:h1 (h (config :site-title))]]
                    [:section#search
                     [:form
-                     [:input {:type "text"}]
+                     {:method "get" :action (search-path url-mapper)}
+                     [:input {:type "text" :name "word"}]
                      [:button {:type "submit"} "Search"]]]
                    [:section
                     [:h2 "Recent Updates"]]]

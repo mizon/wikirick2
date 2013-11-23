@@ -72,4 +72,13 @@
         (is (= (res :status)))
         (let [foo-page (select-page repo "FooPage")]
           (is (= (page-source foo-page) page-content))
-          (is (= ((res :headers) "Location") "/w/FooPage")))))))
+          (is (= ((res :headers) "Location") "/w/FooPage")))))
+
+    (testing "handles GET /search"
+      (with-wiki-service
+        (let [res (app (request :get "/search" {:word "some"}))]
+          (is (= (res :status) 200))
+          (is (= (res :body)
+                 (search-view screen
+                              "some"
+                              (search-pages repository "some")))))))))
