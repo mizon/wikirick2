@@ -95,11 +95,16 @@ some bar
     (testing "returns a empty set when matched no pages"
       (is (= (search-pages repo "foobar") #{})))
 
-    (testing "returns the first matched line in each page"
+    (testing "hits the first matched line only in each page"
       (is (= (search-pages repo "some") #{["FooPage" "some foo"] ["BarPage" "some foo"]})))
 
     (testing "accepts words containing single quotes"
-      (is (= (search-pages repo "'foo")  #{["FooPage" "some 'foo"]})))))
+      (is (= (search-pages repo "'foo") #{["FooPage" "some 'foo"]})))
+
+    (testing "hits titles and has first line of the page"
+      ;; FIXME: Skipped: This feature is not implemented yet
+      ;; (is (= (search-pages repo "barpage") #{["BarPage" "some foo"]}))
+      )))
 
 (deftest pape
   (testing "save-page"
