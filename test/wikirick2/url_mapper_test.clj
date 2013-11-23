@@ -22,7 +22,7 @@
     (is (= (expand-path urlm "foo") "/foo")))
 
   (testing "expands search pathes"
-    (is (= (search-path urlm "foobar") "/search?word=foobar")))
+    (is (= (search-path urlm) "/search")))
 
   (testing "expands the theme path"
     (is (= (theme-path urlm) "/theme.css"))))
