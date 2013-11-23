@@ -54,7 +54,7 @@
         result (shell/sh "rlog" rev-opt title :dir (.base-dir shell))]
     (if (= (:exit result) 0)
       (let [[_ date-str] (re-find #"(?m)^date: (.+?);" (:out result))]
-        (format/parse (format/formatter "yy/MM/dd hh:mm:ss") date-str))
+        (format/parse (format/formatter "yy/MM/dd HH:mm:ss") date-str))
       (throw+ {:type :rlog-date-failed}))))
 
 (defn- parse-co-error [error-result]
