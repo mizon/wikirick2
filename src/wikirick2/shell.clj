@@ -62,7 +62,7 @@
         result (shell/sh "sh" "-c" command :dir (.base-dir shell))
         update-map (fn [m l]
                      (match (re-matches #"(.+?)\:(.+)" l)
-                       [_ name content] (if (m name) m (assoc m name content))
+                       [_ name content] (merge {name content} m)
                        :else m))]
     (if (empty? (:err result))
       (set (reduce update-map {} (string/split-lines (:out result))))
