@@ -26,13 +26,15 @@
   (page-path [self page])
   (page-action-path [self page-title action-name])
   (theme-path [self])
+  (search-path [self])
   (expand-path [self path]))
 
 (defprotocol IScreen
   (read-view [self page])
   (new-view [self page])
   (edit-view [self page])
-  (source-view [self page]))
+  (source-view [self page])
+  (search-view [self word result]))
 
 (defrecord Template [title body])
 

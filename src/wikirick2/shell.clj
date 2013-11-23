@@ -61,7 +61,7 @@
   (let [command (format "grep -iF --exclude-dir RCS '%s' *" (.replace word "'" "'\\''"))
         result (shell/sh "sh" "-c" command :dir (.base-dir shell))
         update-map (fn [m l]
-                     (match (re-matches #"(.+)\:(.+)" l)
+                     (match (re-matches #"(.+?)\:(.+)" l)
                        [_ name content] (if (m name) m (assoc m name content))
                        :else m))]
     (if (empty? (:err result))

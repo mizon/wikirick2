@@ -90,16 +90,20 @@ some 'foo
     (save-page (create-page repo "BarPage" "
 some foo
 some bar
+foo: foobar
 "))
 
     (testing "returns a empty set when matched no pages"
-      (is (= (search-pages repo "foobar") #{})))
+      (is (= (search-pages repo "nooo") #{})))
 
     (testing "hits the first matched line only in each page"
       (is (= (search-pages repo "some") #{["FooPage" "some foo"] ["BarPage" "some foo"]})))
 
     (testing "accepts words containing single quotes"
       (is (= (search-pages repo "'foo") #{["FooPage" "some 'foo"]})))
+
+    (testing "hits lines containing colons"
+      (is (= (search-pages repo "foobar") #{["BarPage" "foo: foobar"]})))
 
     (testing "hits titles and has first line of the page"
       ;; FIXME: Skipped: This feature is not implemented yet
