@@ -81,6 +81,16 @@
       (save-page (create-page repo "SencondPage" "sencond content"))
       (is (= (map :title (select-all-pages repo)) ["SencondPage" "FirstPage"]))))
 
+  (testing "select-recent-pages"
+    (testing-repo "select recent pages"
+      (save-page (create-page repo "FirstPage" "first content"))
+      (save-page (create-page repo "SecondPage" "sencond content"))
+      (save-page (create-page repo "ThirdPage" "third content"))
+
+      (is (= (map :title (select-recent-pages repo 2)) '("ThirdPage" "SecondPage")))
+      (is (= (map :title (select-recent-pages repo 3)) '("ThirdPage" "SecondPage" "FirstPage")))
+      (is (= (map :title (select-recent-pages repo 10)) '("ThirdPage" "SecondPage" "FirstPage")))))
+
   (testing-repo "search-pages"
     (save-page (create-page repo "FooPage" "
 some foo

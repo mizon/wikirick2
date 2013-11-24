@@ -32,6 +32,9 @@
     (with-rw-lock self readLock
       (map #(new-page self %) (shell/ls-rcs-files shell))))
 
+  (select-recent-pages [self n-pages]
+    (take n-pages (select-all-pages self)))
+
   (search-pages [self word]
     (with-rw-lock self readLock
       (shell/grep-iF shell word))))
