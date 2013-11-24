@@ -35,6 +35,7 @@ body {
 
     header {
       margin-bottom: 1em;
+
       a {
         color: $header-color;
         text-decoration: none;
@@ -61,6 +62,17 @@ body {
 
       input {
         width: 100%;
+      }
+    }
+
+    ol {
+      li:before {
+        content: '-';
+        margin-right: 1em;
+      }
+
+      li {
+        list-style-type: none;
       }
     }
   }
@@ -167,25 +179,24 @@ body {
 
     article.search {
       table {
-        width: 100%;
-        border-collapse: collapse;
-        border: solid 1px $border-color;
         margin: 1em 0;
 
         tr {
           th, td {
-            border: solid 1px $border-color;
-            padding: 0 0.5em;
           }
 
           th {
-            width: 20%;
+            text-align: left;
             font-weight: normal;
-            background-color: #EEE;
+          }
+
+          td:before {
+            content: "|";
+            margin-right: 0.5em;
           }
 
           td {
-            background-color: #F8F8F8;
+            padding-left: 1em;
           }
         }
       }

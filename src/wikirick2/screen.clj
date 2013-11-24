@@ -5,7 +5,7 @@
         wikirick2.types)
   (:require [hiccup.page :as page]))
 
-(deftype Screen [url-mapper render-wiki-source config]
+(deftype Screen [repository url-mapper render-wiki-source config]
   IScreen
   (read-view [self page]
     (base-view self
