@@ -31,6 +31,13 @@
    ": Last modified: "
    (show-modified-at page)])
 
+(defn search-box [screen default-word]
+  [:section.search
+   [:form
+    {:method "get" :action (search-path (.url-mapper screen))}
+    [:input {:type "text" :name "word" :value default-word}]
+    [:button {:type "submit"} "Search"]]])
+
 (defn base-view [screen title content]
   (let [url-mapper (.url-mapper screen)
         config (.config screen)]
@@ -46,12 +53,8 @@
                    `[:div.content
                      ~@content]]
                   [:aside
-                   [:header [:h1 (h (config :site-title))]]
-                   [:section#search
-                    [:form
-                     {:method "get" :action (search-path url-mapper)}
-                     [:input {:type "text" :name "word"}]
-                     [:button {:type "submit"} "Search"]]]
+                   [:header [:h1 [:a {:href (index-path url-mapper)} (h (config :site-title))]]]
+                   (search-box screen "")
                    [:section
                     [:h2 "Recent Updates"]]]
                   [:footer "Made with Clojure Programming Language"]]])))

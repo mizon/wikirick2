@@ -68,10 +68,11 @@
                   [:li "History"]]]
                 [:p {:class "page-info"} [:em "Search"] ": " (h word)]
                 `[:article
+                  {:class "search"}
                   [:header [:h1 "Search"]]
-                  [:form ]
+                  ~(search-box self word)
                   [:table
                    ~@(for [[title content] result]
                        [:tr
-                        [:td [:a {:href (page-path url-mapper title)} (h title)]]
+                        [:th [:a {:href (page-path url-mapper title)} (h title)]]
                         [:td (h content)]])]]])))
