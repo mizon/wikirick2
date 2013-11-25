@@ -38,10 +38,11 @@
     [:input {:type "text" :name "word" :value default-word}]
     [:button {:type "submit"} "Search"]]])
 
-(defn recent-updates [screen]
-  (let [pages (select-recent-pages (.repository screen) 10)]
+(defn recent-changes [screen]
+  (let [pages (select-recent-pages (.repository screen) 10)
+        modified-day #(format/unparse (format/formatter "yyyy/MM/dd") (modified-at %))]
     [:section
-     [:h2 "Recent Updates"]
+     [:h2 "Recent Changes"]
      [:ol
       (for [p pages]
         [:li [:a {:href (page-path (.url-mapper screen) (.title p))} (h (.title p))]])]]))
@@ -63,7 +64,7 @@
                   [:aside
                    [:header [:h1 [:a {:href (index-path url-mapper)} (h (config :site-title))]]]
                    (search-box screen "")
-                   (recent-updates screen)]
+                   (recent-changes screen)]
                   [:footer "Made with Clojure Programming Language"]]])))
 
 (defn title-to-li [screen title]
