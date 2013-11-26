@@ -33,8 +33,9 @@
 (defprotocol IScreen
   (read-view [self page])
   (new-view [self page])
-  (edit-view [self page])
   (source-view [self page])
+  (edit-view [self page])
+  (history-view [self page])
   (search-view [self word result]))
 
 (defrecord Template [title body])

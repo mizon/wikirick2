@@ -27,7 +27,7 @@
         (is (= (res :status) 200)))))
 
   (let [foo-page (assoc (new-page repo "FooPage") :source "some content")
-        bar-page (assoc (new-page repo "FooPage") :source "some content")]
+        bar-page (assoc (new-page repo "BarPage") :source "some content")]
     (save-page foo-page)
     (save-page bar-page)
 
@@ -73,6 +73,18 @@
         (let [foo-page (select-page repo "FooPage")]
           (is (= (page-source foo-page) page-content))
           (is (= ((res :headers) "Location") "/w/FooPage")))))
+
+    (testing "handles GET /w/FooPage/history"
+      (with-wiki-service
+        (let [res (app (request :get "/w/FooPage/history"))]
+          (is (= (res :status) 200))
+          (is (= (res :body)
+                 (history-view screen foo-page))))))
+
+    (testing "redirects when GET /w/SomePage/history"
+      (let [res (app (request :get "/w/SomePage/history"))]
+        (is (= (res :status) 302))
+        (is (= ((res :headers) "Location") "/w/SomePage/new"))))
 
     (testing "handles GET /search"
       (with-wiki-service

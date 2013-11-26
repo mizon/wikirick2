@@ -57,6 +57,17 @@
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]]))
 
+  (history-view [self page]
+    (base-view self
+               (.title page)
+               [(navigation self page {:read {:enabled? true :selected? false}
+                                       :source {:enabled? true :selected? false}
+                                       :edit {:enabled? true :selected? false}
+                                       :history {:enabled? true :selected? true}})
+                (page-info page)
+                `[:article
+                  [:header [:h1 ~(h (format "%s: History" (.title page)))]]]]))
+
   (search-view [self word result]
     (base-view self
                "Search"

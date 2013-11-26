@@ -32,6 +32,14 @@
   (with-wiki-service
     (search-view screen word (search-pages repository word))))
 
+(defn- open-history-view [title]
+  (with-wiki-service
+    (try+
+      (let [page (select-page repository title)]
+        (history-view screen page))
+      (catch [:type :page-not-found] _
+        (response/redirect (page-action-path url-mapper title "new"))))))
+
 (defn- register-new-page [{:keys [title source]}]
   (with-wiki-service
     (save-page (assoc (new-page repository title) :source source))))
@@ -50,6 +58,7 @@
   (POST "/w/:title/new" {params :params} (register-new-page params))
   (GET "/w/:title/edit" [title] (open-edit-view title))
   (POST "/w/:title/edit" {params :params} (update-page params))
+  (GET "/w/:title/history" [title] (open-history-view title))
   (GET "/search" {params :params} (open-search-view params))
   (route/resources "/")
   (route/not-found "Not Found"))
