@@ -5,7 +5,7 @@
         wikirick2.types)
   (:require [hiccup.page :as page]))
 
-(deftype Screen [repository url-mapper render-wiki-source config]
+(deftype Screen [repository url-mapper renderer config]
   IScreen
   (read-view [self page]
     (base-view self
@@ -17,7 +17,7 @@
                 (page-info page)
                 `[:article
                   [:header [:h1 ~(h (.title page))]]
-                  ~@(render-wiki-source (page-source page))
+                  ~@(renderer page)
                   [:h2 "Related Pages"]
                   [:ul ~@(map #(title-to-li self %) (referred-titles page))]]]))
 
@@ -87,3 +87,13 @@
                        [:tr
                         [:th [:a {:href (page-path url-mapper title)} (h title)]]
                         [:td (h content)]])]]])))
+
+(defn cached-page-renderer [render-f]
+  (let [cache (ref {})]
+    (letfn [(do-render [page]
+              (let [key (str (.title page) "/" (page-revision page))]
+                (or (@cache key)
+                    (let [rendered (render-f (page-source page))]
+                      (dosync (alter cache #(assoc % key rendered)))
+                      (do-render page)))))]
+      do-render)))
