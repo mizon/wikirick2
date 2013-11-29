@@ -256,12 +256,11 @@
   (<$> first (match-line #"(\t|    )(.+)")))
 
 (def- block-code
-  (do-parser [:let [trim-left #(.replaceAll % "^(\t|    )" "")
-                    trim-right #(.replaceAll % "\\s*$" "")]
-              l code-line
+  (do-parser [l code-line
               ls (c/many (<|> code-line blank-line))
-              :let [code-lines (cons l ls)]]
-    [:pre [:code (h (trim-right (unlines (map trim-left code-lines))))]]))
+              :let [code-lines (cons l ls)
+                    trim-indent #(.replaceAll % "^(\t|    )" "")]]
+    [:pre [:code (h (string/trimr (unlines (map trim-indent code-lines))))]]))
 
 (def- bq-marked-line
   (<$> second (match-line #"\s*> ?(.*)")))
