@@ -4,25 +4,25 @@
         wikirick2.types)
   (:require [clojure.java.shell :as shell]))
 
-(def test-repo "test-repo")
+(def test-storage "test-storage")
 
-(defn setup-test-repo []
-  (shell/sh "mkdir" "-p" (format "%s/RCS" test-repo)))
+(defn setup-test-storage []
+  (shell/sh "mkdir" "-p" (format "%s/RCS" test-storage)))
 
-(defn cleanup-test-repo []
-  (shell/sh "rm" "-rf" test-repo))
+(defn cleanup-test-storage []
+  (shell/sh "rm" "-rf" test-storage))
 
 (def testing-service
-  (make-wiki-service {:repository-dir test-repo
+  (make-wiki-service {:page-storage-dir test-storage
                       :base-path "/"
                       :sqlite-path "test.sqlite3"}))
 
-(defn with-repository [testcase]
+(defn with-page-storage [testcase]
   (try
-    (setup-test-repo)
+    (setup-test-storage)
     (testcase)
     (finally
-      (cleanup-test-repo))))
+      (cleanup-test-storage))))
 
 (defn with-testing-service [testcase]
   (binding [*wiki-service* testing-service]

@@ -39,7 +39,7 @@
     [:button {:type "submit"} "Search"]]])
 
 (defn recent-changes [screen]
-  (let [pages (select-recent-pages (.repository screen) 10)
+  (let [pages (select-recent-pages (.storage screen) 10)
         modified-day #(format/unparse (format/formatter "yyyy/MM/dd") (modified-at %))]
     [:section
      [:h2 "Recent Changes"]

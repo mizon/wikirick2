@@ -1,6 +1,6 @@
-(ns wikirick2.repository
+(ns wikirick2.page-storage
   (:use slingshot.slingshot
-        wikirick2.helper.repository
+        wikirick2.helper.page-storage
         wikirick2.types)
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.java.jdbc.ddl :as ddl]
@@ -13,11 +13,11 @@
 
 (declare map->Page)
 
-(deftype Repository [shell db rw-lock]
-  IRepository
+(deftype PageStorage [shell db rw-lock]
+  IPageStorage
   (new-page [self title]
     (validate-page-title title)
-    (map->Page {:repo self :title title}))
+    (map->Page {:storage self :title title}))
 
   (select-page [self title]
     (let [page (new-page self title)]
@@ -39,7 +39,7 @@
     (with-rw-lock self readLock
       (shell/grep-iF shell word))))
 
-(defrecord Page [repo title source revision edit-comment]
+(defrecord Page [storage title source revision edit-comment]
   IPage
   (save-page [self]
     (letfn [(update-page-relation [db]
@@ -52,40 +52,40 @@
                                  :destination d
                                  :priority priority}))))]
       (validate-page-title title)
-      (jdbc/db-transaction [db (.db repo)]
-        (with-rw-lock repo writeLock
+      (jdbc/db-transaction [db (.db storage)]
+        (with-rw-lock storage writeLock
           (update-page-relation db)
-          (shell/co-l (.shell repo) title)
-          (shell/ci (.shell repo) title (page-source self) (or edit-comment ""))))))
+          (shell/co-l (.shell storage) title)
+          (shell/ci (.shell storage) title (page-source self) (or edit-comment ""))))))
 
   (page-source [self]
-    (or source (with-rw-lock repo readLock
-                 (shell/co-p (.shell repo) title (page-revision self)))))
+    (or source (with-rw-lock storage readLock
+                 (shell/co-p (.shell storage) title (page-revision self)))))
 
   (page-revision [self]
-    (or revision (with-rw-lock repo readLock
-                   (shell/head-revision (.shell repo) title))))
+    (or revision (with-rw-lock storage readLock
+                   (shell/head-revision (.shell storage) title))))
 
   (page-exists? [self]
-    (with-rw-lock repo readLock
-      (shell/test-f (.shell repo) title)))
+    (with-rw-lock storage readLock
+      (shell/test-f (.shell storage) title)))
 
   (modified-at [self]
-    (with-rw-lock repo readLock
-      (shell/rlog-date (.shell repo) title (page-revision self))))
+    (with-rw-lock storage readLock
+      (shell/rlog-date (.shell storage) title (page-revision self))))
 
   (referring-titles [self]
     (wiki-parser/scan-wiki-links (page-source self)))
 
   (referred-titles [self]
-    (jdbc/query (.db repo)
+    (jdbc/query (.db storage)
                 (sql/select [:source]
                             :page_relation
                             (sql/where {:destination title})
                             "ORDER BY priority DESC")
                 :row-fn :source)))
 
-(defn create-repository [base-dir db]
+(defn create-page-storage [base-dir db]
   (letfn [(table-exists? []
             (try
               (jdbc/query db (sql/select * :page_relation))
@@ -103,4 +103,4 @@
         (ddl/create-index :pr_priority_index :page_relation [:priority])))
     (let [shell (shell/->Shell base-dir)]
       (shell/make-rcs-dir shell)
-      (Repository. shell db (ReentrantReadWriteLock.)))))
+      (PageStorage. shell db (ReentrantReadWriteLock.)))))

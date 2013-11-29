@@ -48,6 +48,12 @@
   (let [result (shell/sh "test" "-f" (rcs-file title) :dir (rcs-dir shell))]
     (= (:exit result) 0)))
 
+(defn rlog [shell title]
+  (let [result (shell/sh "rlog" title (.base-dir shell))]
+    (if (= (:exit result) 0)
+      ()
+      (throw+ {:type :rlog-failed}))))
+
 (defn rlog-date [shell title rev]
   (let [rev-opt (format "-r1.%s" rev)
         result (shell/sh "rlog" rev-opt title :dir (.base-dir shell))]

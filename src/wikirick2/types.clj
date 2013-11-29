@@ -1,6 +1,6 @@
 (ns wikirick2.types)
 
-(defprotocol IRepository
+(defprotocol IPageStorage
   (new-page [self title])
   (select-page [self title])
   (select-page-by-revision [self title rev])
@@ -40,4 +40,4 @@
 
 (defrecord Template [title body])
 
-(defrecord WikiService [config repository url-mapper screen])
+(defrecord WikiService [config storage url-mapper screen])

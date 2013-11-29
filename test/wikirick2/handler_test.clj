@@ -14,20 +14,20 @@
 (compojure/defroutes app
   (handler/site wikirick-routes))
 
-(use-fixtures :each with-repository with-testing-service)
+(use-fixtures :each with-page-storage with-testing-service)
 
-(def repo (.repository testing-service))
+(def storage (.storage testing-service))
 
 (deftest wikirick-routes-
-  (let [front-page (assoc (new-page repo "FrontPage") :source "some content")]
+  (let [front-page (assoc (new-page storage "FrontPage") :source "some content")]
     (save-page front-page)
 
     (testing "handles GET /"
       (let [res (app (request :get "/"))]
         (is (= (res :status) 200)))))
 
-  (let [foo-page (assoc (new-page repo "FooPage") :source "some content")
-        bar-page (assoc (new-page repo "BarPage") :source "some content")]
+  (let [foo-page (assoc (new-page storage "FooPage") :source "some content")
+        bar-page (assoc (new-page storage "BarPage") :source "some content")]
     (save-page foo-page)
     (save-page bar-page)
 
@@ -36,7 +36,7 @@
         (let [res (app (request :get "/w/FooPage"))]
           (is (= (res :status) 200))
           (is (= (res :body)
-                 (read-view screen (select-page repository "FooPage")))))))
+                 (read-view screen (select-page storage "FooPage")))))))
 
     (testing "handles GET /w/SomePage/new"
       (with-wiki-service
@@ -44,7 +44,7 @@
           (is (= (res :status) 200))
           (is (= (res :body)
                  (new-view screen
-                           (assoc (new-page repository "SomePage") :source "new content")))))))
+                           (assoc (new-page storage "SomePage") :source "new content")))))))
 
     (testing "handles GET /w/FooPage/edit"
       (with-wiki-service
@@ -52,7 +52,7 @@
           (is (= (res :status) 200))
           (is (= (res :body)
                  (edit-view screen
-                            (select-page repository "FooPage")))))))
+                            (select-page storage "FooPage")))))))
 
     (testing "redirects when GET /w/SomePage"
       (let [res (app (request :get "/w/SomePage"))]
@@ -70,7 +70,7 @@
                               {:source page-content
                                :base-rev "1"}))]
         (is (= (res :status) 303))
-        (let [foo-page (select-page repo "FooPage")]
+        (let [foo-page (select-page storage "FooPage")]
           (is (= (page-source foo-page) page-content))
           (is (= ((res :headers) "Location") "/w/FooPage")))))
 
@@ -93,4 +93,4 @@
           (is (= (res :body)
                  (search-view screen
                               "some"
-                              (search-pages repository "some")))))))))
+                              (search-pages storage "some")))))))))

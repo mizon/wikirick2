@@ -15,10 +15,10 @@
 (deftest with-wiki-service
   (testing "binds the service components"
     (binding [service/*wiki-service* (map->WikiService {:config :dummy-config
-                                                        :repository :dummy-repository
+                                                        :storage :dummy-page-storage
                                                         :url-mapper :dummy-url-mapper
                                                         :screen :dummy-screen})]
       (service/with-wiki-service
-        (is (= repository :dummy-repository))
+        (is (= storage :dummy-page-storage))
         (is (= screen :dummy-screen))
         (is (= url-mapper :dummy-url-mapper))))))

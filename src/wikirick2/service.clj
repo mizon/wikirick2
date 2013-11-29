@@ -1,6 +1,6 @@
 (ns wikirick2.service
   (:use wikirick2.types)
-  (:require [wikirick2.repository :as repository]
+  (:require [wikirick2.page-storage :as page-storage]
             [wikirick2.screen :as screen]
             [wikirick2.url-mapper :as url-mapper]
             [wikirick2.wiki-parser :as wiki-parser]))
@@ -13,21 +13,21 @@
       (app req))))
 
 (defmacro with-wiki-service [& forms]
-  `(let [~'repository (.repository *wiki-service*)
+  `(let [~'storage (.storage *wiki-service*)
          ~'screen (.screen *wiki-service*)
          ~'url-mapper (.url-mapper *wiki-service*)]
      ~@forms))
 
 (defn make-wiki-service [config]
-  (let [repo (repository/create-repository (config :repository-dir)
-                                           {:classname "org.sqlite.JDBC"
-                                            :subprotocol "sqlite"
-                                            :subname (config :sqlite-path)})
+  (let [storage (page-storage/create-page-storage (config :page-storage-dir)
+                                                  {:classname "org.sqlite.JDBC"
+                                                   :subprotocol "sqlite"
+                                                   :subname (config :sqlite-path)})
         urlm (url-mapper/->URLMapper (config :base-path))
         renderer (wiki-parser/make-wiki-source-renderer #(page-path urlm %))
         cached-renderer  (screen/cached-page-renderer renderer)
-        screen (screen/->Screen repo urlm cached-renderer config)]
+        screen (screen/->Screen storage urlm cached-renderer config)]
     (map->WikiService {:config config
-                       :repository repo
+                       :storage storage
                        :url-mapper urlm
                        :screen screen})))

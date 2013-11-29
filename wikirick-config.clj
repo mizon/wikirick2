@@ -1,4 +1,4 @@
 {:site-title "Wikirick2 Wiki Engine"
- :repository-dir "repo"
+ :page-storage-dir "pages"
  :sqlite-path "relations.sqlite3"
  :base-path "/"}

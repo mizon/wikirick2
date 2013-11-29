@@ -11,43 +11,43 @@
 (defn- open-read-view [title]
   (with-wiki-service
     (try+
-      (let [page (select-page repository title)]
+      (let [page (select-page storage title)]
         (read-view screen page))
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
 
 (defn- open-new-view [title]
   (with-wiki-service
-    (new-view screen (assoc (new-page repository title) :source "new content"))))
+    (new-view screen (assoc (new-page storage title) :source "new content"))))
 
 (defn- open-edit-view [title]
   (with-wiki-service
     (try+
-      (let [page (select-page repository title)]
+      (let [page (select-page storage title)]
         (edit-view screen page))
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
 
 (defn- open-search-view [{:keys [word]}]
   (with-wiki-service
-    (search-view screen word (search-pages repository word))))
+    (search-view screen word (search-pages storage word))))
 
 (defn- open-history-view [title]
   (with-wiki-service
     (try+
-      (let [page (select-page repository title)]
+      (let [page (select-page storage title)]
         (history-view screen page))
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
 
 (defn- register-new-page [{:keys [title source]}]
   (with-wiki-service
-    (save-page (assoc (new-page repository title) :source source))))
+    (save-page (assoc (new-page storage title) :source source))))
 
 (defn- update-page [{:keys [title source base-rev]}]
   (with-wiki-service
     (let [base-rev- (Integer/parseInt base-rev)
-          page (select-page-by-revision repository title base-rev-)]
+          page (select-page-by-revision storage title base-rev-)]
       (save-page (assoc page :source source))
       (response/redirect-after-post (page-path url-mapper title)))))
 

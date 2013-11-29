@@ -1,4 +1,4 @@
-(ns wikirick2.helper.repository
+(ns wikirick2.helper.page-storage
   (:use slingshot.slingshot
         wikirick2.types)
   (:require [clojure.core.match :refer [match]]
@@ -6,13 +6,13 @@
             [clojure.string :as string]
             [wikirick2.wiki-parser :as wiki-parser]))
 
-(defmacro with-rw-lock [repo lock-type & forms]
+(defmacro with-rw-lock [storage lock-type & forms]
   `(do
-     (.. ~repo ~'rw-lock ~lock-type lock)
+     (.. ~storage ~'rw-lock ~lock-type lock)
      (try
        ~@forms
        (finally
-         (.. ~repo ~'rw-lock ~lock-type unlock)))))
+         (.. ~storage ~'rw-lock ~lock-type unlock)))))
 
 (defn nlinks-per-page-size [page]
   (let [dests (referring-titles page)]
