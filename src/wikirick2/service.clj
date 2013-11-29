@@ -1,9 +1,9 @@
 (ns wikirick2.service
   (:use wikirick2.types)
-  (:require [wikirick2.parsers :as parsers]
-            [wikirick2.repository :as repository]
+  (:require [wikirick2.repository :as repository]
             [wikirick2.screen :as screen]
-            [wikirick2.url-mapper :as url-mapper]))
+            [wikirick2.url-mapper :as url-mapper]
+            [wikirick2.wiki-parser :as wiki-parser]))
 
 (def ^:dynamic *wiki-service* nil)
 
@@ -24,7 +24,7 @@
                                             :subprotocol "sqlite"
                                             :subname (config :sqlite-path)})
         urlm (url-mapper/->URLMapper (config :base-path))
-        renderer (parsers/make-wiki-source-renderer #(page-path urlm %))
+        renderer (wiki-parser/make-wiki-source-renderer #(page-path urlm %))
         cached-renderer  (screen/cached-page-renderer renderer)
         screen (screen/->Screen repo urlm cached-renderer config)]
     (map->WikiService {:config config

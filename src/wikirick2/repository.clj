@@ -6,8 +6,8 @@
             [clojure.java.jdbc.ddl :as ddl]
             [clojure.java.jdbc.sql :as sql]
             [clojure.string :as string]
-            [wikirick2.parsers :as parsers]
-            [wikirick2.shell :as shell])
+            [wikirick2.shell :as shell]
+            [wikirick2.wiki-parser :as wiki-parser])
   (:import java.sql.SQLException
            java.util.concurrent.locks.ReentrantReadWriteLock))
 
@@ -75,7 +75,7 @@
       (shell/rlog-date (.shell repo) title (page-revision self))))
 
   (referring-titles [self]
-    (parsers/scan-wiki-links (page-source self)))
+    (wiki-parser/scan-wiki-links (page-source self)))
 
   (referred-titles [self]
     (jdbc/query (.db repo)

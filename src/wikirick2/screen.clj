@@ -1,7 +1,6 @@
 (ns wikirick2.screen
   (:use hiccup.core
         wikirick2.helper.screen
-        wikirick2.parsers
         wikirick2.types)
   (:require [hiccup.page :as page]))
 

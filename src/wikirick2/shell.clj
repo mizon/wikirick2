@@ -5,8 +5,7 @@
             [clj-time.format :as format]
             [clojure.core.match :refer [match]]
             [clojure.java.shell :as shell]
-            [clojure.string :as string]
-            [wikirick2.parsers :as parsers]))
+            [clojure.string :as string]))
 
 (declare parse-co-error rcs-file rcs-dir)
 

@@ -1,4 +1,4 @@
-(ns wikirick2.parsers
+(ns wikirick2.wiki-parser
   (:use [hiccup.core :only [h]]
         zetta.core)
   (:require [clojure.string :as string]

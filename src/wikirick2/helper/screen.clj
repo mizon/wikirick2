@@ -1,7 +1,7 @@
 (ns wikirick2.helper.screen
   (:use hiccup.core
-        wikirick2.parsers
-        wikirick2.types)
+        wikirick2.types
+        wikirick2.wiki-parser)
   (:require [clj-time.format :as format]
             [hiccup.page :as page]))
 

@@ -4,7 +4,7 @@
   (:require [clojure.core.match :refer [match]]
             [clojure.java.shell :as shell]
             [clojure.string :as string]
-            [wikirick2.parsers :as parsers]))
+            [wikirick2.wiki-parser :as wiki-parser]))
 
 (defmacro with-rw-lock [repo lock-type & forms]
   `(do
@@ -19,5 +19,5 @@
     (Math/round (float (* (/ (count dests) (count (.source page))) 1e6)))))
 
 (defn validate-page-title [title]
-  (when (not (parsers/valid-page-name? title))
+  (when (not (wiki-parser/valid-page-name? title))
     (throw+ {:type :invalid-page-title})))

@@ -1,6 +1,6 @@
-(ns wikirick2.parsers-test
+(ns wikirick2.wiki-parser-test
   (:use clojure.test)
-  (:require [wikirick2.parsers :as parsers]))
+  (:require [wikirick2.wiki-parser :as wiki-parser]))
 
 (def wiki-source "
 FrontPage
@@ -15,7 +15,7 @@ BarPage -> [[BarPage]]
 [[SomePage]] is funny.
 ")
 
-(def render-wiki-source (parsers/make-wiki-source-renderer #(format "/wiki/%s" %)))
+(def render-wiki-source (wiki-parser/make-wiki-source-renderer #(format "/wiki/%s" %)))
 
 (defn- render? [sxml source]
   (= (render-wiki-source source) sxml))
@@ -25,14 +25,14 @@ BarPage -> [[BarPage]]
 
 (deftest scan-wiki-links
   (testing "scans wiki links from the wiki source"
-    (is (= (parsers/scan-wiki-links wiki-source) #{"SomePage" "FooPage" "BarPage"}))))
+    (is (= (wiki-parser/scan-wiki-links wiki-source) #{"SomePage" "FooPage" "BarPage"}))))
 
 (deftest valid-page-name?
   (testing "check whether the wiki name is valid or not"
-    (are [wiki-link-name] (parsers/valid-page-name? wiki-link-name)
+    (are [wiki-link-name] (wiki-parser/valid-page-name? wiki-link-name)
          "foobar"
          "foo bar")
-    (are [wiki-link-name] (not (parsers/valid-page-name? wiki-link-name))
+    (are [wiki-link-name] (not (wiki-parser/valid-page-name? wiki-link-name))
          ""
          "foo/bar"
          " foobar"
