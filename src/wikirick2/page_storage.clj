@@ -70,6 +70,10 @@
     (with-rw-lock storage readLock
       (shell/test-f (.shell storage) title)))
 
+  (page-history [self]
+    (with-rw-lock storage readLock
+      (shell/rlog (.shell storage) title)))
+
   (modified-at [self]
     (with-rw-lock storage readLock
       (shell/rlog-date (.shell storage) title (page-revision self))))

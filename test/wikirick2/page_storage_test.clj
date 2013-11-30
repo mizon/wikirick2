@@ -150,6 +150,29 @@ foo: foobar
         (save-page page)
         (is (page-exists? page)))))
 
+  (testing-storage "page-history"
+    (let [before (DateTime/now)]
+      (save-page (create-page storage "SomePage" "some content"))
+      (save-page (create-page storage "SomePage" "foo content"))
+
+      (testing "returns the revisions of the commits"
+        (let [hist (page-history (select-page storage "SomePage"))]
+          (is (= (map :revision hist) [2 1]))))
+
+      (testing "returns numbers of edited lines"
+        (let [hist (page-history (select-page storage "SomePage"))]
+          (is (= ((first hist) :lines) {:added 1 :deleted 1}))))
+
+      (testing "doesn't returns num of edited lines of first revision"
+        (let [hist (page-history (select-page storage "SomePage"))]
+          (is (= ((last hist) :lines) nil))))
+
+      (testing "returns the commited dates"
+        (let [hist (page-history (select-page storage "SomePage"))
+              committed-date ((first hist) :date)]
+          (time/after? committed-date before)
+          (time/before? committed-date (DateTime/now))))))
+
   (testing "modified-at"
     (testing-storage "tells when it be modified"
       (let [page (create-page storage "SomePage" "some content")

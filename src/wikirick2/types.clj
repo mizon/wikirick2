@@ -13,6 +13,7 @@
   (page-source [self])
   (page-revision [self])
   (page-exists? [self])
+  (page-history [self])
   (modified-at [self])
   (diff-with-other-revision [self rev])
   (referring-titles [self])

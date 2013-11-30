@@ -7,7 +7,11 @@
             [clojure.java.shell :as shell]
             [clojure.string :as string]))
 
-(declare parse-co-error rcs-file rcs-dir)
+(declare parse-co-error
+         rcs-file
+         rcs-dir
+         parse-date
+         parse-rlog-output)
 
 (deftype Shell [base-dir])
 
@@ -49,9 +53,9 @@
     (= (:exit result) 0)))
 
 (defn rlog [shell title]
-  (let [result (shell/sh "rlog" title (.base-dir shell))]
+  (let [result (shell/sh "rlog" title :dir (.base-dir shell))]
     (if (= (:exit result) 0)
-      ()
+      (parse-rlog-output (:out result))
       (throw+ {:type :rlog-failed}))))
 
 (defn rlog-date [shell title rev]
@@ -59,7 +63,7 @@
         result (shell/sh "rlog" rev-opt title :dir (.base-dir shell))]
     (if (= (:exit result) 0)
       (let [[_ date-str] (re-find #"(?m)^date: (.+?);" (:out result))]
-        (format/parse (format/formatter "yy/MM/dd HH:mm:ss") date-str))
+        (parse-date date-str))
       (throw+ {:type :rlog-date-failed}))))
 
 (defn grep-iF [shell word]
@@ -84,3 +88,22 @@
 
 (defn- rcs-dir [shell]
   (format "%s/RCS" (.base-dir shell)))
+
+(defn- parse-date [date-str]
+  (format/parse (format/formatter "yy/MM/dd HH:mm:ss") date-str))
+
+(defn- parse-rlog-output [output]
+  (map (fn [[rev props]]
+         (let [[_ date] (re-matches #"date: (.+?);.*" props)
+               [lines added deleted] (re-matches #".*?lines: \+(\d+) -(\d+)" props)
+               [_ rev] (re-matches #"revision 1.(\d+)" rev)]
+           (let [m {:date (parse-date date)
+                    :revision (Integer/parseInt rev)}]
+             (if lines
+               (assoc m :lines {:added (Integer/parseInt added)
+                                :deleted (Integer/parseInt deleted)})
+               m))))
+       (partition 2
+                  (filter identity
+                          (map #(first (re-matches #"(revision 1.\d+|date: .+)" %))
+                               (string/split-lines output))))))
