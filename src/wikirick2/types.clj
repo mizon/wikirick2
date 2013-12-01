@@ -26,6 +26,8 @@
 (defprotocol IURLMapper
   (index-path [self])
   (page-path [self page])
+  (page-revision-path [self title revision])
+  (page-diff-path [self title src-rev dest-rev])
   (page-action-path [self page-title action-name])
   (theme-path [self])
   (search-path [self])

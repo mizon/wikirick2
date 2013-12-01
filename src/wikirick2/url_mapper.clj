@@ -16,6 +16,12 @@
   (page-revision-path [self page-title revision]
     (expand-path self (format "%s?rev=%s" (concat-paths "w" page-title) revision)))
 
+  (page-diff-path [self page-title src-rev dest-rev]
+    (expand-path self (concat-paths "w"
+                                    page-title
+                                    "diff"
+                                    (format "%s-%s" src-rev dest-rev))))
+
   (page-action-path [self page-title action-name]
     (expand-path self (concat-paths "w" page-title (.toLowerCase action-name))))
 
@@ -26,7 +32,7 @@
     (expand-path self "search"))
 
   (expand-path [self path]
-    (.toString (.resolve (URI. base-path) path))))
+    (concat-paths base-path path)))
 
 (defn- concat-paths [& paths]
   (string/join "/" paths))

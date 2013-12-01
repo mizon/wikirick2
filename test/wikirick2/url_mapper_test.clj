@@ -9,23 +9,26 @@
 
 (deftest url-mapper
   (testing "index-path"
-    (is (= (index-path urlm) "/")))
+    (is (= (index-path urlm) "/wiki/")))
 
   (testing "page-path"
-    (is (= (page-path urlm "SomePage") "/w/SomePage")))
+    (is (= (page-path urlm "SomePage") "/wiki/w/SomePage")))
 
   (testing "page-revision-path"
-    (is (= (page-revision-path urlm "SomePage" 3) "/w/SomePage?rev=3")))
+    (is (= (page-revision-path urlm "SomePage" 3) "/wiki/w/SomePage?rev=3")))
+
+  (testing "page-diff-path"
+    (is (= (page-diff-path urlm "SomePage" 3 10) "/wiki/w/SomePage/diff/3-10")))
 
   (testing "page-action-path"
-    (is (= (page-action-path urlm "SomePage" "Edit") "/w/SomePage/edit"))
-    (is (= (page-action-path urlm "SomePage" "Source") "/w/SomePage/source")))
+    (is (= (page-action-path urlm "SomePage" "Edit") "/wiki/w/SomePage/edit"))
+    (is (= (page-action-path urlm "SomePage" "Source") "/wiki/w/SomePage/source")))
 
   (testing "expand-path"
-    (is (= (expand-path urlm "foo") "/foo")))
+    (is (= (expand-path urlm "foo") "/wiki/foo")))
 
   (testing "search-path"
-    (is (= (search-path urlm) "/search")))
+    (is (= (search-path urlm) "/wiki/search")))
 
   (testing "theme-path"
-    (is (= (theme-path urlm) "/theme.css"))))
+    (is (= (theme-path urlm) "/wiki/theme.css"))))
