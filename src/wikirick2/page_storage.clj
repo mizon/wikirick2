@@ -17,7 +17,7 @@
   IPageStorage
   (new-page [self title]
     (validate-page-title title)
-    (map->Page {:storage self :title title}))
+    (map->Page {:storage self :title title :latest-revision-cache (ref nil)}))
 
   (select-page [self title]
     (let [page (new-page self title)]
@@ -39,7 +39,7 @@
     (with-rw-lock self readLock
       (shell/grep-iF shell word))))
 
-(defrecord Page [storage title source revision edit-comment]
+(defrecord Page [storage title source revision edit-comment latest-revision-cache]
   IPage
   (save-page [self]
     (letfn [(update-page-relation [db]
@@ -66,8 +66,11 @@
     (or revision (latest-revision self)))
 
   (latest-revision [self]
-    (with-rw-lock storage readLock
-      (shell/head-revision (.shell storage) title)))
+    (or @latest-revision-cache
+        (let [rev (with-rw-lock storage readLock
+                    (shell/head-revision (.shell storage) title))]
+          (dosync (ref-set latest-revision-cache rev))
+          (latest-revision self))))
 
   (page-exists? [self]
     (with-rw-lock storage readLock
