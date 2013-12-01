@@ -3,8 +3,7 @@
   (:require [clojure.string :as string])
   (:import java.net.URI))
 
-(defn- concat-paths [& paths]
-  (string/join "/" paths))
+(declare concat-paths)
 
 (deftype URLMapper [base-path]
   IURLMapper
@@ -13,6 +12,9 @@
 
   (page-path [self page-title]
     (expand-path self (concat-paths "w" page-title)))
+
+  (page-revision-path [self page-title revision]
+    (expand-path self (format "%s?rev=%s" (concat-paths "w" page-title) revision)))
 
   (page-action-path [self page-title action-name]
     (expand-path self (concat-paths "w" page-title (.toLowerCase action-name))))
@@ -25,3 +27,6 @@
 
   (expand-path [self path]
     (.toString (.resolve (URI. base-path) path))))
+
+(defn- concat-paths [& paths]
+  (string/join "/" paths))

@@ -8,21 +8,24 @@
 (defrecord MockedPage [title source])
 
 (deftest url-mapper
-  (testing "expands index pathes"
+  (testing "index-path"
     (is (= (index-path urlm) "/")))
 
-  (testing "expands page pathes"
+  (testing "page-path"
     (is (= (page-path urlm "SomePage") "/w/SomePage")))
 
-  (testing "expands page action pathes"
+  (testing "page-revision-path"
+    (is (= (page-revision-path urlm "SomePage" 3) "/w/SomePage?rev=3")))
+
+  (testing "page-action-path"
     (is (= (page-action-path urlm "SomePage" "Edit") "/w/SomePage/edit"))
     (is (= (page-action-path urlm "SomePage" "Source") "/w/SomePage/source")))
 
-  (testing "expands some pathes"
+  (testing "expand-path"
     (is (= (expand-path urlm "foo") "/foo")))
 
-  (testing "expands search pathes"
+  (testing "search-path"
     (is (= (search-path urlm) "/search")))
 
-  (testing "expands the theme path"
+  (testing "theme-path"
     (is (= (theme-path urlm) "/theme.css"))))
