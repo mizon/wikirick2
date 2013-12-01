@@ -35,7 +35,7 @@
                           (cleanup-page-relation (fn []
                                                    ~@forms))))))
 
-(deftest page-storage-
+(deftest page-storage
   (testing "new-page"
     (testing "makes new page"
       (let [page (new-page storage "NewPage")]
@@ -72,7 +72,7 @@
       (is (throw+? (select-page-by-revision storage "Foo/Page" 1) [:type :invalid-page-title]))))
 
   (testing "select-all-pages"
-    (testing-storage "select all pages"
+    (testing-storage "selects all pages"
       (is (= (select-all-pages storage) []))
 
       (save-page (create-page storage "FirstPage" "first content"))
@@ -82,7 +82,7 @@
       (is (= (map :title (select-all-pages storage)) ["SencondPage" "FirstPage"]))))
 
   (testing "select-recent-pages"
-    (testing-storage "select recent pages"
+    (testing-storage "selects recent pages"
       (save-page (create-page storage "FirstPage" "first content"))
       (save-page (create-page storage "SecondPage" "sencond content"))
       (save-page (create-page storage "ThirdPage" "third content"))
@@ -134,14 +134,34 @@ foo: foobar
       (let [rev1 (create-page storage "FooBar" "some content rev 1")
             rev2 (create-page storage "FooBar" "some content rev 2")]
         (save-page rev1)
-        (is (= (page-revision (select-page storage "FooBar")) 1))
+        (is (= (latest-revision (select-page storage "FooBar")) 1))
         (save-page rev2)
-        (is (= (page-revision (select-page storage "FooBar")) 2))))
+        (is (= (latest-revision (select-page storage "FooBar")) 2))))
 
     (testing-storage "fails to save an invalid title page"
       (let [page (create-page storage "FooBar" "some content")
             invalid-page (assoc page :title "Foo/Page")]
         (throw+? (save-page invalid-page) [:type :invalid-page-title]))))
+
+  (testing "page-revision"
+    (testing-storage "returns the latest revision when the slot is set nil"
+      (let [page (create-page storage "Foo" "foo content")]
+        (save-page page)
+        (is (= (page-revision page) 1))))
+
+    (testing "returns the specified revision when the slot is set non-nil"
+      (let [page (create-page storage "Foo" "foo content")
+            specified (assoc page :revision 10)]
+        (is (= (page-revision specified) 10)))))
+
+  (testing "latest-revision"
+    (testing-storage "returns the latest revision"
+      (let [rev1 (create-page storage "FooPage" "foo content")
+            rev2 (create-page storage "FooPage" "bar content")]
+        (save-page rev1)
+        (is (= (latest-revision (select-page storage "FooPage")) 1))
+        (save-page rev2)
+        (is (= (latest-revision (select-page storage "FooPage")) 2)))))
 
   (testing "page-exists?"
     (testing-storage "knows if page exists"

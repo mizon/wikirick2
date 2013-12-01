@@ -12,6 +12,7 @@
   (save-page [self])
   (page-source [self])
   (page-revision [self])
+  (latest-revision [self])
   (page-exists? [self])
   (page-history [self])
   (modified-at [self])

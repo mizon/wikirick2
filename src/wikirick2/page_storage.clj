@@ -63,8 +63,11 @@
                  (shell/co-p (.shell storage) title (page-revision self)))))
 
   (page-revision [self]
-    (or revision (with-rw-lock storage readLock
-                   (shell/head-revision (.shell storage) title))))
+    (or revision (latest-revision self)))
+
+  (latest-revision [self]
+    (with-rw-lock storage readLock
+      (shell/head-revision (.shell storage) title)))
 
   (page-exists? [self]
     (with-rw-lock storage readLock
