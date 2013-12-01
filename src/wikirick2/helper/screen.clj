@@ -24,6 +24,9 @@
 (defn show-modified-at [page]
   (format/unparse (format/formatter "yyyy/MM/dd HH:mm") (modified-at page)))
 
+(defn show-date [date]
+  (format/unparse (format/formatter "yyyy/MM/dd HH:mm") date))
+
 (defn page-info [page]
   [:p
    {:class "page-info"}
@@ -70,3 +73,30 @@
 (defn title-to-li [screen title]
   (let [url-mapper (.url-mapper screen)]
     `[:li [:a {:href ~(page-path url-mapper title)} ~(h title)]]))
+
+(defn history-line [screen page history odd-or-even]
+  [:tr
+   {:class odd-or-even}
+   [:td (h (show-date (history :date)))]
+   [:td [:a {:href (page-revision-path (.url-mapper screen) (.title page) (history :revision))
+             :class "revision"}
+         (history :revision)]]
+   `[:td
+     ~@(if-let [lines (history :lines)]
+         [[:em {:class (if (> (lines :added) 0) "added" "zero")}
+           (str "+" (lines :added))]
+          " "
+          [:em {:class (if (> (lines :deleted) 0) "deleted" "zero")}
+           (str "-" (lines :deleted))]])]
+   [:td
+    [:a {:href (page-diff-path (.url-mapper screen)
+                               (.title page)
+                               (history :revision)
+                               (latest-revision page))}
+     "Latest"]
+    " | "
+    [:a {:href (page-diff-path (.url-mapper screen)
+                               (.title page)
+                               (dec (history :revision))
+                               (history :revision))}
+     "Previous"]]])

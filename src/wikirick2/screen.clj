@@ -51,7 +51,7 @@
                           :action ~(page-action-path url-mapper (.title page) "edit")}
                    [:input {:type "hidden"
                             :name "base-rev"
-                            :value ~(str (page-revision page))}]
+                            :value ~(page-revision page)}]
                    [:textarea {:name "source"} ~(h (page-source page))]
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]]))
@@ -65,7 +65,14 @@
                                        :history {:enabled? true :selected? true}})
                 (page-info page)
                 `[:article
-                  [:header [:h1 ~(h (format "%s: History" (.title page)))]]]]))
+                  {:class "history"}
+                  [:header [:h1 ~(h (format "%s: History" (.title page)))]]
+                  [:table
+                   [:tr [:th "Timestamp"] [:th "Revision"] [:th "Changes"] [:th "Diff to"]]
+                   ~@(apply concat
+                            (for [[odd-hist even-hist] (partition 2 (page-history page))]
+                              [(history-line self page odd-hist "odd")
+                               (history-line self page even-hist "even")]))]]]))
 
   (search-view [self word result]
     (base-view self

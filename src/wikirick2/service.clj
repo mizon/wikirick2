@@ -25,7 +25,7 @@
                                                    :subname (config :sqlite-path)})
         urlm (url-mapper/->URLMapper (config :base-path))
         renderer (wiki-parser/make-wiki-source-renderer #(page-path urlm %))
-        cached-renderer  (screen/cached-page-renderer renderer)
+        cached-renderer (screen/cached-page-renderer renderer)
         screen (screen/->Screen storage urlm cached-renderer config)]
     (map->WikiService {:config config
                        :storage storage

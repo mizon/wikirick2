@@ -5,6 +5,10 @@ $em-color: #069;
 $bg-color: #F8F8F8;
 $border-color: #CCC;
 $disabled-color: #999;
+$hovered-bg-color: #CCF;
+$header-bg-color: #EEE;
+$odd-line-bg-color: #FFF;
+$even-line-bg-color: #EEF;
 
 @mixin smaller-font() {
   font-size: 75%;
@@ -198,6 +202,48 @@ body {
           td {
             padding-left: 1em;
           }
+        }
+      }
+    }
+
+    article.history {
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 1px;
+
+        tr {
+          th {
+            background-color: $header-bg-color;
+          }
+
+          td {
+            text-align: center;
+          }
+        }
+
+        tr.odd {
+          background-color: $odd-line-bg-color;
+        }
+
+        tr.even {
+          background-color: $even-line-bg-color;
+        }
+
+        a.revision {
+          display: block;
+        }
+
+        em.added {
+          color: #090;
+        }
+
+        em.deleted {
+          color: #900;
+        }
+
+        em.zero {
+          color: $disabled-color;
         }
       }
     }
