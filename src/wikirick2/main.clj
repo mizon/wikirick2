@@ -1,9 +1,9 @@
 (ns wikirick2.main
-  (:use compojure.core
-        wikirick2.handler
-        wikirick2.service
-        wikirick2.types)
-  (:require [compojure.handler :as handler]))
+  (:require [compojure.core :refer :all]
+            [compojure.handler :as handler]
+            [wikirick2.handler :refer :all]
+            [wikirick2.service :refer :all]
+            [wikirick2.types :refer :all]))
 
 (def main-service (make-wiki-service (load-file "./wikirick-config.clj")))
 

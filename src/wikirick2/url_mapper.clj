@@ -1,6 +1,6 @@
 (ns wikirick2.url-mapper
-  (:use wikirick2.types)
-  (:require [clojure.string :as string])
+  (:require [clojure.string :as string]
+            [wikirick2.types :refer :all])
   (:import java.net.URI))
 
 (declare concat-paths)

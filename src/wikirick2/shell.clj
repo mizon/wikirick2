@@ -1,11 +1,11 @@
 (ns wikirick2.shell
-  (:use slingshot.slingshot
-        wikirick2.types)
   (:require [clj-time.core :as clj-time]
             [clj-time.format :as format]
             [clojure.core.match :refer [match]]
             [clojure.java.shell :as shell]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [slingshot.slingshot :refer :all]
+            [wikirick2.types :refer :all]))
 
 (declare parse-co-error
          rcs-file

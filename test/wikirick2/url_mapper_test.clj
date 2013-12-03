@@ -1,7 +1,7 @@
 (ns wikirick2.url-mapper-test
-  (:use clojure.test
-        wikirick2.url-mapper
-        wikirick2.types))
+  (:require [clojure.test :refer :all]
+            [wikirick2.types :refer :all]
+            [wikirick2.url-mapper :refer :all]))
 
 (def urlm (->URLMapper "/wiki"))
 

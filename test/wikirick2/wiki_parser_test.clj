@@ -1,6 +1,6 @@
 (ns wikirick2.wiki-parser-test
-  (:use clojure.test)
-  (:require [wikirick2.wiki-parser :as wiki-parser]))
+  (:require [clojure.test :refer :all]
+            [wikirick2.wiki-parser :as wiki-parser]))
 
 (def wiki-source "
 FrontPage

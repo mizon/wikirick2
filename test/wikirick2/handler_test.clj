@@ -1,15 +1,15 @@
 (ns wikirick2.handler-test
-  (:use clojure.test
-        ring.mock.request
-        wikirick2.handler
-        wikirick2.service
-        wikirick2.testing-helper
-        wikirick2.types)
   (:require [clojure.java.shell :as shell]
+            [clojure.test :refer :all]
             [compojure.core :as compojure]
             [compojure.handler :as handler]
+            [ring.mock.request :refer :all]
             [ring.util.response :as response]
-            [wikirick2.screen :as screen]))
+            [wikirick2.handler :refer :all]
+            [wikirick2.screen :as screen]
+            [wikirick2.service :refer :all]
+            [wikirick2.testing-helper :refer :all]
+            [wikirick2.types :refer :all]))
 
 (compojure/defroutes app
   (handler/site wikirick-routes))

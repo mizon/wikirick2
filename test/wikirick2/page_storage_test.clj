@@ -1,12 +1,12 @@
 (ns wikirick2.page-storage-test
-  (:use clojure.test
-        wikirick2.page-storage
-        wikirick2.testing-helper
-        wikirick2.types)
   (:require [clj-time.core :as time]
             [clojure.java.jdbc :as jdbc]
             [clojure.java.jdbc.sql :as sql]
-            [clojure.java.shell :as shell])
+            [clojure.java.shell :as shell]
+            [clojure.test :refer :all]
+            [wikirick2.page-storage :refer :all]
+            [wikirick2.testing-helper :refer :all]
+            [wikirick2.types :refer :all]
   (:import org.joda.time.DateTime))
 
 (def test-storage-name "test-storage")

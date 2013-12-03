@@ -1,9 +1,9 @@
 (ns wikirick2.helper.screen
-  (:use hiccup.core
-        wikirick2.types
-        wikirick2.wiki-parser)
   (:require [clj-time.format :as format]
-            [hiccup.page :as page]))
+            [hiccup.core :refer :all]
+            [hiccup.page :as page]
+            [wikirick2.types :refer :all]
+            [wikirick2.wiki-parser :refer :all]))
 
 (defn- nav-item [screen action-name action-path spec]
   (let [url-mapper (.url-mapper screen)

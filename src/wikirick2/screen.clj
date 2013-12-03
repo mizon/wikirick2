@@ -1,8 +1,8 @@
 (ns wikirick2.screen
-  (:use hiccup.core
-        wikirick2.helper.screen
-        wikirick2.types)
-  (:require [hiccup.page :as page]))
+  (:require [hiccup.core :refer :all]
+            [hiccup.page :as page]
+            [wikirick2.helper.screen :refer :all]
+            [wikirick2.types :refer :all]))
 
 (deftype Screen [storage url-mapper renderer config]
   IScreen

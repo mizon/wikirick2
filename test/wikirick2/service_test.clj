@@ -1,7 +1,7 @@
 (ns wikirick2.service-test
-  (:use clojure.test
-        wikirick2.types)
-  (:require [wikirick2.service :as service]))
+  (:require [clojure.test :refer :all]
+            [wikirick2.service :as service]
+            [wikirick2.types :refer :all]))
 
 (deftest wrap-with-wiki-service
   (testing "wraps in a service"

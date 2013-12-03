@@ -1,12 +1,12 @@
 (ns wikirick2.page-storage
-  (:use slingshot.slingshot
-        wikirick2.helper.page-storage
-        wikirick2.types)
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.java.jdbc.ddl :as ddl]
             [clojure.java.jdbc.sql :as sql]
             [clojure.string :as string]
+            [slingshot.slingshot :refer :all]
+            [wikirick2.helper.page-storage :refer :all]
             [wikirick2.shell :as shell]
+            [wikirick2.types :refer :all]
             [wikirick2.wiki-parser :as wiki-parser])
   (:import java.sql.SQLException
            java.util.concurrent.locks.ReentrantReadWriteLock))

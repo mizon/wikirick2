@@ -1,8 +1,8 @@
 (ns wikirick2.wiki-parser
-  (:use [hiccup.core :only [h]]
-        zetta.core)
   (:require [clojure.string :as string]
+            [hiccup.core :refer [h]]
             [zetta.combinators :as c]
+            [zetta.core :refer :all]
             [zetta.parser.seq :as s]))
 
 (declare wiki exec-parser collect-references)

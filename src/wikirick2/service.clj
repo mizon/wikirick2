@@ -1,9 +1,9 @@
 (ns wikirick2.service
-  (:use wikirick2.types)
   (:require [wikirick2.page-storage :as page-storage]
             [wikirick2.screen :as screen]
             [wikirick2.url-mapper :as url-mapper]
-            [wikirick2.wiki-parser :as wiki-parser]))
+            [wikirick2.wiki-parser :as wiki-parser]
+            [wikirick2.types :refer :all]))
 
 (def ^:dynamic *wiki-service* nil)
 

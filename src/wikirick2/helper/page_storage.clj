@@ -1,9 +1,9 @@
 (ns wikirick2.helper.page-storage
-  (:use slingshot.slingshot
-        wikirick2.types)
   (:require [clojure.core.match :refer [match]]
             [clojure.java.shell :as shell]
             [clojure.string :as string]
+            [slingshot.slingshot :refer :all]
+            [wikirick2.types :refer :all]
             [wikirick2.wiki-parser :as wiki-parser]))
 
 (defmacro with-rw-lock [storage lock-type & forms]

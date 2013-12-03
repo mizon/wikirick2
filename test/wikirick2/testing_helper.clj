@@ -1,8 +1,8 @@
 (ns wikirick2.testing-helper
-  (:use slingshot.slingshot
-        wikirick2.service
-        wikirick2.types)
-  (:require [clojure.java.shell :as shell]))
+  (:require [clojure.java.shell :as shell]
+            [slingshot.slingshot :refer :all]
+            [wikirick2.service :refer :all]
+            [wikirick2.types :refer :all]))
 
 (def test-storage "test-storage")
 

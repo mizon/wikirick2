@@ -1,12 +1,12 @@
 (ns wikirick2.handler
-  (:use compojure.core
-        slingshot.slingshot
-        wikirick2.service
-        wikirick2.types)
-  (:require [compojure.handler :as handler]
+  (:require [compojure.core :refer :all]
+            [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.util.response :as response]
-            [wikirick2.screen :as screen]))
+            [slingshot.slingshot :refer :all]
+            [wikirick2.screen :as screen]
+            [wikirick2.service :refer :all]
+            [wikirick2.types :refer :all]))
 
 (defn- open-read-view [title]
   (with-wiki-service
