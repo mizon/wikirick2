@@ -69,12 +69,12 @@
 (defn grep-iF [shell word]
   (let [command (format "grep -iF --exclude-dir RCS '%s' *" (.replace word "'" "'\\''"))
         result (shell/sh "sh" "-c" command :dir (.base-dir shell))
-        update-map (fn [m l]
+        merge-line (fn [m l]
                      (match (re-matches #"(.+?)\:(.+)" l)
                        [_ name content] (merge {name content} m)
                        :else m))]
     (if (empty? (:err result))
-      (set (reduce update-map {} (string/split-lines (:out result))))
+      (set (reduce merge-line {} (string/split-lines (:out result))))
       (throw+ {:type :grep-iF-failed :message (:err result)}))))
 
 (defn- parse-co-error [error-result]
