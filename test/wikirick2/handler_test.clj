@@ -38,6 +38,13 @@
           (is (= (res :body)
                  (read-view screen (select-page storage "FooPage")))))))
 
+    (testing "handles GET /w/FooPage?rev=1"
+      (with-wiki-service
+        (let [res (app (request :get "/w/FooPage?rev=1"))]
+          (is (= (res :status) 200))
+          (is (= (res :body)
+                 (read-view screen (select-page-by-revision storage "FooPage" 1)))))))
+
     (testing "handles GET /w/SomePage/new"
       (with-wiki-service
         (let [res (app (request :get "/w/SomePage/new"))]

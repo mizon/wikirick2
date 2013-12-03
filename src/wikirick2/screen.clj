@@ -15,10 +15,16 @@
                                        :history {:enabled? true :selected? false}})
                 (page-info page)
                 `[:article
-                  [:header [:h1 ~(h (.title page))]]
+                  [:header
+                   [:h1 ~(h (.title page))
+                    ~(when (not (latest-revision? page))
+                       [:em {:class "old-revision"}
+                        (h (format ": Revision %s" (page-revision page)))])]]
                   ~@(renderer page)
-                  [:h2 "Related Pages"]
-                  [:ul ~@(map #(title-to-li self %) (referred-titles page))]]]))
+                  ~@(if (latest-revision? page)
+                      [[:h2 "Related Pages"]
+                       `[:ul ~@(map #(title-to-li self %) (referred-titles page))]]
+                      [])]]))
 
   (new-view [self page]
     (base-view self

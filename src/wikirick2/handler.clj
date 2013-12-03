@@ -8,10 +8,12 @@
             [wikirick2.service :refer :all]
             [wikirick2.types :refer :all]))
 
-(defn- open-read-view [title]
+(defn- open-read-view [{title :title revision :rev}]
   (with-wiki-service
     (try+
-      (let [page (select-page storage title)]
+      (let [page (if revision
+                   (select-page-by-revision storage title (Integer/parseInt revision))
+                   (select-page storage title))]
         (read-view screen page))
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
@@ -52,8 +54,8 @@
       (response/redirect-after-post (page-path url-mapper title)))))
 
 (defroutes wikirick-routes
-  (GET "/" [] (open-read-view "FrontPage"))
-  (GET "/w/:title" [title] (open-read-view title))
+  (GET "/" {params :params} (open-read-view (assoc params :title "FrontPage")))
+  (GET "/w/:title" {params :params} (open-read-view params))
   (GET "/w/:title/new" [title] (open-new-view title))
   (POST "/w/:title/new" {params :params} (register-new-page params))
   (GET "/w/:title/edit" [title] (open-edit-view title))
