@@ -7,8 +7,8 @@ $border-color: #CCC;
 $disabled-color: #999;
 $hovered-bg-color: #CCF;
 $header-bg-color: #EEE;
-$odd-line-bg-color: #FFF;
-$even-line-bg-color: #EEF;
+$even-line-bg-color: #FFF;
+$odd-line-bg-color: #EEF;
 
 @mixin smaller-font() {
   font-size: 75%;
@@ -179,42 +179,18 @@ body {
       code {
         margin: 0 0.25em;
       }
-    }
 
-    article.search {
-      table {
-        margin: 1em 0;
-
-        tr {
-          th, td {
-          }
-
-          th {
-            text-align: left;
-            font-weight: normal;
-          }
-
-          td:before {
-            content: "|";
-            margin-right: 0.5em;
-          }
-
-          td {
-            padding-left: 1em;
-          }
-        }
-      }
-    }
-
-    article.history {
-      table {
+      table.tabular {
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 1px;
+        border-collapse: collapse;
+        @include border();
+        border-style: solid none;
 
         tr {
           th {
             background-color: $header-bg-color;
+            @include border();
+            border-style: solid none;
           }
 
           td {
@@ -241,10 +217,26 @@ body {
         em.deleted {
           color: #900;
         }
+      }
+    }
 
-        em.zero {
-          color: $disabled-color;
+    article.search {
+      table {
+        margin: 1em 0;
+
+        .title {
+          width: 10em;
         }
+
+        td.line {
+          text-align: left;
+        }
+      }
+    }
+
+    article.history {
+      em.zero {
+        color: $disabled-color;
       }
     }
 

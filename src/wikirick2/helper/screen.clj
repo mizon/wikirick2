@@ -74,9 +74,13 @@
   (let [url-mapper (.url-mapper screen)]
     `[:li [:a {:href ~(page-path url-mapper title)} ~(h title)]]))
 
-(defn history-line [screen page history odd-or-even]
-  [:tr
-   {:class odd-or-even}
+(defn search-line [screen [title content] line-no]
+  [:tr {:class (if (odd? line-no) "odd" "even")}
+   [:td {:class "title"} [:a {:href (page-path (.url-mapper screen) title)} (h title)]]
+   [:td {:class "line"} (h content)]])
+
+(defn history-line [screen page history line-no]
+  [:tr {:class (if (odd? line-no) "odd" "even")}
    [:td (h (show-date (history :date)))]
    [:td [:a {:href (page-revision-path (.url-mapper screen) (.title page) (history :revision))
              :class "revision"}
@@ -95,8 +99,10 @@
                                (latest-revision page))}
      "Latest"]
     " | "
-    [:a {:href (page-diff-path (.url-mapper screen)
+    (if (> (history :revision) 1)
+      [:a {:href (page-diff-path (.url-mapper screen)
                                (.title page)
                                (dec (history :revision))
                                (history :revision))}
-     "Previous"]]])
+       "Previous"]
+      "Previous")]])

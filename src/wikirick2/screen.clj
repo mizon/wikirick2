@@ -67,12 +67,9 @@
                 `[:article
                   {:class "history"}
                   [:header [:h1 ~(h (format "%s: History" (.title page)))]]
-                  [:table
+                  [:table {:class "tabular"}
                    [:tr [:th "Timestamp"] [:th "Revision"] [:th "Changes"] [:th "Diff to"]]
-                   ~@(apply concat
-                            (for [[odd-hist even-hist] (partition 2 (page-history page))]
-                              [(history-line self page odd-hist "odd")
-                               (history-line self page even-hist "even")]))]]]))
+                   ~@(map #(history-line self page % %2) (page-history page) (range))]]]))
 
   (search-view [self word result]
     (base-view self
@@ -83,16 +80,14 @@
                   [:li "Source"]
                   [:li "Edit"]
                   [:li "History"]]]
-                [:p {:class "page-info"} [:em "Search"] ": " (h word)]
+                [:p {:class "page-info"} [:em "Search"] ": (special page)"]
                 `[:article
                   {:class "search"}
                   [:header [:h1 "Search"]]
                   ~(search-box self word)
-                  [:table
-                   ~@(for [[title content] result]
-                       [:tr
-                        [:th [:a {:href (page-path url-mapper title)} (h title)]]
-                        [:td (h content)]])]]])))
+                  [:table {:class "tabular"}
+                   [:tr [:th {:class "title"} "Title"] [:th {:class "line"} "Line"]]
+                   ~@(map #(search-line self % %2) result (range))]]])))
 
 (defn cached-page-renderer [render-f]
   (let [cache (ref {})]
