@@ -6,7 +6,7 @@
             [clojure.test :refer :all]
             [wikirick2.page-storage :refer :all]
             [wikirick2.testing-helper :refer :all]
-            [wikirick2.types :refer :all]
+            [wikirick2.types :refer :all])
   (:import org.joda.time.DateTime))
 
 (def test-storage-name "test-storage")
