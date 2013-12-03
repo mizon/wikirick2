@@ -14,7 +14,7 @@
 
 (def testing-service
   (make-wiki-service {:page-storage-dir test-storage
-                      :base-path "/"
+                      :base-path ""
                       :sqlite-path "test.sqlite3"}))
 
 (defn with-page-storage [testcase]
