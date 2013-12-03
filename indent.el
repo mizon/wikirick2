@@ -6,3 +6,5 @@
   (db-transaction 1)
   (db-do-commands 1)
   (match 1))
+  (GET 2)
+  (POST 2))
