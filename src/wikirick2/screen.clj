@@ -51,7 +51,7 @@
                           :action ~(page-action-path url-mapper (.title page) "edit")}
                    [:input {:type "hidden"
                             :name "base-rev"
-                            :value ~(page-revision page)}]
+                            :value ~(latest-revision page)}]
                    [:textarea {:name "source"} ~(h (page-source page))]
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]]))
