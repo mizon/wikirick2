@@ -72,6 +72,9 @@
           (dosync (ref-set latest-revision-cache rev))
           (latest-revision self))))
 
+  (latest-revision? [self]
+    (= (page-revision self) (latest-revision self)))
+
   (page-exists? [self]
     (with-rw-lock storage readLock
       (shell/test-f (.shell storage) title)))

@@ -163,6 +163,15 @@ foo: foobar
         (save-page rev2)
         (is (= (latest-revision (select-page storage "FooPage")) 2)))))
 
+  (testing "latest-revision?"
+    (testing-storage "returns the latest revision"
+      (let [rev1 (create-page storage "FooPage" "foo content")
+            rev2 (create-page storage "FooPage" "bar content")]
+        (save-page rev1)
+        (save-page rev2)
+        (is (latest-revision? rev2))
+        (is (not (latest-revision? (assoc rev2 :revision 1)))))))
+
   (testing "page-exists?"
     (testing-storage "knows if page exists"
       (let [page (create-page storage "SomePage" "some content")]
