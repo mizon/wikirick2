@@ -10,8 +10,8 @@ Features
 * Adopting the Markdown syntax
 * Linking automatically between any related pages
 
-Requirments
------------
+Requirements
+------------
 * Clojure 1.5+
 * [Leiningen][] 2.x
 * Linux (I will support other platforms in the future)
