@@ -13,10 +13,10 @@
       (app req))))
 
 (defmacro with-wiki-service [& forms]
-  `(let [~'storage (.storage *wiki-service*)
-         ~'screen (.screen *wiki-service*)
-         ~'url-mapper (.url-mapper *wiki-service*)]
-     ~@forms))
+  (list* `let [{'storage :storage
+                'screen :screen
+                'url-mapper :url-mapper} `*wiki-service*]
+         forms))
 
 (defn make-wiki-service [config]
   (let [storage (page-storage/create-page-storage (config :page-storage-dir)
