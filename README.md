@@ -12,7 +12,7 @@ Features
 
 Requirements
 ------------
-* Clojure 1.5+
+* [Clojure][] 1.5+
 * [Leiningen][] 2.x
 * [GNU RCS][RCS] 5.0+
 * [SQLite][] 3.5+
