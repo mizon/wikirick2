@@ -1,6 +1,6 @@
 Wikirick2
 =========
-A RCS-based wiki engine for personal sites. This software is in development and beta quality yet.
+A [RCS][]-based wiki engine for personal sites. This software is in development and beta quality yet.
 
 Features
 --------
@@ -14,6 +14,8 @@ Requirements
 ------------
 * Clojure 1.5+
 * [Leiningen][] 2.x
+* [GNU RCS][RCS] 5.0+
+* [SQLite][] 3.5+
 * Linux (I will support other platforms in the future)
 
 Installation
@@ -26,5 +28,7 @@ After installed Leiningen, clone this repository and type the next command in th
 
 Wikirick2 will start serving, and you can see the site on `http://localhost:3000/` .
 
+[RCS]: http://www.gnu.org/software/rcs/
 [Clojure]: http://clojure.org/
 [Leiningen]: http://leiningen.org/
+[SQLite]: http://www.sqlite.org/
