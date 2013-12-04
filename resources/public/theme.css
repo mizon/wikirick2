@@ -1,0 +1,226 @@
+@charset "UTF-8";
+/*
+html5doctor.com Reset Stylesheet
+v1.6.1
+Last Updated: 2010-09-17
+Author: Richard Clark - http://richclarkdesign.com
+Twitter: @rich_clark
+*/
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent; }
+
+body {
+  line-height: 1; }
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+nav ul {
+  list-style: none; }
+
+blockquote, q {
+  quotes: none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none; }
+
+a {
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent; }
+
+/* change colours to suit your needs */
+ins {
+  background-color: #ff9;
+  color: #000;
+  text-decoration: none; }
+
+/* change colours to suit your needs */
+mark {
+  background-color: #ff9;
+  color: #000;
+  font-style: italic;
+  font-weight: bold; }
+
+del {
+  text-decoration: line-through; }
+
+abbr[title], dfn[title] {
+  border-bottom: 1px dotted;
+  cursor: help; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* change border colour to suit your needs */
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #cccccc;
+  margin: 1em 0;
+  padding: 0; }
+
+input, select {
+  vertical-align: middle; }
+
+body {
+  line-height: 1.4;
+  background-color: #f8f8f8; }
+
+#container {
+  width: 95%;
+  min-width: 800px;
+  margin: 1em auto; }
+  #container h1, #container h2, #container h3, #container h4 {
+    color: #333333; }
+  #container aside {
+    float: left;
+    width: 10em;
+    margin-right: -10em; }
+    #container aside header {
+      margin-bottom: 1em; }
+      #container aside header a {
+        color: #333333;
+        text-decoration: none; }
+    #container aside section {
+      margin-bottom: 2em;
+      font-size: 75%; }
+      #container aside section h2 {
+        margin-bottom: 0.5em; }
+      #container aside section h2:before {
+        content: "■ ";
+        color: #006699; }
+    #container aside .search {
+      padding: 0.5em;
+      background-color: #EEE; }
+      #container aside .search input {
+        width: 100%; }
+    #container aside ol li:before {
+      content: '-';
+      margin-right: 1em; }
+    #container aside ol li {
+      list-style-type: none; }
+  #container footer {
+    clear: both;
+    text-align: center;
+    font-size: 75%;
+    padding: 0.5em 0; }
+
+#wrapper {
+  float: right;
+  width: 100%; }
+  #wrapper .content {
+    margin-left: 11.4em;
+    position: relative; }
+    #wrapper .content nav {
+      margin-bottom: 0.5em;
+      float: right;
+      font-size: 75%;
+      color: #999999; }
+      #wrapper .content nav ul {
+        width: 100%; }
+        #wrapper .content nav ul li {
+          float: left;
+          padding: 0 0.5em; }
+      #wrapper .content nav a:link, #wrapper .content nav a:visited {
+        color: #333333;
+        text-decoration: none; }
+      #wrapper .content nav a:hover {
+        text-weight: bold;
+        text-decoration: underline; }
+      #wrapper .content nav .selected {
+        color: #006699;
+        font-weight: bold; }
+    #wrapper .content p.page-info {
+      font-size: 75%;
+      padding: 0 0.5em;
+      position: absolute;
+      top: 0;
+      left: 0; }
+      #wrapper .content p.page-info em {
+        color: #006699;
+        font-weight: bold; }
+    #wrapper .content article {
+      background-color: #FFF;
+      clear: both;
+      padding: 1em;
+      margin-bottom: 1em;
+      border: solid 1px #cccccc; }
+      #wrapper .content article h1 {
+        font-size: 125%;
+        color: #006699;
+        padding-bottom: 0.25em;
+        border-bottom: solid 1px #cccccc; }
+      #wrapper .content article h1, #wrapper .content article h2, #wrapper .content article h3, #wrapper .content article h4, #wrapper .content article h5, #wrapper .content article h6 {
+        margin-bottom: 0.5em; }
+      #wrapper .content article p, #wrapper .content article ul, #wrapper .content article ol, #wrapper .content article pre {
+        margin-bottom: 1em; }
+      #wrapper .content article ul li, #wrapper .content article ol li {
+        margin-left: 1.5em; }
+      #wrapper .content article pre {
+        padding: 0.5em;
+        background-color: #f8f8f8;
+        overflow: auto;
+        border: solid 1px #cccccc; }
+      #wrapper .content article code {
+        margin: 0 0.25em; }
+      #wrapper .content article table.tabular {
+        width: 100%;
+        border-collapse: collapse;
+        border: solid 1px #cccccc;
+        border-style: solid none; }
+        #wrapper .content article table.tabular tr th {
+          background-color: #eeeeee;
+          border: solid 1px #cccccc;
+          border-style: solid none; }
+        #wrapper .content article table.tabular tr td {
+          text-align: center; }
+        #wrapper .content article table.tabular tr.odd {
+          background-color: #eeeeff; }
+        #wrapper .content article table.tabular tr.even {
+          background-color: white; }
+        #wrapper .content article table.tabular a.revision {
+          display: block; }
+        #wrapper .content article table.tabular em.added {
+          color: #090; }
+        #wrapper .content article table.tabular em.deleted {
+          color: #900; }
+    #wrapper .content article.search table {
+      margin: 1em 0; }
+      #wrapper .content article.search table .title {
+        width: 10em; }
+      #wrapper .content article.search table td.line {
+        text-align: left; }
+    #wrapper .content article.history em.zero {
+      color: #999999; }
+    #wrapper .content .edit {
+      text-align: right; }
+      #wrapper .content .edit textarea {
+        width: 100%;
+        height: 30em; }
+      #wrapper .content .edit button {
+        width: 10em; }
