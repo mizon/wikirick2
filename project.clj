@@ -1,6 +1,9 @@
 (defproject wikirick2 "0.1.0-SNAPSHOT"
   :description "A wiki software for my site."
   :url "http://mizondev.net/wiki/wikirick2"
+  :license {:name "BSD 3-Clause License"
+            :url "http://opensource.org/licenses/BSD-3-Clause"
+            :distribution :repo}
   :dependencies [[clj-time "0.6.0"]
                  [compojure "1.1.5"]
                  [hiccup "1.0.4"]
