@@ -18,7 +18,7 @@
 
 (defn- page= [actual expected]
   (and (= (.title actual) (.title expected))
-       (= (page-source actual) (page-source expected))))
+       (= (page-source actual nil) (page-source expected nil))))
 
 (defn- cleanup-page-relation [testcase]
   (try
@@ -55,21 +55,6 @@
 
     (testing-storage "failes to select with a invalid title"
       (is (throw+? (select-page storage "Foo/Page") [:type :invalid-page-title]))))
-
-  (testing "select-page-by-revision"
-    (testing-storage "selects some revision"
-      (let [rev1 (create-page storage "RevPage" "some content rev 1")
-            rev2 (create-page storage "RevPage" "some content rev 2")]
-        (save-page rev1)
-        (save-page rev2)
-        (is (page= (select-page-by-revision storage "RevPage" 1) rev1))
-        (is (page= (select-page-by-revision storage "RevPage" 2) rev2))))
-
-    (testing-storage "failes to select non-existed page"
-      (is (throw+? (select-page-by-revision storage "FooPage" 1) [:type :page-not-found])))
-
-    (testing-storage "failes to select with a invalid title"
-      (is (throw+? (select-page-by-revision storage "Foo/Page" 1) [:type :invalid-page-title]))))
 
   (testing "select-all-pages"
     (testing-storage "selects all pages"
@@ -131,46 +116,48 @@ foo: foobar
         (is (page= (select-page storage "BarPage") bar))))
 
     (testing-storage "increments revisions of a saved page"
-      (let [rev1 (create-page storage "FooBar" "some content rev 1")
-            rev2 (create-page storage "FooBar" "some content rev 2")]
-        (save-page rev1)
-        (is (= (latest-revision (select-page storage "FooBar")) 1))
-        (save-page rev2)
-        (is (= (latest-revision (select-page storage "FooBar")) 2))))
+      (save-page (create-page storage "FooBar" "some content rev 1"))
+      (is (= (latest-revision (select-page storage "FooBar")) 1))
+      (save-page (assoc (select-page storage "FooBar")
+                   :source "some content rev 2"))
+      (is (= (latest-revision (select-page storage "FooBar")) 2)))
 
     (testing-storage "fails to save an invalid title page"
       (let [page (create-page storage "FooBar" "some content")
             invalid-page (assoc page :title "Foo/Page")]
         (throw+? (save-page invalid-page) [:type :invalid-page-title]))))
 
-  (testing "page-revision"
-    (testing-storage "returns the latest revision when the slot is set nil"
-      (let [page (create-page storage "Foo" "foo content")]
-        (save-page page)
-        (is (= (page-revision page) 1))))
+  (testing-storage "page-source"
+    (save-page (create-page storage "SomePage" "some content"))
+    (save-page (assoc (select-page storage "SomePage")
+                 :source "some some content"))
+    (let [some-page (select-page storage "SomePage")]
+      (testing "returns the source on latest revision"
+        (is (= (page-source some-page nil) "some some content")))
 
-    (testing "returns the specified revision when the slot is set non-nil"
-      (let [page (create-page storage "Foo" "foo content")
-            specified (assoc page :revision 10)]
-        (is (= (page-revision specified) 10)))))
+      (testing "returns the source on specific revision"
+        (is (= (page-source some-page 1) "some content")))
+
+      (testing "returns the assigned source"
+        (is (= (page-source (create-page storage "SomePage" "new content") nil)
+               "new content")))))
 
   (testing "latest-revision"
     (testing-storage "returns the latest revision"
-      (let [rev1 (create-page storage "FooPage" "foo content")
-            rev2 (create-page storage "FooPage" "bar content")]
-        (save-page rev1)
-        (is (= (latest-revision (select-page storage "FooPage")) 1))
-        (save-page rev2)
-        (is (= (latest-revision (select-page storage "FooPage")) 2)))))
+      (save-page (create-page storage "FooPage" "foo content"))
+      (is (= (latest-revision (select-page storage "FooPage")) 1))
+      (save-page (assoc (select-page storage "FooPage")
+                   :source "bar content"))
+      (is (= (latest-revision (select-page storage "FooPage")) 2))))
 
   (testing "latest-revision?"
-    (testing-storage "returns the latest revision"
-      (let [rev1 (create-page storage "FooPage" "foo content")
-            rev2 (create-page storage "FooPage" "bar content")]
-        (save-page rev1)
-        (save-page rev2)
-        (is (latest-revision? rev2))
-        (is (not (latest-revision? (assoc rev2 :revision 1)))))))
+    (testing-storage "checks the argument is the latest revision"
+      (save-page (create-page storage "FooPage" "foo content"))
+      (save-page (assoc (select-page storage "FooPage")
+                   :source "bar content"))
+      (let [page (select-page storage "FooPage")]
+        (is (not (latest-revision? page 1)))
+        (is (latest-revision? page 2)))))
 
   (testing "page-exists?"
     (testing-storage "knows if page exists"
@@ -207,56 +194,56 @@ foo: foobar
       (let [page (create-page storage "SomePage" "some content")
             before (DateTime/now)]
         (save-page page)
-        (time/after? (modified-at page) before)
-        (time/before? (modified-at page) (DateTime/now))))
+        (time/after? (modified-at page nil) before)
+        (time/before? (modified-at page nil) (DateTime/now))))
 
     (testing-storage "throws exception when called before saved"
       (let [page (create-page storage "SomePage" "some content")]
-        (throw+? (modified-at page) [:type :head-revision-failed]))))
+        (throw+? (modified-at page nil) [:type :head-revision-failed]))))
 
-  (testing "diff-from-previous-revision"
-    (testing-storage "gets diff from previous revision"
-      (let [rev1 (create-page storage "SomePage" "
-foo
-bar
-foobar
-")
-            _ (save-page rev1)
-            rev2 (select-page storage "SomePage")
-            _ (save-page (assoc rev2 :source "
-foo
-foobar
-foobar
-"))]
-        (is (= (diff-from-previous-revision (select-page-by-revision storage "SomePage" 2)) "@@ -1,4 +1,4 @@
+;;   (testing "diff-from-previous-revision"
+;;     (testing-storage "gets diff from previous revision"
+;;       (let [rev1 (create-page storage "SomePage" "
+;; foo
+;; bar
+;; foobar
+;; ")
+;;             _ (save-page rev1)
+;;             rev2 (select-page storage "SomePage")
+;;             _ (save-page (assoc rev2 :source "
+;; foo
+;; foobar
+;; foobar
+;; "))]
+;;         (is (= (diff-from-previous-revision (select-page-by-revision storage "SomePage" 2)) "@@ -1,4 +1,4 @@
  
- foo
--bar
-+foobar
- foobar
-")))))
+;;  foo
+;; -bar
+;; +foobar
+;;  foobar
+;; ")))))
 
-  (testing "diff-from-latest-revision"
-    (testing-storage "gets diff from the latest revision"
-      (let [rev1 (create-page storage "SomePage" "
-foo
-bar
-foobar
-")
-            _ (save-page rev1)
-            rev2 (select-page storage "SomePage")
-            _ (save-page (assoc rev2 :source "
-foo
-foobar
-foobar
-"))]
-        (is (= (diff-from-latest-revision (select-page-by-revision storage "SomePage" 1)) "@@ -1,4 +1,4 @@
+;;   (testing "diff-from-latest-revision"
+;;     (testing-storage "gets diff from the latest revision"
+;;       (let [rev1 (create-page storage "SomePage" "
+;; foo
+;; bar
+;; foobar
+;; ")
+;;             _ (save-page rev1)
+;;             rev2 (select-page storage "SomePage")
+;;             _ (save-page (assoc rev2 :source "
+;; foo
+;; foobar
+;; foobar
+;; "))]
+;;         (is (= (diff-from-latest-revision (select-page-by-revision storage "SomePage" 1)) "@@ -1,4 +1,4 @@
  
- foo
--bar
-+foobar
- foobar
-")))))
+;;  foo
+;; -bar
+;; +foobar
+;;  foobar
+;; ")))))
 
   (testing "referring-titles"
     (testing-storage "gets referring titles"

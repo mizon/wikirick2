@@ -10,15 +10,12 @@
 
 (defprotocol IPage
   (save-page [self])
-  (page-source [self])
-  (page-revision [self])
+  (page-source [self revision])
   (latest-revision [self])
-  (latest-revision? [self])
+  (latest-revision? [self revision])
   (page-exists? [self])
   (page-history [self])
-  (modified-at [self])
-  (diff-from-previous-revision [self])
-  (diff-from-latest-revision [self])
+  (modified-at [self revision])
   (referring-titles [self])
   (referred-titles [self]))
 
@@ -37,7 +34,7 @@
   (expand-path [self path]))
 
 (defprotocol IScreen
-  (read-view [self page])
+  (read-view [self page revision])
   (new-view [self page])
   (source-view [self page])
   (edit-view [self page])

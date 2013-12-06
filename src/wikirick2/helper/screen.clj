@@ -21,8 +21,8 @@
        ~(nav-item screen "Edit" (page-action-path urls (.title page) "edit") spec)
        ~(nav-item screen "History" (page-action-path urls (.title page) "history") spec)]]))
 
-(defn show-modified-at [page]
-  (format/unparse (format/formatter "yyyy/MM/dd HH:mm") (modified-at page)))
+(defn show-modified-at [page revision]
+  (format/unparse (format/formatter "yyyy/MM/dd HH:mm") (modified-at page revision)))
 
 (defn show-date [date]
   (format/unparse (format/formatter "yyyy/MM/dd HH:mm") date))
@@ -32,7 +32,7 @@
    {:class "page-info"}
    [:em (h (.title page))]
    ": Last modified: "
-   (show-modified-at page)])
+   (show-modified-at page nil)])
 
 (defn search-box [screen default-word]
   [:section.search
@@ -42,8 +42,7 @@
     [:button {:type "submit"} "Search"]]])
 
 (defn recent-changes [screen]
-  (let [pages (select-recent-pages (.storage screen) 10)
-        modified-day #(format/unparse (format/formatter "yyyy/MM/dd") (modified-at %))]
+  (let [pages (select-recent-pages (.storage screen) 10)]
     [:section
      [:h2 "Recent Changes"]
      [:ol

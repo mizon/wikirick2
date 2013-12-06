@@ -26,7 +26,7 @@
         page)))
 
   (select-page-by-revision [self title rev]
-    (assoc (select-page self title) :revision rev))
+    (select-page self title))
 
   (select-all-pages [self]
     (with-rw-lock self readLock
@@ -39,7 +39,7 @@
     (with-rw-lock self readLock
       (shell/grep-iF shell word))))
 
-(defrecord Page [storage title source revision edit-comment latest-revision-cache]
+(defrecord Page [storage title source edit-comment latest-revision-cache]
   IPage
   (save-page [self]
     (letfn [(update-page-relation [db]
@@ -56,14 +56,13 @@
         (with-rw-lock storage writeLock
           (update-page-relation db)
           (shell/co-l (.shell storage) title)
-          (shell/ci (.shell storage) title (page-source self) (or edit-comment ""))))))
+          (shell/ci (.shell storage) title (page-source self nil) (or edit-comment ""))))))
 
-  (page-source [self]
+  (page-source [self revision]
     (or source (with-rw-lock storage readLock
-                 (shell/co-p (.shell storage) title (page-revision self)))))
-
-  (page-revision [self]
-    (or revision (latest-revision self)))
+                 (shell/co-p (.shell storage)
+                             title
+                             (or revision (latest-revision self))))))
 
   (latest-revision [self]
     (or @latest-revision-cache
@@ -72,8 +71,8 @@
           (dosync (ref-set latest-revision-cache rev))
           (latest-revision self))))
 
-  (latest-revision? [self]
-    (= (page-revision self) (latest-revision self)))
+  (latest-revision? [self revision]
+    (= revision (latest-revision self)))
 
   (page-exists? [self]
     (with-rw-lock storage readLock
@@ -83,18 +82,12 @@
     (with-rw-lock storage readLock
       (shell/rlog (.shell storage) title)))
 
-  (modified-at [self]
+  (modified-at [self revision]
     (with-rw-lock storage readLock
-      (shell/rlog-date (.shell storage) title (page-revision self))))
-
-  (diff-from-previous-revision [self]
-    (shell/rcsdiff (.shell storage) title (dec (page-revision self)) (page-revision self)))
-
-  (diff-from-latest-revision [self]
-    (shell/rcsdiff (.shell storage) title (page-revision self) (latest-revision self)))
+      (shell/rlog-date (.shell storage) title (or revision (latest-revision self)))))
 
   (referring-titles [self]
-    (wiki-parser/scan-wiki-links (page-source self)))
+    (wiki-parser/scan-wiki-links (page-source self nil)))
 
   (referred-titles [self]
     (jdbc/query (.db storage)
