@@ -214,6 +214,50 @@ foo: foobar
       (let [page (create-page storage "SomePage" "some content")]
         (throw+? (modified-at page) [:type :head-revision-failed]))))
 
+  (testing "diff-from-previous-revision"
+    (testing-storage "gets diff from previous revision"
+      (let [rev1 (create-page storage "SomePage" "
+foo
+bar
+foobar
+")
+            _ (save-page rev1)
+            rev2 (select-page storage "SomePage")
+            _ (save-page (assoc rev2 :source "
+foo
+foobar
+foobar
+"))]
+        (is (= (diff-from-previous-revision (select-page-by-revision storage "SomePage" 2)) "@@ -1,4 +1,4 @@
+ 
+ foo
+-bar
++foobar
+ foobar
+")))))
+
+  (testing "diff-from-latest-revision"
+    (testing-storage "gets diff from the latest revision"
+      (let [rev1 (create-page storage "SomePage" "
+foo
+bar
+foobar
+")
+            _ (save-page rev1)
+            rev2 (select-page storage "SomePage")
+            _ (save-page (assoc rev2 :source "
+foo
+foobar
+foobar
+"))]
+        (is (= (diff-from-latest-revision (select-page-by-revision storage "SomePage" 1)) "@@ -1,4 +1,4 @@
+ 
+ foo
+-bar
++foobar
+ foobar
+")))))
+
   (testing "referring-titles"
     (testing-storage "gets referring titles"
       (let [page (create-page storage "SomePage" "[[Foo]] [[Bar]]")]

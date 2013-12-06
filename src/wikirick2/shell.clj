@@ -77,6 +77,17 @@
       (set (reduce merge-line {} (string/split-lines (:out result))))
       (throw+ {:type :grep-iF-failed :message (:err result)}))))
 
+(defn rcsdiff [shell title from-rev to-rev]
+  (let [result (shell/sh "rcsdiff"
+                         "-u"
+                         (format "-r1.%s" from-rev)
+                         (format "-r1.%s" to-rev)
+                         title
+                         :dir (.base-dir shell))]
+    (if (= (:exit result) 1)
+      (re-find #"(?ms)^@@.*\Z" (:out result))
+      (throw+ {:type :rcsdiff-failed :message (:err result)}))))
+
 (defn- parse-co-error [error-result]
   (match (re-matches #"co: RCS/(.+),v: (.*)" (.trim error-result))
     [_ page-name "No such file or directory"] {:type :page-not-found}

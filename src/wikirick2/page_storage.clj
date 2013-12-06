@@ -87,6 +87,12 @@
     (with-rw-lock storage readLock
       (shell/rlog-date (.shell storage) title (page-revision self))))
 
+  (diff-from-previous-revision [self]
+    (shell/rcsdiff (.shell storage) title (dec (page-revision self)) (page-revision self)))
+
+  (diff-from-latest-revision [self]
+    (shell/rcsdiff (.shell storage) title (page-revision self) (latest-revision self)))
+
   (referring-titles [self]
     (wiki-parser/scan-wiki-links (page-source self)))
 
