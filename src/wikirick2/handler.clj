@@ -11,10 +11,8 @@
 (defn- open-read-view [{title :title revision :rev}]
   (with-wiki-service
     (try+
-      (let [page (if revision
-                   (select-page-by-revision storage title (Integer/parseInt revision))
-                   (select-page storage title))]
-        (read-view screen page))
+      (let [page (select-page storage title)]
+        (read-view screen page (when revision (Integer/parseInt revision))))
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
 
@@ -41,6 +39,14 @@
         (history-view screen page))
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
+
+(defn- open-previous-diff-view [{title :title revision :rev}]
+  (with-wiki-service
+    ))
+
+(defn- open-latest-diff-view [{title :title revision :rev}]
+  (with-wiki-service
+    ))
 
 (defn- register-new-page [{:keys [title source]}]
   (with-wiki-service

@@ -36,14 +36,14 @@
         (let [res (app (request :get "/w/FooPage"))]
           (is (= (res :status) 200))
           (is (= (res :body)
-                 (read-view screen (select-page storage "FooPage")))))))
+                 (read-view screen (select-page storage "FooPage") nil))))))
 
     (testing "handles GET /w/FooPage?rev=1"
       (with-wiki-service
         (let [res (app (request :get "/w/FooPage?rev=1"))]
           (is (= (res :status) 200))
           (is (= (res :body)
-                 (read-view screen (select-page-by-revision storage "FooPage" 1)))))))
+                 (read-view screen (select-page storage "FooPage") 1))))))
 
     (testing "handles GET /w/SomePage/new"
       (with-wiki-service
@@ -78,7 +78,7 @@
                                :base-rev "1"}))]
         (is (= (res :status) 303))
         (let [foo-page (select-page storage "FooPage")]
-          (is (= (page-source foo-page) page-content))
+          (is (= (page-source foo-page nil) page-content))
           (is (= ((res :headers) "Location") "/w/FooPage")))))
 
     (testing "handles GET /w/FooPage/history"

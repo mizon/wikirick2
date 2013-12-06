@@ -6,7 +6,7 @@
 
 (deftype Screen [storage url-mapper renderer config]
   IScreen
-  (read-view [self page]
+  (read-view [self page revision]
     (base-view self
                (.title page)
                [(navigation self page {:read {:enabled? true :selected? true}
@@ -17,11 +17,11 @@
                 `[:article
                   [:header
                    [:h1 ~(h (.title page))
-                    ~(when (not (latest-revision? page))
+                    ~(when revision
                        [:em {:class "old-revision"}
-                        (h (format ": Revision %s" (page-revision page)))])]]
-                  ~@(renderer page)
-                  ~@(if (latest-revision? page)
+                        (h (format ": Revision %s" revision))])]]
+                  ~@(renderer page revision)
+                  ~@(if (not revision)
                       [[:h2 "Related Pages"]
                        `[:ul ~@(map #(title-to-li self %) (referred-titles page))]]
                       [])]]))
@@ -38,7 +38,7 @@
                   [:header [:h1 ~(h (format "%s: New" (.title page)))]]
                   [:section
                    {:class "edit"}
-                   [:textarea {:placeholder ~(page-source page)}]
+                   [:textarea {:placeholder ~(page-source page nil)}]
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]]))
 
@@ -58,7 +58,7 @@
                    [:input {:type "hidden"
                             :name "base-rev"
                             :value ~(latest-revision page)}]
-                   [:textarea {:name "source"} ~(h (page-source page))]
+                   [:textarea {:name "source"} ~(h (page-source page nil))]
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]]))
 
@@ -97,10 +97,10 @@
 
 (defn cached-page-renderer [render-f]
   (let [cache (ref {})]
-    (letfn [(do-render [page]
-              (let [key (str (.title page) "/" (page-revision page))]
+    (letfn [(do-render [page revision]
+              (let [key (str (.title page) "/" (or revision (latest-revision page)))]
                 (or (@cache key)
-                    (let [rendered (render-f (page-source page))]
+                    (let [rendered (render-f (page-source page revision))]
                       (dosync (alter cache #(assoc % key rendered)))
-                      (do-render page)))))]
+                      (do-render page revision)))))]
       do-render)))
