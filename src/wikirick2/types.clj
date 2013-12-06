@@ -16,6 +16,7 @@
   (page-exists? [self])
   (page-history [self])
   (modified-at [self revision])
+  (diff-revisions [self from-rev to-rev])
   (referring-titles [self])
   (referred-titles [self]))
 
