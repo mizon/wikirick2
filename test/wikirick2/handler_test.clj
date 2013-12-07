@@ -26,11 +26,13 @@
       (let [res (app (request :get "/"))]
         (is (= (res :status) 200)))))
 
-  (let [foo-page (assoc (new-page storage "FooPage") :source "some content")
-        bar-page (assoc (new-page storage "BarPage") :source "some content")]
-    (save-page foo-page)
-    (save-page bar-page)
+  (save-page (create-page storage "FooPage" "some content"))
+  (save-page (assoc (select-page storage "FooPage")
+               :source "foo content"))
+  (save-page (create-page storage "BarPage" "some content"))
 
+  (let [foo-page (select-page storage "FooPage")
+        bar-page (select-page storage "BarPage")]
     (testing "handles GET /w/FooPage"
       (with-wiki-service
         (let [res (app (request :get "/w/FooPage"))]
@@ -80,6 +82,13 @@
         (let [foo-page (select-page storage "FooPage")]
           (is (= (page-source foo-page nil) page-content))
           (is (= ((res :headers) "Location") "/w/FooPage")))))
+
+    (testing "handles GET /w/FooPage/diff/from-to"
+      (with-wiki-service
+        (let [res (app (request :get "/w/FooPage/diff/1-2"))]
+          (is (= (res :status) 200))
+          (is (= (res :body)
+                 (diff-view screen foo-page 1 2))))))
 
     (testing "handles GET /w/FooPage/history"
       (with-wiki-service

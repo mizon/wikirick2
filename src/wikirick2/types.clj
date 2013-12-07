@@ -39,6 +39,7 @@
   (new-view [self page])
   (source-view [self page])
   (edit-view [self page])
+  (diff-view [self page from-rev to-rev])
   (history-view [self page])
   (search-view [self word result]))
 

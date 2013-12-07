@@ -27,6 +27,11 @@
 (defn show-date [date]
   (format/unparse (format/formatter "yyyy/MM/dd HH:mm") date))
 
+(defn show-revision [page revision]
+  (if (latest-revision? page revision)
+    (format "rev%s[Latest]" revision)
+    (format "rev%s" revision)))
+
 (defn page-info [page]
   [:p
    {:class "page-info"}

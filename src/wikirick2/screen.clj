@@ -1,5 +1,6 @@
 (ns wikirick2.screen
-  (:require [hiccup.core :refer :all]
+  (:require [clojure.string :as string]
+            [hiccup.core :refer :all]
             [hiccup.page :as page]
             [wikirick2.helper.screen :refer :all]
             [wikirick2.types :refer :all]))
@@ -15,6 +16,7 @@
                                        :history {:enabled? true :selected? false}})
                 (page-info page)
                 `[:article
+                  {:class "read"}
                   [:header
                    [:h1 ~(h (.title page))
                     ~(when revision
@@ -61,6 +63,40 @@
                    [:textarea {:name "source"} ~(h (page-source page nil))]
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]]))
+
+  (diff-view [self page from-rev to-rev]
+    (let [diff-lines (string/split-lines (diff-revisions page from-rev to-rev))
+          colorlize-line #(cond (re-find #"\A@@" %) [:em {:class "section-header"} (h %)]
+                                (re-find #"\A\+" %) [:em {:class "added"} (h %)]
+                                (re-find #"\A-" %) [:em {:class "removed"} (h %)]
+                                :else (h %))
+          diff-result (map colorlize-line
+                           (list* (format "--- %s %s %s"
+                                          (.title page)
+                                          (show-modified-at page from-rev)
+                                          (show-revision page
+                                                         from-rev))
+                                  (format "+++ %s %s %s"
+                                          (.title page)
+                                          (show-modified-at page to-rev)
+                                          (show-revision page
+                                                         to-rev))
+                                  diff-lines))]
+      (base-view self
+                 (.title page)
+                 [(navigation self page {:read {:enabled? true :selected? false}
+                                         :source {:enabled? true :selected? false}
+                                         :edit {:enabled? true :selected? true}
+                                         :history {:enabled? true :selected? false}})
+                  (page-info page)
+                  `[:article
+                    {:class "diff"}
+                    [:header [:h1 ~(h (format "%s: Diff" (.title page)))]]
+                    [:h2 ~(h (format "Changes between %s and %s"
+                                     (show-revision page from-rev)
+                                     (show-revision page to-rev)))]
+                    [:pre
+                     ~@(interpose "\n" diff-result)]]])))
 
   (history-view [self page]
     (base-view self

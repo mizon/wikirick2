@@ -40,13 +40,13 @@
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
 
-(defn- open-previous-diff-view [{title :title revision :rev}]
+(defn- open-diff-view [{title :title revision-range :range}]
   (with-wiki-service
-    ))
-
-(defn- open-latest-diff-view [{title :title revision :rev}]
-  (with-wiki-service
-    ))
+    (let [[_ from-rev to-rev] (re-matches #"(\d+)-(\d+)" revision-range)]
+      (diff-view screen
+                 (select-page storage title)
+                 (Integer/parseInt from-rev)
+                 (Integer/parseInt to-rev)))))
 
 (defn- register-new-page [{:keys [title source]}]
   (with-wiki-service
@@ -66,6 +66,7 @@
   (POST "/w/:title/new" {params :params} (register-new-page params))
   (GET "/w/:title/edit" [title] (open-edit-view title))
   (POST "/w/:title/edit" {params :params} (update-page params))
+  (GET "/w/:title/diff/:range" {params :params} (open-diff-view params))
   (GET "/w/:title/history" [title] (open-history-view title))
   (GET "/search" {params :params} (open-search-view params))
   (route/resources "/")
