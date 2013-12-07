@@ -5,21 +5,36 @@
             [wikirick2.types :refer :all]
             [wikirick2.wiki-parser :refer :all]))
 
-(defn- nav-item [screen action-name action-path spec]
-  (let [url-mapper (.url-mapper screen)
-        key (-> action-name .toLowerCase keyword)]
-    (cond (-> spec key :selected?) [:li {:class "selected"} action-name]
-          (-> spec key :enabled?) [:li [:a {:href action-path} action-name]]
-          :else [:li action-name])))
+(defn navigation [screen page selected]
+  (let [urls (.url-mapper screen)
+        selected? #(= % selected)]
+    [:nav
+     [:ul
+      (cond (selected? :read) [:li {:class "selected"} "Read"]
+            (page-exists? page) [:li [:a {:href (page-path urls (.title page))} "Read"]]
+            :else [:li "Read"])
+      (cond (selected? :edit) [:li {:class "selected"} "Edit"]
+            (page-exists? page) [:li
+                                 [:a {:href (page-action-path urls (.title page) "edit")}
+                                  "Edit"]]
+            :else [:li "Edit"])
+      (cond (selected? :diff) [:li {:class "selected"} "Diff"]
+            (and (page-exists? page)
+                 (not= (latest-revision page) 1))
+            [:li
+             [:a {:href (page-diff-path urls
+                                        (.title page)
+                                        (dec (latest-revision page))
+                                        (latest-revision page))}
+              "Diff"]]
+            :else [:li "Diff"])
+      (cond (selected? :history) [:li {:class "selected"} "History"]
+            (page-exists? page) [:li [:a {:href (page-action-path urls (.title page) "history")}
+                                      "History"]]
+            :else [:li "History"])]]))
 
-(defn navigation [screen page spec]
-  (let [urls (.url-mapper screen)]
-    `[:nav
-      [:ul
-       ~(nav-item screen "Read" (page-path urls (.title page)) spec)
-       ~(nav-item screen "Source" (page-action-path urls (.title page) "source") spec)
-       ~(nav-item screen "Edit" (page-action-path urls (.title page) "edit") spec)
-       ~(nav-item screen "History" (page-action-path urls (.title page) "history") spec)]]))
+(defn all-disabled-navigation [screen]
+  [:nav [:ul [:li "Read"] [:li "Edit"] [:li "Diff"] [:li "History"]]])
 
 (defn show-modified-at [page revision]
   (format/unparse (format/formatter "yyyy/MM/dd HH:mm") (modified-at page revision)))
@@ -29,7 +44,7 @@
 
 (defn show-revision [page revision]
   (if (latest-revision? page revision)
-    (format "rev%s[Latest]" revision)
+    (format "Latest" revision)
     (format "rev%s" revision)))
 
 (defn page-info [page]

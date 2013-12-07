@@ -10,10 +10,7 @@
   (read-view [self page revision]
     (base-view self
                (.title page)
-               [(navigation self page {:read {:enabled? true :selected? true}
-                                       :source {:enabled? true :selected? false}
-                                       :edit {:enabled? true :selected? false}
-                                       :history {:enabled? true :selected? false}})
+               [(navigation self page :read)
                 (page-info page)
                 `[:article
                   {:class "read"}
@@ -31,10 +28,7 @@
   (new-view [self page]
     (base-view self
                (.title page)
-               [(navigation self page {:read {:enabled? false :selected? false}
-                                       :source {:enabled? false :selected? false}
-                                       :edit {:enabled? true :selected? true}
-                                       :history {:enabled? false :selected? false}})
+               [(navigation self page :edit)
                 [:p {:class "page-info"} [:em (h (.title page))] ": (new page)"]
                 `[:article
                   [:header [:h1 ~(h (format "%s: New" (.title page)))]]
@@ -47,10 +41,7 @@
   (edit-view [self page]
     (base-view self
                (.title page)
-               [(navigation self page {:read {:enabled? true :selected? false}
-                                       :source {:enabled? true :selected? false}
-                                       :edit {:enabled? true :selected? true}
-                                       :history {:enabled? true :selected? false}})
+               [(navigation self page :edit)
                 (page-info page)
                 `[:article
                   [:header [:h1 ~(h (format "%s: Edit" (.title page)))]]
@@ -84,10 +75,7 @@
                                   diff-lines))]
       (base-view self
                  (.title page)
-                 [(navigation self page {:read {:enabled? true :selected? false}
-                                         :source {:enabled? true :selected? false}
-                                         :edit {:enabled? true :selected? true}
-                                         :history {:enabled? true :selected? false}})
+                 [(navigation self page :diff)
                   (page-info page)
                   `[:article
                     {:class "diff"}
@@ -101,10 +89,7 @@
   (history-view [self page]
     (base-view self
                (.title page)
-               [(navigation self page {:read {:enabled? true :selected? false}
-                                       :source {:enabled? true :selected? false}
-                                       :edit {:enabled? true :selected? false}
-                                       :history {:enabled? true :selected? true}})
+               [(navigation self page :history)
                 (page-info page)
                 `[:article
                   {:class "history"}
@@ -116,12 +101,7 @@
   (search-view [self word result]
     (base-view self
                "Search"
-               [[:nav
-                 [:ul
-                  [:li "Read"]
-                  [:li "Source"]
-                  [:li "Edit"]
-                  [:li "History"]]]
+               [(all-disabled-navigation self)
                 [:p {:class "page-info"} [:em "Search"] ": (special page)"]
                 `[:article
                   {:class "search"}
