@@ -30,9 +30,6 @@
     (is (= (page-action-path urlm "SomePage" "Edit") "/wiki/w/SomePage/edit"))
     (is (= (page-action-path urlm "SomePage" "Source") "/wiki/w/SomePage/source")))
 
-  (testing "expand-path"
-    (is (= (expand-path urlm "foo") "/wiki/foo")))
-
   (testing "search-path"
     (is (= (search-path urlm) "/wiki/search")))
 

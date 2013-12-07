@@ -33,8 +33,7 @@
   (diff-from-next-path [self page-title revision])
   (page-action-path [self page-title action-name])
   (theme-path [self])
-  (search-path [self])
-  (expand-path [self path]))
+  (search-path [self]))
 
 (defprotocol IScreen
   (read-view [self page revision])

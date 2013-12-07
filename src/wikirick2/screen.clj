@@ -62,13 +62,11 @@
                            (list* (format "--- %s %s %s"
                                           (.title page)
                                           (show-modified-at page from-rev)
-                                          (show-revision page
-                                                         from-rev))
+                                          (show-revision page from-rev))
                                   (format "+++ %s %s %s"
                                           (.title page)
                                           (show-modified-at page to-rev)
-                                          (show-revision page
-                                                         to-rev))
+                                          (show-revision page to-rev))
                                   diff-lines))]
       (base-view self
                  (.title page)
@@ -80,7 +78,6 @@
                      "Changes between "
                      ~[:a {:href (page-revision-path url-mapper (.title page) from-rev)}
                        (h (show-revision page from-rev))]
-
                      " and "
                      ~[:a {:href (page-revision-path url-mapper (.title page) to-rev)}
                        (h (show-revision page to-rev))]]

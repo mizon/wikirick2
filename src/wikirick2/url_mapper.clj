@@ -1,26 +1,25 @@
 (ns wikirick2.url-mapper
   (:require [clojure.string :as string]
             [wikirick2.types :refer :all])
-  (:import java.net.URI))
+  (:import java.net.URLEncoder))
 
-(declare concat-paths)
+(declare encode concat-paths build-url)
 
 (deftype URLMapper [base-path]
   IURLMapper
   (index-path [self]
-    (expand-path self ""))
+    (build-url self [""] nil))
 
   (page-path [self page-title]
-    (expand-path self (concat-paths "w" page-title)))
+    (build-url self ["w" page-title] nil))
 
   (page-revision-path [self page-title revision]
-    (expand-path self (format "%s?rev=%s" (concat-paths "w" page-title) revision)))
+    (build-url self ["w" page-title] (str "?rev=" revision)))
 
   (page-diff-path [self page-title src-rev dest-rev]
-    (expand-path self (concat-paths "w"
-                                    page-title
-                                    "diff"
-                                    (format "%s-%s" src-rev dest-rev))))
+    (build-url self
+               ["w" page-title "diff" (format "%s-%s" src-rev dest-rev)]
+               nil))
 
   (diff-from-previous-path [self page-title revision]
     {:pre (not= revision 1)}
@@ -31,16 +30,15 @@
     (page-diff-path self page-title revision (inc revision)))
 
   (page-action-path [self page-title action-name]
-    (expand-path self (concat-paths "w" page-title (.toLowerCase action-name))))
+    (build-url self ["w" page-title (.toLowerCase action-name)] nil))
 
   (theme-path [self]
-    (expand-path self "theme.css"))
+    (build-url self ["theme.css"] nil))
 
   (search-path [self]
-    (expand-path self "search"))
+    (build-url self ["search"] nil)))
 
-  (expand-path [self path]
-    (concat-paths base-path path)))
-
-(defn- concat-paths [& paths]
-  (string/join "/" paths))
+(defn- build-url [urls segments query]
+  (let [segs (concat (string/split (.base-path urls) #"/") segments)
+        encoded-segs (map #(URLEncoder/encode % "UTF-8") segs)]
+    (str (string/join "/" encoded-segs) query)))
