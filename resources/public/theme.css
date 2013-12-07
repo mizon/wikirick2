@@ -198,7 +198,7 @@ body {
           border: solid 1px #cccccc;
           border-style: solid none; }
         #wrapper .content article table.tabular tr th, #wrapper .content article table.tabular tr td {
-          text-align: left;
+          text-align: center;
           padding: 0 0.5em; }
         #wrapper .content article table.tabular tr.odd {
           background-color: #eeeeff; }
