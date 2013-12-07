@@ -22,6 +22,10 @@
                                     "diff"
                                     (format "%s-%s" src-rev dest-rev))))
 
+  (diff-from-previous-path [self page-title revision]
+    {:pre (not= revision 1)}
+    (page-diff-path self page-title (dec revision) revision))
+
   (page-action-path [self page-title action-name]
     (expand-path self (concat-paths "w" page-title (.toLowerCase action-name))))
 

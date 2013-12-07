@@ -29,6 +29,7 @@
   (page-path [self page])
   (page-revision-path [self title revision])
   (page-diff-path [self title src-rev dest-rev])
+  (diff-from-previous-path [self page-title revision])
   (page-action-path [self page-title action-name])
   (theme-path [self])
   (search-path [self])
