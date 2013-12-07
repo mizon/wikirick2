@@ -204,8 +204,6 @@ body {
           background-color: #eeeeff; }
         #wrapper .content article table.tabular tr.even {
           background-color: white; }
-        #wrapper .content article table.tabular a.revision {
-          display: block; }
         #wrapper .content article table.tabular em.added {
           color: #090; }
         #wrapper .content article table.tabular em.deleted {
@@ -224,6 +222,11 @@ body {
       color: #990000; }
     #wrapper .content article.history em.zero {
       color: #999999; }
+    #wrapper .content article.history a.revision {
+      display: block; }
+    #wrapper .content article.history a.changes {
+      display: block;
+      text-decoration: none; }
     #wrapper .content .edit {
       text-align: right; }
       #wrapper .content .edit textarea {

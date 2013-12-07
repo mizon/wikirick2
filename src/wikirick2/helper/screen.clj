@@ -90,12 +90,17 @@
              :class "revision"}
          (history :revision)]]
    `[:td
-     ~@(if-let [lines (history :lines)]
-         [[:em {:class (if (> (lines :added) 0) "added" "zero")}
-           (str "+" (lines :added))]
-          " "
-          [:em {:class (if (> (lines :deleted) 0) "deleted" "zero")}
-           (str "-" (lines :deleted))]])]
+     ~(if-let [lines (history :lines)]
+        [:a {:class "changes"
+             :href (page-diff-path (.url-mapper screen)
+                                   (.title page)
+                                   (dec (history :revision))
+                                   (history :revision))}
+         [:em {:class (if (> (lines :deleted) 0) "deleted" "zero")}
+          (str "-" (lines :deleted))]
+         " "
+         [:em {:class (if (> (lines :added) 0) "added" "zero")}
+          (str "+" (lines :added))]])]
    [:td
     (if (latest-revision? page (history :revision))
       "Latest"
@@ -107,8 +112,8 @@
     " | "
     (if (> (history :revision) 1)
       [:a {:href (page-diff-path (.url-mapper screen)
-                               (.title page)
-                               (dec (history :revision))
-                               (history :revision))}
+                                 (.title page)
+                                 (dec (history :revision))
+                                 (history :revision))}
        "Previous"]
       "Previous")]])

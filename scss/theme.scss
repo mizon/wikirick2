@@ -210,10 +210,6 @@ body {
           background-color: $even-line-bg-color;
         }
 
-        a.revision {
-          display: block;
-        }
-
         em.added {
           color: #090;
         }
@@ -257,6 +253,15 @@ body {
     article.history {
       em.zero {
         color: $disabled-color;
+      }
+
+      a.revision {
+        display: block;
+      }
+
+      a.changes {
+        display: block;
+        text-decoration: none;
       }
     }
 
