@@ -28,6 +28,9 @@
   (binding [*wiki-service* testing-service]
     (testcase)))
 
+(defn create-page [storage title source]
+  (assoc (new-page storage title) :source source))
+
 (defmacro throw+? [try-form catch-form]
   `(try+
      ~try-form

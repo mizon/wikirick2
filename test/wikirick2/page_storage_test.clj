@@ -26,9 +26,6 @@
     (finally
       (jdbc/execute! db-spec (sql/delete :page_relation []) :multi? true))))
 
-(defn- create-page [storage title source]
-  (assoc (new-page storage title) :source source))
-
 (defmacro testing-storage [name & forms]
   `(testing ~name
      (with-page-storage (fn []
