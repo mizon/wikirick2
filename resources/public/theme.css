@@ -136,23 +136,23 @@ body {
   #wrapper .content {
     margin-left: 11.4em;
     position: relative; }
-    #wrapper .content nav {
+    #wrapper .content nav.page-actions {
       margin-bottom: 0.5em;
       float: right;
       font-size: 75%;
       color: #999999; }
-      #wrapper .content nav ul {
+      #wrapper .content nav.page-actions ul {
         width: 100%; }
-        #wrapper .content nav ul li {
+        #wrapper .content nav.page-actions ul li {
           float: left;
           padding: 0 0.5em; }
-      #wrapper .content nav a:link, #wrapper .content nav a:visited {
+      #wrapper .content nav.page-actions a:link, #wrapper .content nav.page-actions a:visited {
         color: #333333;
         text-decoration: none; }
-      #wrapper .content nav a:hover {
+      #wrapper .content nav.page-actions a:hover {
         text-weight: bold;
         text-decoration: underline; }
-      #wrapper .content nav .selected {
+      #wrapper .content nav.page-actions .selected {
         color: #006699;
         font-weight: bold; }
     #wrapper .content p.page-info {
@@ -164,6 +164,9 @@ body {
       #wrapper .content p.page-info em {
         color: #006699;
         font-weight: bold; }
+        #wrapper .content p.page-info em a {
+          color: #006699;
+          text-decoration: none; }
     #wrapper .content article {
       background-color: #FFF;
       clear: both;
@@ -175,6 +178,9 @@ body {
         color: #006699;
         padding-bottom: 0.25em;
         border-bottom: solid 1px #cccccc; }
+        #wrapper .content article h1 a {
+          text-decoration: none;
+          color: #006699; }
       #wrapper .content article h1, #wrapper .content article h2, #wrapper .content article h3, #wrapper .content article h4, #wrapper .content article h5, #wrapper .content article h6 {
         margin-bottom: 0.5em; }
       #wrapper .content article p, #wrapper .content article ul, #wrapper .content article ol, #wrapper .content article pre {
@@ -188,16 +194,15 @@ body {
         border: solid 1px #cccccc; }
       #wrapper .content article code {
         margin: 0 0.25em; }
-      #wrapper .content article navigation.related-pages {
-        display: block;
+      #wrapper .content article nav.related-pages {
         margin-top: 2em;
         padding: 0.5em 0;
         border-top: solid 1px #cccccc; }
-        #wrapper .content article navigation.related-pages h2 {
+        #wrapper .content article nav.related-pages h2 {
           display: inline; }
-        #wrapper .content article navigation.related-pages ul {
+        #wrapper .content article nav.related-pages ul {
           display: inline; }
-        #wrapper .content article navigation.related-pages li {
+        #wrapper .content article nav.related-pages li {
           display: inline;
           margin-left: 0.5em; }
       #wrapper .content article table.tabular {

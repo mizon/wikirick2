@@ -8,7 +8,7 @@
 (defn navigation [screen page selected]
   (let [urls (.url-mapper screen)
         selected? #(= % selected)]
-    [:nav
+    [:nav.page-actions
      [:ul
       (cond (selected? :read) [:li.selected "Read"]
             (page-exists? page) [:li [:a {:href (page-path urls (.title page))} "Read"]]
@@ -47,9 +47,9 @@
     (format "Latest" revision)
     (format "rev%s" revision)))
 
-(defn page-info [page]
+(defn page-info [screen page]
   [:p.page-info
-   [:em (h (.title page))]
+   [:em [:a {:href (page-path (.url-mapper screen) (.title page))} (h (.title page))]]
    ": Last modified: "
    (show-modified-at page nil)])
 

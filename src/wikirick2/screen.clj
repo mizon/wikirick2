@@ -11,7 +11,7 @@
     (base-view self
                (.title page)
                [(navigation self page :read)
-                (page-info page)
+                (page-info self page)
                 `[:article.read
                   [:header
                    [:h1 ~(h (.title page))
@@ -20,7 +20,7 @@
                         (h (format ": Revision %s" revision))])]]
                   ~@(render-page page revision)
                   ~(when (not revision)
-                     [:navigation.related-pages
+                     [:nav.related-pages
                       [:h2 "Related Pages:"]
                       `[:ul ~@(map #(title-to-li self %) (referred-titles page))]])]]))
 
@@ -36,7 +36,7 @@
     (page-editor self
                  page
                  "Edit"
-                 (page-info page)
+                 (page-info self page)
                  nil
                  (page-source page nil)))
 
@@ -59,7 +59,7 @@
       (base-view self
                  (.title page)
                  [(navigation self page :diff)
-                  (page-info page)
+                  (page-info self page)
                   `[:article.diff
                     [:header [:h1 ~(h (format "%s: Diff" (.title page)))]]
                     [:h2
@@ -76,7 +76,7 @@
     (base-view self
                (.title page)
                [(navigation self page :history)
-                (page-info page)
+                (page-info self page)
                 `[:article.history
                   [:header [:h1 ~(h (format "%s: History" (.title page)))]]
                   [:table.tabular
