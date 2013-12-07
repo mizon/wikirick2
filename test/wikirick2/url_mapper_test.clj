@@ -23,6 +23,9 @@
   (testing "diff-from-previous-path"
     (is (= (diff-from-previous-path urlm "SomePage" 5) "/wiki/w/SomePage/diff/4-5")))
 
+  (testing "diff-from-next-path"
+    (is (= (diff-from-next-path urlm "SomePage" 5) "/wiki/w/SomePage/diff/5-6")))
+
   (testing "page-action-path"
     (is (= (page-action-path urlm "SomePage" "Edit") "/wiki/w/SomePage/edit"))
     (is (= (page-action-path urlm "SomePage" "Source") "/wiki/w/SomePage/source")))
