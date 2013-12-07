@@ -80,7 +80,7 @@
                 `[:article.history
                   [:header [:h1 ~(h (format "%s: History" (.title page)))]]
                   [:table.tabular
-                   [:tr [:th "Timestamp"] [:th "Revision"] [:th "Changes"] [:th "Diff to"]]
+                   [:tr [:th "Timestamp"] [:th "Revision"] [:th "Changes"] [:th "Diff from"]]
                    ~@(map #(history-line self page % %2) (page-history page) (range))]]]))
 
   (search-view [self word result]
