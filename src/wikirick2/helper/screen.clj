@@ -53,6 +53,10 @@
    ": Last modified: "
    (show-modified-at page nil)])
 
+(defn special-page-info [title message]
+  [:p.page-info
+   [:em (h title)] (h (format ": (%s)" message))])
+
 (defn search-box [screen default-word]
   [:section.search
    [:form
@@ -88,6 +92,20 @@
                    (recent-changes screen)]
                   [:footer "Made with Clojure Programming Language"]]])))
 
+(defn page-editor [screen page new-or-edit page-info placeholder source]
+  (let [url-mapper (.url-mapper screen)]
+    (base-view screen
+               (.title page)
+               [(navigation screen page :edit)
+                page-info
+                [:article
+                 [:header [:h1 (h (format "%s: %s" (.title page) new-or-edit))]]
+                 [:form.edit {:method "post"
+                              :action (page-action-path url-mapper (.title page) "edit")}
+                  [:textarea {:name "source" :placeholder placeholder} (h source)]
+                  [:button {:type "submit"} "Preview"]
+                  [:button {:type "submit"} "Submit"]]]])))
+
 (defn title-to-li [screen title]
   (let [url-mapper (.url-mapper screen)]
     `[:li [:a {:href ~(page-path url-mapper title)} ~(h title)]]))
@@ -104,17 +122,17 @@
                                                 (.title page)
                                                 (history :revision))}
          (history :revision)]]
-   `[:td
-     ~(if-let [lines (history :lines)]
-        [:a.changes {:href (page-diff-path (.url-mapper screen)
-                                           (.title page)
-                                           (dec (history :revision))
-                                           (history :revision))}
-         [:em {:class (if (> (lines :deleted) 0) "deleted" "zero")}
-          (str "-" (lines :deleted))]
-         " "
-         [:em {:class (if (> (lines :added) 0) "added" "zero")}
-          (str "+" (lines :added))]])]
+   [:td
+    (if-let [lines (history :lines)]
+      [:a.changes {:href (page-diff-path (.url-mapper screen)
+                                         (.title page)
+                                         (dec (history :revision))
+                                         (history :revision))}
+       [:em {:class (if (> (lines :deleted) 0) "deleted" "zero")}
+        (str "-" (lines :deleted))]
+       " "
+       [:em {:class (if (> (lines :added) 0) "added" "zero")}
+        (str "+" (lines :added))]])]
    [:td
     (if (latest-revision? page (history :revision))
       "Latest"

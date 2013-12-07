@@ -5,7 +5,7 @@
             [wikirick2.helper.screen :refer :all]
             [wikirick2.types :refer :all]))
 
-(deftype Screen [storage url-mapper renderer config]
+(deftype Screen [storage url-mapper render-page config]
   IScreen
   (read-view [self page revision]
     (base-view self
@@ -18,39 +18,27 @@
                     ~(when revision
                        [:em.old-revision
                         (h (format ": Revision %s" revision))])]]
-                  ~@(renderer page revision)
+                  ~@(render-page page revision)
                   ~@(if (not revision)
                       [[:h2 "Related Pages"]
                        `[:ul ~@(map #(title-to-li self %) (referred-titles page))]]
                       [])]]))
 
   (new-view [self page]
-    (base-view self
-               (.title page)
-               [(navigation self page :edit)
-                [:p.page-info [:em (h (.title page))] ": (new page)"]
-                `[:article
-                  [:header [:h1 ~(h (format "%s: New" (.title page)))]]
-                  [:section.edit
-                   [:textarea {:placeholder ~(page-source page nil)}]
-                   [:button {:type "submit"} "Preview"]
-                   [:button {:type "submit"} "Submit"]]]]))
+    (page-editor self
+                 page
+                 "New"
+                 (special-page-info (.title page) "new page")
+                 (page-source page nil)
+                 nil))
 
   (edit-view [self page]
-    (base-view self
-               (.title page)
-               [(navigation self page :edit)
-                (page-info page)
-                `[:article
-                  [:header [:h1 ~(h (format "%s: Edit" (.title page)))]]
-                  [:form.edit {:method "post"
-                               :action ~(page-action-path url-mapper (.title page) "edit")}
-                   [:input {:type "hidden"
-                            :name "base-rev"
-                            :value ~(latest-revision page)}]
-                   [:textarea {:name "source"} ~(h (page-source page nil))]
-                   [:button {:type "submit"} "Preview"]
-                   [:button {:type "submit"} "Submit"]]]]))
+    (page-editor self
+                 page
+                 "Edit"
+                 (page-info page)
+                 nil
+                 (page-source page nil)))
 
   (diff-view [self page from-rev to-rev]
     (let [diff-lines (string/split-lines (diff-revisions page from-rev to-rev))
@@ -99,6 +87,7 @@
     (base-view self
                "Search"
                [(all-disabled-navigation self)
+                (special-page-info "Search" "special page")
                 [:p.page-info [:em "Search"] ": (special page)"]
                 `[:article.search
                   [:header [:h1 "Search"]]
@@ -107,12 +96,12 @@
                    [:tr [:th.title "Title"] [:th.line "Line"]]
                    ~@(map #(search-line self % %2) result (range))]]])))
 
-(defn cached-page-renderer [render-f]
+(defn cached-page-renderer [render-source]
   (let [cache (ref {})]
     (letfn [(do-render [page revision]
               (let [key (str (.title page) "/" (or revision (latest-revision page)))]
                 (or (@cache key)
-                    (let [rendered (render-f (page-source page revision))]
+                    (let [rendered (render-source (page-source page revision))]
                       (dosync (alter cache #(assoc % key rendered)))
                       (do-render page revision)))))]
       do-render)))
