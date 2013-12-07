@@ -84,7 +84,8 @@
       (shell/rlog-date (.shell storage) title (or revision (latest-revision self)))))
 
   (diff-revisions [self from-rev to-rev]
-    (shell/rcsdiff (.shell storage) title from-rev to-rev))
+    (with-rw-lock storage readLock
+      (shell/rcsdiff (.shell storage) title from-rev to-rev)))
 
   (referring-titles [self]
     (wiki-parser/scan-wiki-links (page-source self nil)))
