@@ -188,6 +188,18 @@ body {
         border: solid 1px #cccccc; }
       #wrapper .content article code {
         margin: 0 0.25em; }
+      #wrapper .content article navigation.related-pages {
+        display: block;
+        margin-top: 2em;
+        padding: 0.5em 0;
+        border-top: solid 1px #cccccc; }
+        #wrapper .content article navigation.related-pages h2 {
+          display: inline; }
+        #wrapper .content article navigation.related-pages ul {
+          display: inline; }
+        #wrapper .content article navigation.related-pages li {
+          display: inline;
+          margin-left: 0.5em; }
       #wrapper .content article table.tabular {
         width: 100%;
         border-collapse: collapse;

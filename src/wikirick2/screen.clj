@@ -19,10 +19,10 @@
                        [:em.old-revision
                         (h (format ": Revision %s" revision))])]]
                   ~@(render-page page revision)
-                  ~@(if (not revision)
-                      [[:h2 "Related Pages"]
-                       `[:ul ~@(map #(title-to-li self %) (referred-titles page))]]
-                      [])]]))
+                  ~(when (not revision)
+                     [:navigation.related-pages
+                      [:h2 "Related Pages:"]
+                      `[:ul ~@(map #(title-to-li self %) (referred-titles page))]])]]))
 
   (new-view [self page]
     (page-editor self
