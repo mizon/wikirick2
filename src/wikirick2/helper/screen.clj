@@ -97,11 +97,13 @@
           [:em {:class (if (> (lines :deleted) 0) "deleted" "zero")}
            (str "-" (lines :deleted))]])]
    [:td
-    [:a {:href (page-diff-path (.url-mapper screen)
-                               (.title page)
-                               (history :revision)
-                               (latest-revision page))}
-     "Latest"]
+    (if (latest-revision? page (history :revision))
+      "Latest"
+      [:a {:href (page-diff-path (.url-mapper screen)
+                                 (.title page)
+                                 (history :revision)
+                                 (latest-revision page))}
+       "Latest"])
     " | "
     (if (> (history :revision) 1)
       [:a {:href (page-diff-path (.url-mapper screen)
