@@ -80,9 +80,14 @@
                   `[:article
                     {:class "diff"}
                     [:header [:h1 ~(h (format "%s: Diff" (.title page)))]]
-                    [:h2 ~(h (format "Changes between %s and %s"
-                                     (show-revision page from-rev)
-                                     (show-revision page to-rev)))]
+                    [:h2
+                     "Changes between "
+                     ~[:a {:href (page-revision-path url-mapper (.title page) from-rev)}
+                       (h (show-revision page from-rev))]
+
+                     " and "
+                     ~[:a {:href (page-revision-path url-mapper (.title page) to-rev)}
+                       (h (show-revision page to-rev))]]
                     [:pre
                      ~@(interpose "\n" diff-result)]]])))
 
