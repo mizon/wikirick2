@@ -12,12 +12,11 @@
                (.title page)
                [(navigation self page :read)
                 (page-info page)
-                `[:article
-                  {:class "read"}
+                `[:article.read
                   [:header
                    [:h1 ~(h (.title page))
                     ~(when revision
-                       [:em {:class "old-revision"}
+                       [:em.old-revision
                         (h (format ": Revision %s" revision))])]]
                   ~@(renderer page revision)
                   ~@(if (not revision)
@@ -29,11 +28,10 @@
     (base-view self
                (.title page)
                [(navigation self page :edit)
-                [:p {:class "page-info"} [:em (h (.title page))] ": (new page)"]
+                [:p.page-info [:em (h (.title page))] ": (new page)"]
                 `[:article
                   [:header [:h1 ~(h (format "%s: New" (.title page)))]]
-                  [:section
-                   {:class "edit"}
+                  [:section.edit
                    [:textarea {:placeholder ~(page-source page nil)}]
                    [:button {:type "submit"} "Preview"]
                    [:button {:type "submit"} "Submit"]]]]))
@@ -45,9 +43,8 @@
                 (page-info page)
                 `[:article
                   [:header [:h1 ~(h (format "%s: Edit" (.title page)))]]
-                  [:form {:class "edit"
-                          :method "post"
-                          :action ~(page-action-path url-mapper (.title page) "edit")}
+                  [:form.edit {:method "post"
+                               :action ~(page-action-path url-mapper (.title page) "edit")}
                    [:input {:type "hidden"
                             :name "base-rev"
                             :value ~(latest-revision page)}]
@@ -57,9 +54,9 @@
 
   (diff-view [self page from-rev to-rev]
     (let [diff-lines (string/split-lines (diff-revisions page from-rev to-rev))
-          colorlize-line #(cond (re-find #"\A@@" %) [:em {:class "section-header"} (h %)]
-                                (re-find #"\A\+" %) [:em {:class "added"} (h %)]
-                                (re-find #"\A-" %) [:em {:class "removed"} (h %)]
+          colorlize-line #(cond (re-find #"\A@@" %) [:em.section-header (h %)]
+                                (re-find #"\A\+" %) [:em.added (h %)]
+                                (re-find #"\A-" %) [:em.removed (h %)]
                                 :else (h %))
           diff-result (map colorlize-line
                            (list* (format "--- %s %s %s"
@@ -77,8 +74,7 @@
                  (.title page)
                  [(navigation self page :diff)
                   (page-info page)
-                  `[:article
-                    {:class "diff"}
+                  `[:article.diff
                     [:header [:h1 ~(h (format "%s: Diff" (.title page)))]]
                     [:h2
                      "Changes between "
@@ -96,10 +92,9 @@
                (.title page)
                [(navigation self page :history)
                 (page-info page)
-                `[:article
-                  {:class "history"}
+                `[:article.history
                   [:header [:h1 ~(h (format "%s: History" (.title page)))]]
-                  [:table {:class "tabular"}
+                  [:table.tabular
                    [:tr [:th "Timestamp"] [:th "Revision"] [:th "Changes"] [:th "Diff to"]]
                    ~@(map #(history-line self page % %2) (page-history page) (range))]]]))
 
@@ -107,13 +102,12 @@
     (base-view self
                "Search"
                [(all-disabled-navigation self)
-                [:p {:class "page-info"} [:em "Search"] ": (special page)"]
-                `[:article
-                  {:class "search"}
+                [:p.page-info [:em "Search"] ": (special page)"]
+                `[:article.search
                   [:header [:h1 "Search"]]
                   ~(search-box self word)
-                  [:table {:class "tabular"}
-                   [:tr [:th {:class "title"} "Title"] [:th {:class "line"} "Line"]]
+                  [:table.tabular
+                   [:tr [:th.title "Title"] [:th.line "Line"]]
                    ~@(map #(search-line self % %2) result (range))]]])))
 
 (defn cached-page-renderer [render-f]

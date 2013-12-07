@@ -10,15 +10,15 @@
         selected? #(= % selected)]
     [:nav
      [:ul
-      (cond (selected? :read) [:li {:class "selected"} "Read"]
+      (cond (selected? :read) [:li.selected "Read"]
             (page-exists? page) [:li [:a {:href (page-path urls (.title page))} "Read"]]
             :else [:li "Read"])
-      (cond (selected? :edit) [:li {:class "selected"} "Edit"]
+      (cond (selected? :edit) [:li.selected "Edit"]
             (page-exists? page) [:li
                                  [:a {:href (page-action-path urls (.title page) "edit")}
                                   "Edit"]]
             :else [:li "Edit"])
-      (cond (selected? :diff) [:li {:class "selected"} "Diff"]
+      (cond (selected? :diff) [:li.selected "Diff"]
             (and (page-exists? page)
                  (not= (latest-revision page) 1))
             [:li
@@ -28,7 +28,7 @@
                                         (latest-revision page))}
               "Diff"]]
             :else [:li "Diff"])
-      (cond (selected? :history) [:li {:class "selected"} "History"]
+      (cond (selected? :history) [:li.selected "History"]
             (page-exists? page) [:li [:a {:href (page-action-path urls (.title page) "history")}
                                       "History"]]
             :else [:li "History"])]]))
@@ -48,8 +48,7 @@
     (format "rev%s" revision)))
 
 (defn page-info [page]
-  [:p
-   {:class "page-info"}
+  [:p.page-info
    [:em (h (.title page))]
    ": Last modified: "
    (show-modified-at page nil)])
@@ -95,22 +94,22 @@
 
 (defn search-line [screen [title content] line-no]
   [:tr {:class (if (odd? line-no) "odd" "even")}
-   [:td {:class "title"} [:a {:href (page-path (.url-mapper screen) title)} (h title)]]
-   [:td {:class "line"} (h content)]])
+   [:td.title [:a {:href (page-path (.url-mapper screen) title)} (h title)]]
+   [:td.line (h content)]])
 
 (defn history-line [screen page history line-no]
   [:tr {:class (if (odd? line-no) "odd" "even")}
    [:td (h (show-date (history :date)))]
-   [:td [:a {:href (page-revision-path (.url-mapper screen) (.title page) (history :revision))
-             :class "revision"}
+   [:td [:a.revision {:href (page-revision-path (.url-mapper screen)
+                                                (.title page)
+                                                (history :revision))}
          (history :revision)]]
    `[:td
      ~(if-let [lines (history :lines)]
-        [:a {:class "changes"
-             :href (page-diff-path (.url-mapper screen)
-                                   (.title page)
-                                   (dec (history :revision))
-                                   (history :revision))}
+        [:a.changes {:href (page-diff-path (.url-mapper screen)
+                                           (.title page)
+                                           (dec (history :revision))
+                                           (history :revision))}
          [:em {:class (if (> (lines :deleted) 0) "deleted" "zero")}
           (str "-" (lines :deleted))]
          " "
