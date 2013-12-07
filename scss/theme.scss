@@ -9,6 +9,9 @@ $hovered-bg-color: #CCF;
 $header-bg-color: #EEE;
 $even-line-bg-color: #FFF;
 $odd-line-bg-color: #EEF;
+$section-header-color: #009;
+$added-line-color: #090;
+$removed-line-color: #900;
 
 @mixin smaller-font() {
   font-size: 75%;
@@ -193,8 +196,9 @@ body {
             border-style: solid none;
           }
 
-          td {
-            text-align: center;
+          th, td {
+            text-align: left;
+            padding: 0 0.5em;
           }
         }
 
@@ -230,6 +234,22 @@ body {
 
         td.line {
           text-align: left;
+        }
+      }
+    }
+
+    article.diff {
+      pre {
+        .section-header {
+          color: $section-header-color;
+        }
+
+        .added {
+          color: $added-line-color;
+        }
+
+        .removed {
+          color: $removed-line-color;
         }
       }
     }

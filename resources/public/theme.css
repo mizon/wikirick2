@@ -197,8 +197,9 @@ body {
           background-color: #eeeeee;
           border: solid 1px #cccccc;
           border-style: solid none; }
-        #wrapper .content article table.tabular tr td {
-          text-align: center; }
+        #wrapper .content article table.tabular tr th, #wrapper .content article table.tabular tr td {
+          text-align: left;
+          padding: 0 0.5em; }
         #wrapper .content article table.tabular tr.odd {
           background-color: #eeeeff; }
         #wrapper .content article table.tabular tr.even {
@@ -215,6 +216,12 @@ body {
         width: 10em; }
       #wrapper .content article.search table td.line {
         text-align: left; }
+    #wrapper .content article.diff pre .section-header {
+      color: #000099; }
+    #wrapper .content article.diff pre .added {
+      color: #009900; }
+    #wrapper .content article.diff pre .removed {
+      color: #990000; }
     #wrapper .content article.history em.zero {
       color: #999999; }
     #wrapper .content .edit {
