@@ -76,8 +76,7 @@
     (testing "handles POST /w/FooPage/edit"
       (let [page-content "some content"
             res (app (request :post "/w/FooPage/edit"
-                              {:source page-content
-                               :base-rev "1"}))]
+                              {:source page-content}))]
         (is (= (res :status) 303))
         (let [foo-page (select-page storage "FooPage")]
           (is (= (page-source foo-page nil) page-content))

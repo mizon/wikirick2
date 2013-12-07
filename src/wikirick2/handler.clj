@@ -52,10 +52,9 @@
   (with-wiki-service
     (save-page (assoc (new-page storage title) :source source))))
 
-(defn- update-page [{:keys [title source base-rev]}]
+(defn- update-page [{:keys [title source]}]
   (with-wiki-service
-    (let [base-rev- (Integer/parseInt base-rev)
-          page (select-page-by-revision storage title base-rev-)]
+    (let [page (select-page storage title)]
       (save-page (assoc page :source source))
       (response/redirect-after-post (page-path url-mapper title)))))
 

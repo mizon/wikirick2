@@ -25,9 +25,6 @@
         (throw+ {:type :page-not-found})
         page)))
 
-  (select-page-by-revision [self title rev]
-    (select-page self title))
-
   (select-all-pages [self]
     (with-rw-lock self readLock
       (map #(new-page self %) (shell/ls-rcs-files shell))))
