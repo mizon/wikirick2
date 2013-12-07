@@ -3,7 +3,6 @@
 (defprotocol IPageStorage
   (new-page [self title])
   (select-page [self title])
-  (select-page-by-revision [self title rev])
   (select-all-pages [self])
   (select-recent-pages [self n-pages])
   (search-pages [self word]))
