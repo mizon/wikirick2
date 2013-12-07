@@ -251,4 +251,11 @@ foobar
         (save-page densed-page)
         (save-page linkful-page)
         (save-page sparsed-page)
-        (is (= (referred-titles target-page) ["LinkFul" "Densed" "Sparsed"]))))))
+        (is (= (referred-titles target-page) ["LinkFul" "Densed" "Sparsed"])))))
+
+  (testing "orphan-page?"
+    (testing-storage "knows if self is an orphan page or not"
+      (save-page (create-page storage "FooPage" "foo content"))
+      (is (orphan-page? (select-page storage "FooPage")))
+      (save-page (create-page storage "SomePage" "[[FooPage]]"))
+      (is (not (orphan-page? (select-page storage "FooPage")))))))

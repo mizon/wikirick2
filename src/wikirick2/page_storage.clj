@@ -96,7 +96,10 @@
                             :page_relation
                             (sql/where {:destination title})
                             "ORDER BY priority DESC")
-                :row-fn :source)))
+                :row-fn :source))
+
+  (orphan-page? [self]
+    (zero? (count (referred-titles self)))))
 
 (defn create-page-storage [base-dir db]
   (letfn [(table-exists? []
