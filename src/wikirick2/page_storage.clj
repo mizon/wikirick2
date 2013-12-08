@@ -65,7 +65,7 @@
   (latest-revision [self]
     (or @latest-revision-cache
         (let [rev (with-rw-lock storage readLock
-                    (shell/head-revision (.shell storage) title))]
+                    (shell/rlog-head (.shell storage) title))]
           (dosync (ref-set latest-revision-cache rev))
           (latest-revision self))))
 

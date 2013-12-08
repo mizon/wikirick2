@@ -29,13 +29,6 @@
     (when (not= (:exit result) 0)
       (throw+ {:type :ci-failed}))))
 
-(defn head-revision [shell title]
-  (let [result (shell/sh "head" (rcs-file title) :dir (rcs-dir shell))
-        parse-revision #(Integer/parseInt (second (re-find #"head\s+\d+\.(\d+);" %)))]
-    (if (= (:exit result) 0)
-      (parse-revision (first (string/split-lines (:out result))))
-      (throw+ {:type :head-revision-failed}))))
-
 (defn ls-rcs-files [shell]
   (let [result (shell/sh "ls" "-t" (rcs-dir shell))
         fnames (string/split-lines (:out result))]
@@ -57,6 +50,13 @@
     (if (= (:exit result) 0)
       (parse-rlog-output (:out result))
       (throw+ {:type :rlog-failed}))))
+
+(defn rlog-head [shell title]
+  (let [result (shell/sh "rlog" "-h" (rcs-file title) :dir (.base-dir shell))
+        parse-head-rev #(Integer/parseInt (second (re-find #"(?m)^head: \d+\.(\d+)" %)))]
+    (if (= (:exit result) 0)
+      (parse-head-rev (:out result))
+      (throw+ {:type :head-revision-failed}))))
 
 (defn rlog-date [shell title rev]
   (let [rev-opt (format "-r1.%s" rev)
