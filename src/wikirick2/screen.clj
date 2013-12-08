@@ -16,8 +16,7 @@
                   [:header
                    [:h1 ~(h (.title page))
                     ~(when revision
-                       [:em.old-revision
-                        (h (format ": Revision %s" revision))])]]
+                       (h (format ": Revision %s" revision)))]]
                   ~@(render-page page revision)
                   ~(when (not (or revision (orphan-page? page)))
                      [:nav.related-pages
