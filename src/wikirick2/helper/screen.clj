@@ -37,7 +37,7 @@
   [:nav.page-actions [:ul [:li "Read"] [:li "Edit"] [:li "Diff"] [:li "History"]]])
 
 (defn show-modified-at [page revision]
-  (format/unparse (format/formatter "yyyy/MM/dd HH:mm") (modified-at page revision)))
+  (show-date (modified-at page revision)))
 
 (defn show-date [date]
   (format/unparse (format/formatter "yyyy/MM/dd HH:mm") date))
