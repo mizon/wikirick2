@@ -119,11 +119,13 @@ body {
       background-color: #EEE; }
       #container aside .search input {
         width: 100%; }
-    #container aside ol li:before {
-      content: '-';
-      margin-right: 1em; }
-    #container aside ol li {
-      list-style-type: none; }
+    #container aside ol, #container aside ul {
+      margin-bottom: 1em; }
+      #container aside ol li:before, #container aside ul li:before {
+        content: '-';
+        margin-right: 1em; }
+      #container aside ol li, #container aside ul li {
+        list-style-type: none; }
   #container footer {
     clear: both;
     text-align: center;

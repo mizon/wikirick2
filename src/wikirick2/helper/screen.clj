@@ -64,6 +64,14 @@
     [:input {:type "text" :name "word" :value default-word}]
     [:button {:type "submit"} "Search"]]])
 
+(defn editable-sidebar [screen]
+  (let [render-page (.render-page screen)
+        storage (.storage screen)
+        url-mapper (.url-mapper screen)]
+    `[:section
+      ~@(render-page (select-page storage "Sidebar") nil)
+      [:p "[" [:a {:href ~(page-action-path url-mapper "Sidebar" "edit")} "Edit"] "]"]]))
+
 (defn recent-changes [screen]
   (let [pages (select-recent-pages (.storage screen) 10)]
     [:section
@@ -89,6 +97,7 @@
                   [:aside
                    [:header [:h1 [:a {:href (index-path url-mapper)} (h (config :site-title))]]]
                    (search-box screen "")
+                   (editable-sidebar screen)
                    (recent-changes screen)]
                   [:footer "Made with Clojure Programming Language"]]])))
 

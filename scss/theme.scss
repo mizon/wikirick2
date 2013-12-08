@@ -72,7 +72,9 @@ body {
       }
     }
 
-    ol {
+    ol, ul {
+      margin-bottom: 1em;
+
       li:before {
         content: '-';
         margin-right: 1em;
