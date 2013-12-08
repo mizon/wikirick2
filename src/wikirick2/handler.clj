@@ -54,9 +54,9 @@
 
 (defn- update-page [{:keys [title source]}]
   (with-wiki-service
-    (let [page (select-page storage title)]
-      (save-page (assoc page :source source))
-      (response/redirect-after-post (page-path url-mapper title)))))
+    (save-page (assoc (new-page storage title)
+                 :source source))
+    (response/redirect-after-post (page-path url-mapper title))))
 
 (defroutes wikirick-routes
   (GET "/" {params :params} (open-read-view (assoc params :title "FrontPage")))
