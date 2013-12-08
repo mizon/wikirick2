@@ -14,7 +14,7 @@ $added-line-color: #090;
 $removed-line-color: #900;
 
 @mixin smaller-font() {
-  font-size: 75%;
+  font-size: 80%;
 }
 
 @mixin border() {
@@ -200,10 +200,12 @@ body {
 
         h2 {
           display: inline;
+          font-weight: normal;
         }
 
         ul {
           display: inline;
+          margin: 0;
         }
 
         li {

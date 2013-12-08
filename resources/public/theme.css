@@ -108,7 +108,7 @@ body {
         text-decoration: none; }
     #container aside section {
       margin-bottom: 2em;
-      font-size: 75%; }
+      font-size: 80%; }
       #container aside section h2 {
         margin-bottom: 0.5em; }
       #container aside section h2:before {
@@ -127,7 +127,7 @@ body {
   #container footer {
     clear: both;
     text-align: center;
-    font-size: 75%;
+    font-size: 80%;
     padding: 0.5em 0; }
 
 #wrapper {
@@ -139,7 +139,7 @@ body {
     #wrapper .content nav.page-actions {
       margin-bottom: 0.5em;
       float: right;
-      font-size: 75%;
+      font-size: 80%;
       color: #999999; }
       #wrapper .content nav.page-actions ul {
         width: 100%; }
@@ -156,7 +156,7 @@ body {
         color: #006699;
         font-weight: bold; }
     #wrapper .content p.page-info {
-      font-size: 75%;
+      font-size: 80%;
       padding: 0 0.5em;
       position: absolute;
       top: 0;
@@ -199,9 +199,11 @@ body {
         padding: 0.5em 0;
         border-top: solid 1px #cccccc; }
         #wrapper .content article nav.related-pages h2 {
-          display: inline; }
+          display: inline;
+          font-weight: normal; }
         #wrapper .content article nav.related-pages ul {
-          display: inline; }
+          display: inline;
+          margin: 0; }
         #wrapper .content article nav.related-pages li {
           display: inline;
           margin-left: 0.5em; }
