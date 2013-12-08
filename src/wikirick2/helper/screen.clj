@@ -92,6 +92,20 @@
                    (recent-changes screen)]
                   [:footer "Made with Clojure Programming Language"]]])))
 
+(defn error-notification [screen messages]
+  `[:ul.errors ~@(map (fn [message]
+                        [:li (h message)])
+                      messages)])
+
+(defn editor-form [screen page placeholder source]
+  [:form.edit {:method "post"
+               :action (page-action-path (.url-mapper screen)
+                                         (.title page)
+                                         "edit")}
+   [:textarea {:name "source" :placeholder placeholder} (h source)]
+   [:button {:type "submit"} "Preview"]
+   [:button {:type "submit"} "Submit"]])
+
 (defn page-editor [screen page new-or-edit page-info placeholder source]
   (let [url-mapper (.url-mapper screen)]
     (base-view screen
@@ -100,11 +114,7 @@
                 page-info
                 [:article
                  [:header [:h1 (h (format "%s: %s" (.title page) new-or-edit))]]
-                 [:form.edit {:method "post"
-                              :action (page-action-path url-mapper (.title page) "edit")}
-                  [:textarea {:name "source" :placeholder placeholder} (h source)]
-                  [:button {:type "submit"} "Preview"]
-                  [:button {:type "submit"} "Submit"]]]])))
+                 (editor-form screen page placeholder source)]])))
 
 (defn title-to-li [screen title]
   (let [url-mapper (.url-mapper screen)]
