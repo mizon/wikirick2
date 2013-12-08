@@ -12,7 +12,11 @@
     (is (= (index-path urlm) "/wiki/")))
 
   (testing "page-path"
-    (is (= (page-path urlm "SomePage") "/wiki/w/SomePage")))
+    (testing "returns a path to SomePage"
+      (is (= (page-path urlm "SomePage") "/wiki/w/SomePage")))
+
+    (testing "returns a encoded path to Some Page"
+      (is (= (page-path urlm "Some Page") "/wiki/w/Some%20Page"))))
 
   (testing "page-revision-path"
     (is (= (page-revision-path urlm "SomePage" 3) "/wiki/w/SomePage?rev=3")))

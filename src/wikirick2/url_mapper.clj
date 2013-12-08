@@ -1,9 +1,9 @@
 (ns wikirick2.url-mapper
   (:require [clojure.string :as string]
-            [wikirick2.types :refer :all])
-  (:import java.net.URLEncoder))
+            [ring.util.codec :as codec]
+            [wikirick2.types :refer :all]))
 
-(declare encode concat-paths build-url)
+(declare build-url)
 
 (deftype URLMapper [base-path]
   IURLMapper
@@ -40,5 +40,5 @@
 
 (defn- build-url [urls segments query]
   (let [segs (concat (string/split (.base-path urls) #"/") segments)
-        encoded-segs (map #(URLEncoder/encode % "UTF-8") segs)]
+        encoded-segs (map codec/url-encode segs)]
     (str (string/join "/" encoded-segs) query)))
