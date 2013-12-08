@@ -19,7 +19,7 @@
                        [:em.old-revision
                         (h (format ": Revision %s" revision))])]]
                   ~@(render-page page revision)
-                  ~(when (not revision)
+                  ~(when (not (or revision (orphan-page? page)))
                      [:nav.related-pages
                       [:h2 "Related Pages:"]
                       `[:ul ~@(map #(title-to-li self %) (referred-titles page))]])]]))
