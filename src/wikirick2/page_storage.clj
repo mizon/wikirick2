@@ -21,9 +21,10 @@
 
   (select-page [self title]
     (let [page (new-page self title)]
-      (if (not (page-exists? page))
-        (throw+ {:type :page-not-found})
-        page)))
+      (with-rw-lock self readLock
+        (if (not (page-exists? page))
+          (throw+ {:type :page-not-found})
+          page))))
 
   (select-all-pages [self]
     (with-rw-lock self readLock
