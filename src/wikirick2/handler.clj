@@ -58,15 +58,23 @@
                  :source source))
     (response/redirect-after-post (page-path url-mapper title))))
 
-(defroutes wikirick-routes
-  (GET "/" {params :params} (open-read-view (assoc params :title "FrontPage")))
-  (GET "/w/:title" {params :params} (open-read-view params))
-  (GET "/w/:title/new" [title] (open-new-view title))
-  (POST "/w/:title/new" {params :params} (register-new-page params))
-  (GET "/w/:title/edit" [title] (open-edit-view title))
-  (POST "/w/:title/edit" {params :params} (update-page params))
-  (GET "/w/:title/diff/:range" {params :params} (open-diff-view params))
-  (GET "/w/:title/history" [title] (open-history-view title))
-  (GET "/search" {params :params} (open-search-view params))
-  (route/resources "/")
-  (route/not-found "Not Found"))
+(defn- catch-invalid-title-request [app]
+  (fn [req]
+    (try+
+      (app req)
+      (catch [:type :invalid-page-title] _
+        ((route/not-found "Not Found") req)))))
+
+(def wikirick-routes
+  (-> (routes (GET "/" {params :params} (open-read-view (assoc params :title "FrontPage")))
+              (GET "/w/:title" {params :params} (open-read-view params))
+              (GET "/w/:title/new" [title] (open-new-view title))
+              (POST "/w/:title/new" {params :params} (register-new-page params))
+              (GET "/w/:title/edit" [title] (open-edit-view title))
+              (POST "/w/:title/edit" {params :params} (update-page params))
+              (GET "/w/:title/diff/:range" {params :params} (open-diff-view params))
+              (GET "/w/:title/history" [title] (open-history-view title))
+              (GET "/search" {params :params} (open-search-view params))
+              (route/resources "/")
+              (route/not-found "Not Found"))
+      catch-invalid-title-request))

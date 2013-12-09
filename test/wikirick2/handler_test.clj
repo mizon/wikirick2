@@ -19,17 +19,20 @@
 (def storage (.storage testing-service))
 
 (deftest wikirick-routes-
-  (let [front-page (assoc (new-page storage "FrontPage") :source "some content")]
-    (save-page front-page)
-
-    (testing "handles GET /"
-      (let [res (app (request :get "/"))]
-        (is (= (res :status) 200)))))
-
   (save-page (create-page storage "FooPage" "some content"))
   (save-page (assoc (select-page storage "FooPage")
                :source "foo content"))
   (save-page (create-page storage "BarPage" "some content"))
+  (save-page (create-page storage "FrontPage" "front page content"))
+  (save-page (create-page storage "Sidebar" "## Sidebar"))
+
+  (testing "handles GET /"
+    (with-wiki-service
+      (let [res (app (request :get "/"))]
+        (is (= (res :status) 200))
+        (is (= (res :body)
+               (read-view screen (select-page storage "FrontPage") nil))))))
+
 
   (let [foo-page (select-page storage "FooPage")
         bar-page (select-page storage "BarPage")]
@@ -108,4 +111,9 @@
           (is (= (res :body)
                  (search-view screen
                               "some"
-                              (search-pages storage "some")))))))))
+                              (search-pages storage "some")))))))
+
+    (testing "handles invalid title requests"
+      (let [res (app (request :get "/w/Foo%20%20Bar"))]
+        (is (= (res :status) 404))
+        (is (= (res :body) "Not Found"))))))
