@@ -42,7 +42,7 @@
 
 (defn- open-diff-view [{title :title revision-range :range}]
   (with-wiki-service
-    (let [[_ from-rev to-rev] (re-matches #"(\d+)-(\d+)" revision-range)]
+    (if-let [[_ from-rev to-rev] (re-matches #"(\d+)-(\d+)" revision-range)]
       (diff-view screen
                  (select-page storage title)
                  (Integer/parseInt from-rev)
@@ -58,7 +58,7 @@
                  :source source))
     (response/redirect-after-post (page-path url-mapper title))))
 
-(defn- catch-invalid-title-request [app]
+(defn- catch-known-exceptions [app]
   (fn [req]
     (try+
       (app req)
@@ -77,4 +77,4 @@
               (GET "/search" {params :params} (open-search-view params))
               (route/resources "/")
               (route/not-found "Not Found"))
-      catch-invalid-title-request))
+      catch-known-exceptions))
