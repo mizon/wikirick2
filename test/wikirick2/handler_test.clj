@@ -76,22 +76,24 @@
         (is (= (res :status) 302))
         (is (= ((res :headers) "Location") "/w/SomePage/new"))))
 
-    (testing "handles POST /w/FooPage/preview"
-      (with-wiki-service
-        (let [foo-page (create-page storage "FooPage" "foo content")
-              res (app (request :post "/w/FooPage/preview"
-                                {:source (page-source foo-page nil)}))]
-          (is (= (res :status) 200))
-          (is (= (res :body) (preview-view screen foo-page))))))
-
     (testing "handles POST /w/FooPage/edit"
-      (let [page-content "some content"
-            res (app (request :post "/w/FooPage/edit"
-                              {:source page-content}))]
-        (is (= (res :status) 303))
-        (let [foo-page (select-page storage "FooPage")]
-          (is (= (page-source foo-page nil) page-content))
-          (is (= ((res :headers) "Location") "/w/FooPage")))))
+      (with-wiki-service
+        (testing "opens the preview view"
+          (let [foo-page (create-page storage "FooPage" "foo content")
+                res (app (request :post "/w/FooPage/edit"
+                                  {:source (page-source foo-page nil)
+                                   :preview true}))]
+            (is (= (res :status) 200))
+            (is (= (res :body) (preview-view screen foo-page)))))
+
+        (testing "register a posted page"
+          (let [page-content "some content"
+                res (app (request :post "/w/FooPage/edit"
+                                  {:source page-content}))]
+            (is (= (res :status) 303))
+            (let [foo-page (select-page storage "FooPage")]
+              (is (= (page-source foo-page nil) page-content))
+              (is (= ((res :headers) "Location") "/w/FooPage")))))))
 
     (testing "handles GET /w/FooPage/diff/from-to"
       (with-wiki-service

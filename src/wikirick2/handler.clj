@@ -28,12 +28,6 @@
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
 
-(defn- open-preview-view [{:keys [title source]}]
-  (with-wiki-service
-    (let [page (assoc (new-page storage title)
-                 :source source)]
-      (preview-view screen page))))
-
 (defn- open-search-view [{:keys [word]}]
   (with-wiki-service
     (search-view screen word (search-pages storage word))))
@@ -54,15 +48,13 @@
                  (Integer/parseInt from-rev)
                  (Integer/parseInt to-rev)))))
 
-(defn- register-new-page [{:keys [title source]}]
+(defn- post-page [{title :title source :source preview? :preview}]
   (with-wiki-service
-    (save-page (assoc (new-page storage title) :source source))))
-
-(defn- update-page [{:keys [title source]}]
-  (with-wiki-service
-    (save-page (assoc (new-page storage title)
-                 :source source))
-    (response/redirect-after-post (page-path url-mapper title))))
+    (let [page (assoc (new-page storage title) :source source)]
+      (if preview?
+        (preview-view screen page)
+        (do (save-page page)
+            (response/redirect-after-post (page-path url-mapper (.title page))))))))
 
 (defn- catch-known-exceptions [app]
   (fn [req]
@@ -78,7 +70,7 @@
               (POST "/w/:title/new" {params :params} (register-new-page params))
               (GET "/w/:title/edit" [title] (open-edit-view title))
               (POST "/w/:title/preview" {params :params} (open-preview-view params))
-              (POST "/w/:title/edit" {params :params} (update-page params))
+              (POST "/w/:title/edit" {params :params} (post-page params))
               (GET "/w/:title/diff/:range" {params :params} (open-diff-view params))
               (GET "/w/:title/history" [title] (open-history-view title))
               (GET "/search" {params :params} (open-search-view params))
