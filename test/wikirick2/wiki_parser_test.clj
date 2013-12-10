@@ -46,7 +46,8 @@ BarPage -> [[BarPage]]
          "foo?bar"
          "foo\rbar"
          "foo\nbar"
-         "foo.bar")))
+         "foo.bar"
+         "RCS")))
 
 (deftest render-wiki-source-inline-level
   (testing "text"

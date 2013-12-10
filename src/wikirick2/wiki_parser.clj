@@ -23,6 +23,7 @@
 (defn valid-page-name? [name]
   (and (not (empty? name))
        (not (re-find #"([/\.\t\[\]<>\|\?\r\n]|  )" name))
+       (not= name "RCS") ; Reserved for the system
        (= (.trim name) name)))
 
 ;;; Helpers
