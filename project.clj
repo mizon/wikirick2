@@ -7,6 +7,7 @@
   :dependencies [[clj-time "0.6.0"]
                  [compojure "1.1.5"]
                  [hiccup "1.0.4"]
+                 [org.clojars.runa/conjure "2.1.3"]
                  [org.clojure/algo.monads "0.1.4"]
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-1934"]
