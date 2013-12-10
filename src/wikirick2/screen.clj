@@ -24,20 +24,10 @@
                       `[:ul ~@(map #(title-to-li self %) (referred-titles page))]])]]))
 
   (new-view [self page]
-    (page-editor self
-                 page
-                 "New"
-                 (special-page-info (.title page) "new page")
-                 (page-source page nil)
-                 nil))
+    (page-editor self page "New" (page-source page nil) nil))
 
   (edit-view [self page]
-    (page-editor self
-                 page
-                 "Edit"
-                 (page-info self page)
-                 nil
-                 (page-source page nil)))
+    (page-editor self page "Edit" nil (page-source page nil)))
 
   (preview-view [self page]
     (base-view self

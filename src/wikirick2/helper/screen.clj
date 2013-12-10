@@ -48,10 +48,11 @@
     (format "rev%s" revision)))
 
 (defn page-info [screen page]
-  [:p.page-info
-   [:em [:a {:href (page-path (.url-mapper screen) (.title page))} (h (.title page))]]
-   ": Last modified: "
-   (show-modified-at page nil)])
+  `[:p.page-info
+    ~[:em [:a {:href (page-path (.url-mapper screen) (.title page))} (h (.title page))]]
+    ~@(if (page-exists? page)
+        [": Last modified: " (show-modified-at page nil)]
+        [": (new page)"])])
 
 (defn special-page-info [title message]
   [:p.page-info
@@ -115,12 +116,12 @@
    [:button {:type "submit"} "Preview"]
    [:button {:type "submit"} "Submit"]])
 
-(defn page-editor [screen page new-or-edit page-info placeholder source]
+(defn page-editor [screen page new-or-edit placeholder source]
   (let [url-mapper (.url-mapper screen)]
     (base-view screen
                (.title page)
                [(navigation screen page :edit)
-                page-info
+                (page-info screen page)
                 [:article
                  [:header [:h1 (h (format "%s: %s" (.title page) new-or-edit))]]
                  (editor-form screen page placeholder source)]])))
