@@ -113,7 +113,7 @@
                                          (.title page)
                                          "edit")}
    [:textarea {:name "source" :placeholder placeholder} (h source)]
-   [:button {:type "submit"} "Preview"]
+   [:button {:name "preview" :type "submit"} "Preview"]
    [:button {:type "submit"} "Submit"]])
 
 (defn page-editor [screen page new-or-edit placeholder source]

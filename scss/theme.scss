@@ -253,6 +253,14 @@ body {
       }
     }
 
+    article.preview {
+      background-color: $bg-color;
+
+      em.preview {
+        color: #900;
+      }
+    }
+
     article.search {
       table {
         margin: 1em 0;

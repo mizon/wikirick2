@@ -35,7 +35,7 @@
                [(navigation self page :edit)
                 (page-info self page)
                 `[:article.preview
-                  ~[:h1 (h (.title page)) ": Preview"]
+                  ~[:h1 (h (.title page)) ": " [:em.preview "Preview"]]
                   ~@(render-page page nil false)]]))
 
   (diff-view [self page from-rev to-rev]

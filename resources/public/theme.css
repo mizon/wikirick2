@@ -229,6 +229,10 @@ body {
           color: #090; }
         #wrapper .content article table.tabular em.deleted {
           color: #900; }
+    #wrapper .content article.preview {
+      background-color: #f8f8f8; }
+      #wrapper .content article.preview em.preview {
+        color: #900; }
     #wrapper .content article.search table {
       margin: 1em 0; }
       #wrapper .content article.search table .title {
