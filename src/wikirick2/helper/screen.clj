@@ -69,7 +69,7 @@
         storage (.storage screen)
         url-mapper (.url-mapper screen)]
     `[:section
-      ~@(render-page (select-page storage "Sidebar") nil)
+      ~@(render-page (select-page storage "Sidebar") nil true)
       [:p "[" [:a {:href ~(page-action-path url-mapper "Sidebar" "edit")} "Edit"] "]"]]))
 
 (defn recent-changes [screen]

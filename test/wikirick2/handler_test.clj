@@ -76,6 +76,14 @@
         (is (= (res :status) 302))
         (is (= ((res :headers) "Location") "/w/SomePage/new"))))
 
+    (testing "handles POST /w/FooPage/preview"
+      (with-wiki-service
+        (let [foo-page (create-page storage "FooPage" "foo content")
+              res (app (request :post "/w/FooPage/preview"
+                                {:source (page-source foo-page nil)}))]
+          (is (= (res :status) 200))
+          (is (= (res :body) (preview-view screen foo-page))))))
+
     (testing "handles POST /w/FooPage/edit"
       (let [page-content "some content"
             res (app (request :post "/w/FooPage/edit"

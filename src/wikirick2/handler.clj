@@ -28,6 +28,12 @@
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
 
+(defn- open-preview-view [{:keys [title source]}]
+  (with-wiki-service
+    (let [page (assoc (new-page storage title)
+                 :source source)]
+      (preview-view screen page))))
+
 (defn- open-search-view [{:keys [word]}]
   (with-wiki-service
     (search-view screen word (search-pages storage word))))
@@ -71,6 +77,7 @@
               (GET "/w/:title/new" [title] (open-new-view title))
               (POST "/w/:title/new" {params :params} (register-new-page params))
               (GET "/w/:title/edit" [title] (open-edit-view title))
+              (POST "/w/:title/preview" {params :params} (open-preview-view params))
               (POST "/w/:title/edit" {params :params} (update-page params))
               (GET "/w/:title/diff/:range" {params :params} (open-diff-view params))
               (GET "/w/:title/history" [title] (open-history-view title))

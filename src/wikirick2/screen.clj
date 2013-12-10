@@ -17,7 +17,7 @@
                    [:h1 ~(h (.title page))
                     ~(when revision
                        (h (format ": Revision %s" revision)))]]
-                  ~@(render-page page revision)
+                  ~@(render-page page revision true)
                   ~(when (not (or revision (orphan-page? page)))
                      [:nav.related-pages
                       [:h2 "Related Pages:"]
@@ -38,6 +38,15 @@
                  (page-info self page)
                  nil
                  (page-source page nil)))
+
+  (preview-view [self page]
+    (base-view self
+               (.title page)
+               [(navigation self page :edit)
+                (page-info self page)
+                `[:article.preview
+                  ~[:h1 (h (.title page)) ": Preview"]
+                  ~@(render-page page nil false)]]))
 
   (diff-view [self page from-rev to-rev]
     (let [diff-lines (string/split-lines (diff-revisions page from-rev to-rev))
@@ -95,12 +104,14 @@
                    [:tr [:th.title "Title"] [:th.line "Line"]]
                    ~@(map #(search-line self % %2) result (range))]]])))
 
-(defn cached-page-renderer [render-source]
+(defn make-page-renderer [render-source]
   (let [cache (ref {})]
-    (letfn [(do-render [page revision]
-              (let [key (str (.title page) "/" (or revision (latest-revision page)))]
-                (or (@cache key)
-                    (let [rendered (render-source (page-source page revision))]
-                      (dosync (alter cache #(assoc % key rendered)))
-                      (do-render page revision)))))]
+    (letfn [(do-render [page revision cache?]
+              (if cache?
+                (let [key (str (.title page) "/" (or revision (latest-revision page)))]
+                  (or (@cache key)
+                      (let [rendered (render-source (page-source page revision))]
+                        (dosync (alter cache #(assoc % key rendered)))
+                        (do-render page revision true))))
+                (render-source (page-source page revision))))]
       do-render)))

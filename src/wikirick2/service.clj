@@ -24,9 +24,9 @@
                                                    :subprotocol "sqlite"
                                                    :subname (config :sqlite-path)})
         urlm (url-mapper/->URLMapper (config :base-path))
-        renderer (wiki-parser/make-wiki-source-renderer #(page-path urlm %))
-        cached-renderer (screen/cached-page-renderer renderer)
-        screen (screen/->Screen storage urlm cached-renderer config)]
+        render-source (wiki-parser/make-wiki-source-renderer #(page-path urlm %))
+        render-page (screen/make-page-renderer render-source)
+        screen (screen/->Screen storage urlm render-page config)]
     (map->WikiService {:config config
                        :storage storage
                        :url-mapper urlm
