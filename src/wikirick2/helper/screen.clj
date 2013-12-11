@@ -1,9 +1,11 @@
 (ns wikirick2.helper.screen
-  (:require [clj-time.format :as format]
+  (:require [clj-time.core :as time]
+            [clj-time.format :as format]
             [hiccup.core :refer :all]
             [hiccup.page :as page]
             [wikirick2.types :refer :all]
-            [wikirick2.wiki-parser :refer :all]))
+            [wikirick2.wiki-parser :refer :all])
+  (:import org.joda.time.DateTime))
 
 (defn navigation [screen page selected]
   (let [urls (.url-mapper screen)
@@ -73,13 +75,22 @@
       ~@(render-page (select-page storage "Sidebar") nil true)
       [:p "[" [:a {:href ~(page-action-path url-mapper "Sidebar" "edit")} "Edit"] "]"]]))
 
+(defn last-modified-digest [page]
+  (let [i (time/interval (modified-at page nil) (DateTime/now))]
+    (cond (zero? (time/in-days i)) "today"
+          (zero? (time/in-months i)) (format "%sd" (time/in-days i))
+          (zero? (time/in-years i)) (format "%sm" (time/in-months i))
+          :else (format "%sy" (time/in-years i)))))
+
 (defn recent-changes [screen]
   (let [pages (select-recent-pages (.storage screen) 10)]
     [:section
      [:h2 "Recent Changes"]
      [:ol
       (for [p pages]
-        [:li [:a {:href (page-path (.url-mapper screen) (.title p))} (h (.title p))]])]]))
+        [:li
+         [:a {:href (page-path (.url-mapper screen) (.title p))} (h (.title p))]
+         (h (format " - %s" (last-modified-digest p)))])]]))
 
 (defn base-view [screen title content]
   (let [url-mapper (.url-mapper screen)
