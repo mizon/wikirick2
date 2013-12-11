@@ -5,8 +5,6 @@
 
 (def urlm (->URLMapper "/wiki"))
 
-(defrecord MockedPage [title source])
-
 (deftest url-mapper
   (testing "index-path"
     (is (= (index-path urlm) "/wiki/")))
