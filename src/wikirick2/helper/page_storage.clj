@@ -16,7 +16,7 @@
 
 (defn nlinks-per-page-size [page]
   (let [dests (referring-titles page)]
-    (Math/round (float (* (/ (count dests) (count (.source page))) 1e6)))))
+    (Math/round (float (* (/ (count dests) (count (page-source page nil))) 1e6)))))
 
 (defn validate-page-title [title]
   (when (not (wiki-parser/valid-page-name? title))

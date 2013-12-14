@@ -39,7 +39,7 @@
         (is (= (.title page) "NewPage"))))
 
     (testing "failes to make a invalid title page"
-      (throw+? (new-page storage "New/Page") [:type :invalid-page-title])))
+      (is (throw+? (new-page storage "New/Page") [:type :invalid-page-title]))))
 
   (testing "select-page"
     (testing-storage "selects a page"
@@ -122,7 +122,19 @@ foo: foobar
     (testing-storage "fails to save an invalid title page"
       (let [page (create-page storage "FooBar" "some content")
             invalid-page (assoc page :title "Foo/Page")]
-        (throw+? (save-page invalid-page) [:type :invalid-page-title]))))
+        (is (throw+? (save-page invalid-page) [:type :invalid-page-title]))))
+
+    (testing-storage "fails to save same content"
+      (save-page (create-page storage "Foo" "foo content"))
+      (is (throw+? (save-page (select-page storage "Foo")) [:type :source-unchanged])))
+
+    (testing-storage "failed to save, doesn't change recent page results"
+      (save-page (create-page storage "Foo" "foo content"))
+      (save-page (create-page storage "Bar" "bar content"))
+      (is (throw+? (save-page (select-page storage "Foo")) [:type :source-unchanged]))
+
+      (is (= (map :title (select-recent-pages storage 10))
+             ["Bar" "Foo"]))))
 
   (testing-storage "page-source"
     (save-page (create-page storage "SomePage" "some content"))
@@ -196,7 +208,7 @@ foo: foobar
 
     (testing-storage "throws exception when called before saved"
       (let [page (create-page storage "SomePage" "some content")]
-        (throw+? (modified-at page nil) [:type :head-revision-failed]))))
+        (is (throw+? (modified-at page nil) [:type :head-revision-failed])))))
 
   (testing-storage "diff-revisions"
     (save-page (create-page storage "SomePage" "

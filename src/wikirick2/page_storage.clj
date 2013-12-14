@@ -54,7 +54,13 @@
         (with-rw-lock storage writeLock
           (update-page-relation db)
           (shell/co-l (.shell storage) title)
-          (shell/ci (.shell storage) title (page-source self nil) (or edit-comment ""))))))
+          (try+
+            (shell/ci (.shell storage) title (page-source self nil) (or edit-comment ""))
+            (catch Object e
+              (when (page-exists? self)
+                (shell/co-u (.shell storage) title)
+                (shell/touch-rcs-file (.shell storage) title (modified-at self nil)))
+              (throw+ e)))))))
 
   (page-source [self revision]
     (or source (with-rw-lock storage readLock
@@ -103,13 +109,13 @@
     (zero? (count (referred-titles self)))))
 
 (defn create-page-storage [base-dir db]
-  (letfn [(table-exists? []
+  (letfn [(table-exists? [table-name]
             (try
-              (jdbc/query db (sql/select * :page_relation))
+              (jdbc/query db (sql/select * table-name))
               true
               (catch SQLException e
                 false)))]
-    (when (not (table-exists?))
+    (when (not (table-exists? :page_relation))
       (jdbc/db-do-commands db
         (ddl/create-table :page_relation
                           [:source "text"]

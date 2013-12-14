@@ -8,9 +8,11 @@
             [wikirick2.types :refer :all]))
 
 (declare parse-co-error
+         parse-ci-error
          rcs-file
          rcs-dir
          parse-date
+         date-string
          parse-rlog-output)
 
 (deftype Shell [base-dir])
@@ -26,8 +28,8 @@
   (let [result (shell/sh "ci" "-u" title
                          :in edit-comment
                          :dir (.base-dir shell))]
-    (when (not= (:exit result) 0)
-      (throw+ {:type :ci-failed}))))
+    (if-let [error (parse-ci-error (:err result))]
+      (throw+ error))))
 
 (defn ls-rcs-files [shell]
   (let [result (shell/sh "ls" "-t" (rcs-dir shell))
@@ -37,6 +39,14 @@
 
 (defn co-l [shell title]
   (shell/sh "co" "-l" title :dir (.base-dir shell)))
+
+(defn co-u [shell title]
+  (shell/sh "co" "-u" "-f" title :dir (.base-dir shell)))
+
+(defn touch-rcs-file [shell title date]
+  (let [result (shell/sh "touch" "-d" (date-string date) (rcs-file title) :dir (rcs-dir shell))]
+    (if (not (zero? (:exit result)))
+      (throw+ {:type :touch-failed :message (:err result)}))))
 
 (defn make-rcs-dir [shell]
   (shell/sh "mkdir" "-p" (rcs-dir shell)))
@@ -94,6 +104,13 @@
     err {:type :unknown-error :message (str err)}
     :else (assert false "must not happen: parse-co-error")))
 
+(defn- parse-ci-error [err]
+  (let [message (second (string/split-lines err))]
+    (cond (re-find #"\Afile is unchanged;" message) {:type :source-unchanged}
+          (or (re-find #"\Anew revision:" message)
+              (re-find #"\Ainitial revision:" message)) nil
+          :else {:type :unknown-ci-error :message message})))
+
 (defn- rcs-file [title]
   (format "%s,v" title))
 
@@ -102,6 +119,9 @@
 
 (defn- parse-date [date-str]
   (format/parse (format/formatter "yy/MM/dd HH:mm:ss") date-str))
+
+(defn- date-string [date]
+  (format/unparse (format/formatter "yyyy-MM-dd HH:mm:ss z") date))
 
 (defn- parse-rlog-output [output]
   (map (fn [[rev props]]
