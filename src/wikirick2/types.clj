@@ -37,9 +37,9 @@
 
 (defprotocol IScreen
   (read-view [self page revision])
-  (new-view [self page])
+  (new-view [self page errors])
   (source-view [self page])
-  (edit-view [self page])
+  (edit-view [self page errors])
   (preview-view [self page])
   (diff-view [self page from-rev to-rev])
   (history-view [self page])

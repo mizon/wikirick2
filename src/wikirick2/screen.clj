@@ -23,11 +23,11 @@
                       [:h2 "Related Pages:"]
                       `[:ul ~@(map #(title-to-li self %) (referred-titles page))]])]]))
 
-  (new-view [self page]
-    (page-editor self page "New" (page-source page nil) nil))
+  (new-view [self page errors]
+    (page-editor self page "New" (page-source page nil) nil errors))
 
-  (edit-view [self page]
-    (page-editor self page "Edit" nil (page-source page nil)))
+  (edit-view [self page errors]
+    (page-editor self page "Edit" nil (page-source page nil) errors))
 
   (preview-view [self page]
     (base-view self

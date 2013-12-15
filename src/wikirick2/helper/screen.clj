@@ -119,22 +119,26 @@
                       messages)])
 
 (defn editor-form [screen page placeholder source]
-  [:form.edit {:method "post"
-               :action (page-action-path (.url-mapper screen)
-                                         (.title page)
-                                         "edit")}
+  [:form {:method "post"
+          :action (page-action-path (.url-mapper screen)
+                                    (.title page)
+                                    "edit")}
    [:textarea {:name "source" :placeholder placeholder} (h source)]
    [:button {:name "preview" :type "submit"} "Preview"]
    [:button {:type "submit"} "Submit"]])
 
-(defn page-editor [screen page new-or-edit placeholder source]
+(defn page-editor [screen page new-or-edit placeholder source errors]
   (let [url-mapper (.url-mapper screen)]
     (base-view screen
                (.title page)
                [(navigation screen page :edit)
                 (page-info screen page)
-                [:article
+                [:article.edit
                  [:header [:h1 (h (format "%s: %s" (.title page) new-or-edit))]]
+                 (when (not (empty? errors))
+                   [:ul.errors
+                    (for [e errors]
+                      [:li (h e)])])
                  (editor-form screen page placeholder source)]])))
 
 (defn title-to-li [screen title]

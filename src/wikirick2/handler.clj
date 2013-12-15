@@ -18,13 +18,13 @@
 
 (defn- open-new-view [title]
   (with-wiki-service
-    (new-view screen (assoc (new-page storage title) :source "new content"))))
+    (new-view screen (assoc (new-page storage title) :source "new content") [])))
 
 (defn- open-edit-view [title]
   (with-wiki-service
     (try+
       (let [page (select-page storage title)]
-        (edit-view screen page))
+        (edit-view screen page []))
       (catch [:type :page-not-found] _
         (response/redirect (page-action-path url-mapper title "new"))))))
 
@@ -55,6 +55,14 @@
       (if (not (and referer (.endsWith referer editor-path)))
         (throw+ {:type :direct-post-denied})))))
 
+(defn- register-page [page]
+  (with-wiki-service
+    (try+
+      (save-page page)
+      (response/redirect-after-post (page-path url-mapper (.title page)))
+      (catch [:type :source-unchanged] _
+        (edit-view screen page ["Source is unchanged."])))))
+
 (defn- post-page [req]
   (with-wiki-service
     (let [{title :title source :source preview? :preview} (req :params)]
@@ -62,8 +70,7 @@
       (let [page (assoc (new-page storage title) :source source)]
         (if preview?
           (preview-view screen page)
-          (do (save-page page)
-              (response/redirect-after-post (page-path url-mapper (.title page)))))))))
+          (register-page page))))))
 
 (defn- catch-known-exceptions [app]
   (fn [req]

@@ -3,6 +3,7 @@
             [clojure.test :refer :all]
             [compojure.core :as compojure]
             [compojure.handler :as handler]
+            [conjure.core :refer :all]
             [ring.mock.request :refer :all]
             [ring.util.response :as response]
             [wikirick2.handler :refer :all]
@@ -33,7 +34,6 @@
         (is (= (res :body)
                (read-view screen (select-page storage "FrontPage") nil))))))
 
-
   (let [foo-page (select-page storage "FooPage")
         bar-page (select-page storage "BarPage")]
     (testing "handles GET /w/FooPage"
@@ -56,7 +56,8 @@
           (is (= (res :status) 200))
           (is (= (res :body)
                  (new-view screen
-                           (assoc (new-page storage "SomePage") :source "new content")))))))
+                           (assoc (new-page storage "SomePage") :source "new content")
+                           []))))))
 
     (testing "handles GET /w/FooPage/edit"
       (with-wiki-service
@@ -64,7 +65,8 @@
           (is (= (res :status) 200))
           (is (= (res :body)
                  (edit-view screen
-                            (select-page storage "FooPage")))))))
+                            (select-page storage "FooPage")
+                            []))))))
 
     (testing "redirects when GET /w/SomePage"
       (let [res (app (request :get "/w/SomePage"))]
@@ -95,14 +97,24 @@
             (is (= (res :status) 303))
             (let [foo-page (select-page storage "FooPage")]
               (is (= (page-source foo-page nil) page-content))
-              (is (= ((res :headers) "Location") "/w/FooPage")))))
+              (is (= (-> (res :headers) (get "Location")) "/w/FooPage")))))
 
         (testing "denies requests without editor referer"
           (let [res (app (request :post
                                   "/w/FooPage/edit"
                                   {:source "foo content"}))]
             (is (= (res :status) 404))
-            (is (= (res :body) "Not Found"))))))
+            (is (= (res :body) "Not Found"))))
+
+        (testing "reopen the editor if posted unchanged source"
+          (let [_ (app (-> (request :post "/w/FooPage/edit" {:source "foo content"})
+                           (header "referer" "/w/FooPage/edit")))
+                res (app (-> (request :post "/w/FooPage/edit" {:source "foo content"})
+                             (header "referer" "/w/FooPage/edit")))]
+            (is (= (res :status) 200))
+            (is (= (res :body) (edit-view screen
+                                          (create-page storage "FooPage" "foo content")
+                                          ["Source is unchanged."])))))))
 
     (testing "handles GET /w/FooPage/diff/from-to"
       (with-wiki-service
