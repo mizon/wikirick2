@@ -64,10 +64,11 @@
               (throw+ e)))))))
 
   (page-source [self revision]
-    (or source (with-rw-lock storage readLock
-                 (shell/co-p (.shell storage)
-                             title
-                             (or revision (latest-revision self))))))
+    (trim-end-of-source
+     (or source (with-rw-lock storage readLock
+                  (shell/co-p (.shell storage)
+                              title
+                              (or revision (latest-revision self)))))))
 
   (latest-revision [self]
     (or @latest-revision-cache

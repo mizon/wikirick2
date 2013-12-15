@@ -90,7 +90,7 @@
             (is (= (res :body) (preview-view screen foo-page)))))
 
         (testing "register the posted page"
-          (let [page-content "some content"
+          (let [page-content "some content\n"
                 res (app (-> (request :post "/w/FooPage/edit"
                                       {:source page-content})
                              (header "referer" "/w/FooPage/edit")))]

@@ -25,3 +25,6 @@
 (defn validate-page-source [source]
   (when (empty? (.trim source))
     (throw+ {:type :empty-source})))
+
+(defn trim-end-of-source [source]
+  (str (string/trimr source) "\n"))

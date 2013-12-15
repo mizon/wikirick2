@@ -3,6 +3,7 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.java.jdbc.sql :as sql]
             [clojure.java.shell :as shell]
+            [clojure.string :as string]
             [clojure.test :refer :all]
             [wikirick2.page-storage :refer :all]
             [wikirick2.testing-helper :refer :all]
@@ -18,7 +19,8 @@
 
 (defn- page= [actual expected]
   (and (= (.title actual) (.title expected))
-       (= (page-source actual nil) (page-source expected nil))))
+       (= (string/trimr (page-source actual nil))
+          (string/trimr (page-source expected nil)))))
 
 (defn- cleanup-page-relation [testcase]
   (try
@@ -142,14 +144,18 @@ foo: foobar
                  :source "some some content"))
     (let [some-page (select-page storage "SomePage")]
       (testing "returns the source on latest revision"
-        (is (= (page-source some-page nil) "some some content")))
+        (is (= (page-source some-page nil) "some some content\n")))
 
       (testing "returns the source on specific revision"
-        (is (= (page-source some-page 1) "some content")))
+        (is (= (page-source some-page 1) "some content\n")))
 
       (testing "returns the assigned source"
         (is (= (page-source (create-page storage "SomePage" "new content") nil)
-               "new content")))))
+               "new content\n"))))
+
+    (testing "trims end of space chars"
+      (is (page-source (create-page storage "FooPage" "foobar    \n   \n \t   ") nil)
+          "foobar\n")))
 
   (testing "latest-revision"
     (testing-storage "returns the latest revision"
