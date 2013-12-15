@@ -24,7 +24,7 @@
   (save-page (assoc (select-page storage "FooPage")
                :source "foo content"))
   (save-page (create-page storage "BarPage" "some content"))
-  (save-page (create-page storage "FrontPage" "front page content"))
+  (save-page (create-page storage "Front Page" "front page content"))
   (save-page (create-page storage "Sidebar" "## Sidebar"))
 
   (testing "handles GET /"
@@ -32,7 +32,7 @@
       (let [res (app (request :get "/"))]
         (is (= (res :status) 200))
         (is (= (res :body)
-               (read-view screen (select-page storage "FrontPage") nil))))))
+               (read-view screen (select-page storage "Front Page") nil))))))
 
   (let [foo-page (select-page storage "FooPage")
         bar-page (select-page storage "BarPage")]

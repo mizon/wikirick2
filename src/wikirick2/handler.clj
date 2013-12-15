@@ -84,7 +84,7 @@
         ((route/not-found "Not Found") req)))))
 
 (def wikirick-routes
-  (-> (routes (GET "/" {params :params} (open-read-view (assoc params :title "FrontPage")))
+  (-> (routes (GET "/" {params :params} (open-read-view (assoc params :title "Front Page")))
               (GET "/w/:title" {params :params} (open-read-view params))
               (GET "/w/:title/new" [title] (open-new-view title))
               (GET "/w/:title/edit" [title] (open-edit-view title))
