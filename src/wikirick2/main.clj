@@ -8,10 +8,24 @@
 
 (def wikirick-config (load-file "./wikirick-config.clj"))
 
-(def main-service (make-wiki-service wikirick-config))
+(defn- initialize-service []
+  (let [service (make-wiki-service wikirick-config)
+        storage (.storage service)]
+    (if (not (has-page? storage "Front Page"))
+      (let [front-page (new-page storage "Front Page")
+            front-page (assoc front-page :source "Welcome to Wikirick2 Wiki Engine!")]
+        (save-page front-page)))
+    (if (not (has-page? storage "Sidebar"))
+      (let [sidebar (new-page storage "Sidebar")
+            sidebar (assoc sidebar :source "Menu
+----
+You can edit here.
+")]
+        (save-page sidebar)))
+    service))
 
 (defroutes application
-  (wrap-with-wiki-service (handler/site wikirick-routes) main-service))
+  (wrap-with-wiki-service (handler/site wikirick-routes) (initialize-service)))
 
 (defn -main []
   (jetty/run-jetty application {:port (wikirick-config :production-port)}))
