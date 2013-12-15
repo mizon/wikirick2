@@ -21,7 +21,6 @@
             [speclj "2.5.0"]
             [lein-cljsbuild "0.3.4"]]
   :main wikirick2.main
-  :aot [wikirick2.main]
   :ring {:handler wikirick2.main/application}
   :profiles {:dev {:dependencies [[ring-mock "0.1.5"]]}}
   :test-paths ["test"]
