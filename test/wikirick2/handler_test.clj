@@ -50,33 +50,28 @@
           (is (= (res :body)
                  (read-view screen (select-page storage "FooPage") 1))))))
 
-    (testing "handles GET /w/SomePage/new"
-      (with-wiki-service
-        (let [res (app (request :get "/w/SomePage/new"))]
-          (is (= (res :status) 200))
-          (is (= (res :body)
-                 (new-view screen
-                           (assoc (new-page storage "SomePage") :source "new content")
-                           []))))))
-
     (testing "handles GET /w/FooPage/edit"
       (with-wiki-service
-        (let [res (app (request :get "/w/FooPage/edit"))]
-          (is (= (res :status) 200))
-          (is (= (res :body)
-                 (edit-view screen
-                            (select-page storage "FooPage")
-                            []))))))
+        (testing "shows edit view"
+          (let [res (app (request :get "/w/FooPage/edit"))]
+            (is (= (res :status) 200))
+            (is (= (res :body)
+                   (edit-view screen
+                              (select-page storage "FooPage")
+                              [])))))
+
+        (testing "shows new view"
+          (let [res (app (request :get "/w/NewPage/edit"))]
+            (is (= (res :status) 200))
+            (is (= (res :body)
+                   (new-view screen
+                             (create-page storage "NewPage" "new content")
+                             [])))))))
 
     (testing "redirects when GET /w/SomePage"
       (let [res (app (request :get "/w/SomePage"))]
         (is (= (res :status) 302))
-        (is (= ((res :headers) "Location") "/w/SomePage/new"))))
-
-    (testing "redirects when GET /w/SomePage/edit"
-      (let [res (app (request :get "/w/SomePage/edit"))]
-        (is (= (res :status) 302))
-        (is (= ((res :headers) "Location") "/w/SomePage/new"))))
+        (is (= ((res :headers) "Location") "/w/SomePage/edit"))))
 
     (testing "handles POST /w/FooPage/edit"
       (with-wiki-service
@@ -141,7 +136,7 @@
     (testing "redirects when GET /w/SomePage/history"
       (let [res (app (request :get "/w/SomePage/history"))]
         (is (= (res :status) 302))
-        (is (= ((res :headers) "Location") "/w/SomePage/new"))))
+        (is (= ((res :headers) "Location") "/w/SomePage/edit"))))
 
     (testing "handles GET /search"
       (with-wiki-service

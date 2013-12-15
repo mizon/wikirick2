@@ -14,11 +14,7 @@
       (let [page (select-page storage title)]
         (read-view screen page (when revision (Integer/parseInt revision))))
       (catch [:type :page-not-found] _
-        (response/redirect (page-action-path url-mapper title "new"))))))
-
-(defn- open-new-view [title]
-  (with-wiki-service
-    (new-view screen (assoc (new-page storage title) :source "new content") [])))
+        (response/redirect (page-action-path url-mapper title "edit"))))))
 
 (defn- open-edit-view [title]
   (with-wiki-service
@@ -26,7 +22,7 @@
       (let [page (select-page storage title)]
         (edit-view screen page []))
       (catch [:type :page-not-found] _
-        (response/redirect (page-action-path url-mapper title "new"))))))
+        (new-view screen (assoc (new-page storage title) :source "new content") [])))))
 
 (defn- open-search-view [{:keys [word]}]
   (with-wiki-service
@@ -38,7 +34,7 @@
       (let [page (select-page storage title)]
         (history-view screen page))
       (catch [:type :page-not-found] _
-        (response/redirect (page-action-path url-mapper title "new"))))))
+        (response/redirect (page-action-path url-mapper title "edit"))))))
 
 (defn- open-diff-view [{title :title revision-range :range}]
   (with-wiki-service
@@ -57,13 +53,17 @@
 
 (defn- register-page [page]
   (with-wiki-service
-    (try+
-      (save-page page)
-      (response/redirect-after-post (page-path url-mapper (.title page)))
-      (catch [:type :empty-source] _
-        (edit-view screen page ["Source is empty."]))
-      (catch [:type :unchanged-source] _
-        (edit-view screen page ["Source is unchanged."])))))
+    (letfn [(reopen-editor [messages]
+              (if (page-exists? page)
+                (edit-view screen page messages)
+                (new-view screen page messages)))]
+      (try+
+        (save-page page)
+        (response/redirect-after-post (page-path url-mapper (.title page)))
+        (catch [:type :empty-source] _
+          (reopen-editor ["Source is empty."]))
+        (catch [:type :unchanged-source] _
+          (reopen-editor ["Source is unchanged."]))))))
 
 (defn- post-page [req]
   (with-wiki-service
@@ -86,7 +86,6 @@
 (def wikirick-routes
   (-> (routes (GET "/" {params :params} (open-read-view (assoc params :title "Front Page")))
               (GET "/w/:title" {params :params} (open-read-view params))
-              (GET "/w/:title/new" [title] (open-new-view title))
               (GET "/w/:title/edit" [title] (open-edit-view title))
               (POST "/w/:title/edit" req (post-page req))
               (GET "/w/:title/diff/:range" {params :params} (open-diff-view params))
