@@ -108,7 +108,15 @@
                 :row-fn :source))
 
   (orphan-page? [self]
-    (zero? (count (referred-titles self)))))
+    (zero? (count (referred-titles self))))
+
+  (remove-page [self]
+    (jdbc/db-transaction [db (.db storage)]
+      (with-rw-lock storage writeLock
+        (assert (page-exists? self) "page must exist")
+        (shell/rm-co-file (.shell storage) title)
+        (shell/rm-rcs-file (.shell storage) title)
+        (jdbc/delete! db :page_relation (sql/where {:source title}))))))
 
 (defn create-page-storage [base-dir db]
   (letfn [(table-exists? [table-name]

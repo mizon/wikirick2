@@ -276,4 +276,10 @@ foobar
       (save-page (create-page storage "FooPage" "foo content"))
       (is (orphan-page? (select-page storage "FooPage")))
       (save-page (create-page storage "SomePage" "[[FooPage]]"))
-      (is (not (orphan-page? (select-page storage "FooPage")))))))
+      (is (not (orphan-page? (select-page storage "FooPage"))))))
+
+  (testing "remove-page"
+    (testing-storage "removes a page"
+      (save-page (create-page storage "FooPage" "foo content"))
+      (remove-page (select-page storage "FooPage"))
+      (is (throw+? (select-page storage "FooPage") [:type :page-not-found])))))

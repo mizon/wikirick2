@@ -55,6 +55,16 @@
   (let [result (shell/sh "test" "-f" (rcs-file title) :dir (rcs-dir shell))]
     (= (:exit result) 0)))
 
+(defn rm-rcs-file [shell title]
+  (let [result (shell/sh "rm" "-f" (rcs-file title) :dir (rcs-dir shell))]
+    (when (not (zero? (:exit result)))
+      (throw+ {:type :rm-rcs-file-failed :message (:err result)}))))
+
+(defn rm-co-file [shell title]
+  (let [result (shell/sh "rm" "-f" title :dir (.base-dir shell))]
+    (when (not (zero? (:exit result)))
+      (throw+ {:type :rm-co-file-failed :message (:err result)}))))
+
 (defn rlog [shell title]
   (let [result (shell/sh "rlog" title :dir (.base-dir shell))]
     (if (= (:exit result) 0)

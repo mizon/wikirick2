@@ -18,7 +18,8 @@
   (diff-revisions [self from-rev to-rev])
   (referring-titles [self])
   (referred-titles [self])
-  (orphan-page? [self]))
+  (orphan-page? [self])
+  (remove-page [self]))
 
 (defprotocol IPageRelation
   (update-relations [self page])
