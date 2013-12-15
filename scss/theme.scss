@@ -280,6 +280,11 @@ body {
       em.preview {
         color: #900;
       }
+
+      form {
+        border-top: solid 1px $border-color;
+        padding-top: 1em;
+      }
     }
 
     article.search {

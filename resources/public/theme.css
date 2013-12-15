@@ -244,6 +244,9 @@ body {
       background-color: #f8f8f8; }
       #wrapper .content article.preview em.preview {
         color: #900; }
+      #wrapper .content article.preview form {
+        border-top: solid 1px #cccccc;
+        padding-top: 1em; }
     #wrapper .content article.search table {
       margin: 1em 0; }
       #wrapper .content article.search table .title {

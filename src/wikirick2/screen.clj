@@ -34,9 +34,10 @@
                (.title page)
                [(navigation self page :edit)
                 (page-info self page)
-                `[:article.preview
+                `[:article.preview.edit
                   ~[:h1 (h (.title page)) ": " [:em.preview "Preview"]]
-                  ~@(render-page page nil false)]]))
+                  ~@(render-page page nil false)
+                  ~(editor-form self page "" (page-source page nil))]]))
 
   (diff-view [self page from-rev to-rev]
     (let [diff-lines (string/split-lines (diff-revisions page from-rev to-rev))
