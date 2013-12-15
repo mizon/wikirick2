@@ -48,19 +48,30 @@
                  (Integer/parseInt from-rev)
                  (Integer/parseInt to-rev)))))
 
-(defn- post-page [{title :title source :source preview? :preview}]
+(defn- deny-direct-post [req title]
   (with-wiki-service
-    (let [page (assoc (new-page storage title) :source source)]
-      (if preview?
-        (preview-view screen page)
-        (do (save-page page)
-            (response/redirect-after-post (page-path url-mapper (.title page))))))))
+    (let [referer (-> req :headers (get "referer"))
+          editor-path (page-action-path url-mapper title "edit")]
+      (if (not (and referer (.endsWith referer editor-path)))
+        (throw+ {:type :direct-post-denied})))))
+
+(defn- post-page [req]
+  (with-wiki-service
+    (let [{title :title source :source preview? :preview} (req :params)]
+      (deny-direct-post req title)
+      (let [page (assoc (new-page storage title) :source source)]
+        (if preview?
+          (preview-view screen page)
+          (do (save-page page)
+              (response/redirect-after-post (page-path url-mapper (.title page)))))))))
 
 (defn- catch-known-exceptions [app]
   (fn [req]
     (try+
       (app req)
       (catch [:type :invalid-page-title] _
+        ((route/not-found "Not Found") req))
+      (catch [:type :direct-post-denied] _
         ((route/not-found "Not Found") req)))))
 
 (def wikirick-routes
@@ -68,7 +79,7 @@
               (GET "/w/:title" {params :params} (open-read-view params))
               (GET "/w/:title/new" [title] (open-new-view title))
               (GET "/w/:title/edit" [title] (open-edit-view title))
-              (POST "/w/:title/edit" {params :params} (post-page params))
+              (POST "/w/:title/edit" req (post-page req))
               (GET "/w/:title/diff/:range" {params :params} (open-diff-view params))
               (GET "/w/:title/history" [title] (open-history-view title))
               (GET "/search" {params :params} (open-search-view params))

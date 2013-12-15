@@ -80,20 +80,29 @@
       (with-wiki-service
         (testing "opens the preview view"
           (let [foo-page (create-page storage "FooPage" "foo content")
-                res (app (request :post "/w/FooPage/edit"
-                                  {:source (page-source foo-page nil)
-                                   :preview true}))]
+                res (app (-> (request :post "/w/FooPage/edit"
+                                      {:source (page-source foo-page nil)
+                                       :preview true})
+                             (header "referer" "/w/FooPage/edit")))]
             (is (= (res :status) 200))
             (is (= (res :body) (preview-view screen foo-page)))))
 
         (testing "register a posted page"
           (let [page-content "some content"
-                res (app (request :post "/w/FooPage/edit"
-                                  {:source page-content}))]
+                res (app (-> (request :post "/w/FooPage/edit"
+                                      {:source page-content})
+                             (header "referer" "/w/FooPage/edit")))]
             (is (= (res :status) 303))
             (let [foo-page (select-page storage "FooPage")]
               (is (= (page-source foo-page nil) page-content))
-              (is (= ((res :headers) "Location") "/w/FooPage")))))))
+              (is (= ((res :headers) "Location") "/w/FooPage")))))
+
+        (testing "denies requests without editor referer"
+          (let [res (app (request :post
+                                  "/w/FooPage/edit"
+                                  {:source "foo content"}))]
+            (is (= (res :status) 404))
+            (is (= (res :body) "Not Found"))))))
 
     (testing "handles GET /w/FooPage/diff/from-to"
       (with-wiki-service
