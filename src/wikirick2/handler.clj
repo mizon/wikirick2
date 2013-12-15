@@ -60,7 +60,9 @@
     (try+
       (save-page page)
       (response/redirect-after-post (page-path url-mapper (.title page)))
-      (catch [:type :source-unchanged] _
+      (catch [:type :empty-source] _
+        (edit-view screen page ["Source is empty."]))
+      (catch [:type :unchanged-source] _
         (edit-view screen page ["Source is unchanged."])))))
 
 (defn- post-page [req]

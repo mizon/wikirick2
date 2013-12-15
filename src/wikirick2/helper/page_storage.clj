@@ -21,3 +21,7 @@
 (defn validate-page-title [title]
   (when (not (wiki-parser/valid-page-name? title))
     (throw+ {:type :invalid-page-title})))
+
+(defn validate-page-source [source]
+  (when (empty? (.trim source))
+    (throw+ {:type :empty-source})))

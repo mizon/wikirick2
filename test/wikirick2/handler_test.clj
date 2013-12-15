@@ -89,7 +89,7 @@
             (is (= (res :status) 200))
             (is (= (res :body) (preview-view screen foo-page)))))
 
-        (testing "register a posted page"
+        (testing "register the posted page"
           (let [page-content "some content"
                 res (app (-> (request :post "/w/FooPage/edit"
                                       {:source page-content})
@@ -114,7 +114,15 @@
             (is (= (res :status) 200))
             (is (= (res :body) (edit-view screen
                                           (create-page storage "FooPage" "foo content")
-                                          ["Source is unchanged."])))))))
+                                          ["Source is unchanged."])))))
+
+        (testing "reopen the editor if posted empty source"
+          (let [res (app (-> (request :post "/w/FooPage/edit" {:source "  "})
+                             (header "referer" "/w/FooPage/edit")))]
+            (is (= (res :status) 200))
+            (is (= (res :body) (edit-view screen
+                                          (create-page storage "FooPage" "  ")
+                                          ["Source is empty."])))))))
 
     (testing "handles GET /w/FooPage/diff/from-to"
       (with-wiki-service

@@ -50,6 +50,7 @@
                                  :destination d
                                  :priority priority}))))]
       (validate-page-title title)
+      (validate-page-source (page-source self nil))
       (jdbc/db-transaction [db (.db storage)]
         (with-rw-lock storage writeLock
           (update-page-relation db)

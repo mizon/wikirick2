@@ -106,7 +106,7 @@
 
 (defn- parse-ci-error [err]
   (let [message (second (string/split-lines err))]
-    (cond (re-find #"\Afile is unchanged;" message) {:type :source-unchanged}
+    (cond (re-find #"\Afile is unchanged;" message) {:type :unchanged-source}
           (or (re-find #"\Anew revision:" message)
               (re-find #"\Ainitial revision:" message)) nil
           :else {:type :unknown-ci-error :message message})))

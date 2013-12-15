@@ -126,12 +126,12 @@ foo: foobar
 
     (testing-storage "fails to save same content"
       (save-page (create-page storage "Foo" "foo content"))
-      (is (throw+? (save-page (select-page storage "Foo")) [:type :source-unchanged])))
+      (is (throw+? (save-page (select-page storage "Foo")) [:type :unchanged-source])))
 
     (testing-storage "failed to save, doesn't change recent page results"
       (save-page (create-page storage "Foo" "foo content"))
       (save-page (create-page storage "Bar" "bar content"))
-      (is (throw+? (save-page (select-page storage "Foo")) [:type :source-unchanged]))
+      (is (throw+? (save-page (select-page storage "Foo")) [:type :unchanged-source]))
 
       (is (= (map :title (select-recent-pages storage 10))
              ["Bar" "Foo"]))))
