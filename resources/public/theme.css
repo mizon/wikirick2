@@ -229,6 +229,17 @@ body {
           color: #090; }
         #wrapper .content article table.tabular em.deleted {
           color: #900; }
+    #wrapper .content article.edit ul.errors {
+      border: solid 2px #900;
+      background-color: #FEE;
+      color: #900; }
+    #wrapper .content article.edit form {
+      text-align: right; }
+      #wrapper .content article.edit form textarea {
+        width: 100%;
+        height: 30em; }
+      #wrapper .content article.edit form button {
+        width: 10em; }
     #wrapper .content article.preview {
       background-color: #f8f8f8; }
       #wrapper .content article.preview em.preview {
@@ -252,10 +263,3 @@ body {
     #wrapper .content article.history a.changes {
       display: block;
       text-decoration: none; }
-    #wrapper .content .edit {
-      text-align: right; }
-      #wrapper .content .edit textarea {
-        width: 100%;
-        height: 30em; }
-      #wrapper .content .edit button {
-        width: 10em; }
