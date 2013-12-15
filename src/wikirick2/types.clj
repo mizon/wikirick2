@@ -5,14 +5,15 @@
   (select-page [self title])
   (select-all-pages [self])
   (select-recent-pages [self n-pages])
-  (search-pages [self word]))
+  (search-pages [self word])
+  (has-page? [self title]))
 
 (defprotocol IPage
   (save-page [self])
   (page-source [self revision])
   (latest-revision [self])
   (latest-revision? [self revision])
-  (page-exists? [self])
+  (new-page? [self])
   (page-history [self])
   (modified-at [self revision])
   (diff-revisions [self from-rev to-rev])

@@ -13,27 +13,25 @@
     [:nav.page-actions
      [:ul
       (cond (selected? :read) [:li.selected "Read"]
-            (page-exists? page) [:li [:a {:href (page-path urls (.title page))} "Read"]]
-            :else [:li "Read"])
+            (new-page? page) [:li "Read"]
+            :else [:li [:a {:href (page-path urls (.title page))} "Read"]])
       (cond (selected? :edit) [:li.selected "Edit"]
-            (page-exists? page) [:li
-                                 [:a {:href (page-action-path urls (.title page) "edit")}
-                                  "Edit"]]
-            :else [:li "Edit"])
+            (new-page? page) [:li "Edit"]
+            :else [:li
+                   [:a {:href (page-action-path urls (.title page) "edit")}
+                    "Edit"]])
       (cond (selected? :diff) [:li.selected "Diff"]
-            (and (page-exists? page)
-                 (not= (latest-revision page) 1))
-            [:li
-             [:a {:href (page-diff-path urls
-                                        (.title page)
-                                        (dec (latest-revision page))
-                                        (latest-revision page))}
-              "Diff"]]
-            :else [:li "Diff"])
+            (or (new-page? page) (= (latest-revision page) 1)) [:li "Diff"]
+            :else [:li
+                   [:a {:href (page-diff-path urls
+                                              (.title page)
+                                              (dec (latest-revision page))
+                                              (latest-revision page))}
+                    "Diff"]])
       (cond (selected? :history) [:li.selected "History"]
-            (page-exists? page) [:li [:a {:href (page-action-path urls (.title page) "history")}
-                                      "History"]]
-            :else [:li "History"])]]))
+            (new-page? page) [:li "History"]
+            :else [:li [:a {:href (page-action-path urls (.title page) "history")}
+                        "History"]])]]))
 
 (defn all-disabled-navigation [screen]
   [:nav.page-actions [:ul [:li "Read"] [:li "Edit"] [:li "Diff"] [:li "History"]]])
@@ -52,7 +50,7 @@
 (defn page-info [screen page]
   `[:p.page-info
     ~[:em [:a {:href (page-path (.url-mapper screen) (.title page))} (h (.title page))]]
-    ~@(if (page-exists? page)
+    ~@(if (not (new-page? page))
         [": Last modified: " (show-modified-at page nil)]
         [": (new page)"])])
 

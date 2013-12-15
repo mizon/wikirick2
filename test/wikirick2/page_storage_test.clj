@@ -174,12 +174,12 @@ foo: foobar
         (is (not (latest-revision? page 1)))
         (is (latest-revision? page 2)))))
 
-  (testing "page-exists?"
-    (testing-storage "knows if page exists"
+  (testing "new-page?"
+    (testing-storage "knows itself is whether new page or not"
       (let [page (create-page storage "SomePage" "some content")]
-        (is (not (page-exists? page)))
+        (is (new-page? page))
         (save-page page)
-        (is (page-exists? page)))))
+        (is (not (new-page? page))))))
 
   (testing-storage "page-history"
     (let [before (DateTime/now)]

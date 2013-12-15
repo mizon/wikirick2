@@ -1,5 +1,4 @@
 (ns wikirick2.main
-  (:gen-class)
   (:require [compojure.core :refer :all]
             [compojure.handler :as handler]
             [ring.adapter.jetty :as jetty]

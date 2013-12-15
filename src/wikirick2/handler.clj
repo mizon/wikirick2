@@ -54,9 +54,9 @@
 (defn- register-page [page]
   (with-wiki-service
     (letfn [(reopen-editor [messages]
-              (if (page-exists? page)
-                (edit-view screen page messages)
-                (new-view screen page messages)))]
+              (if (new-page? page)
+                (new-view screen page messages)
+                (edit-view screen page messages)))]
       (try+
         (save-page page)
         (response/redirect-after-post (page-path url-mapper (.title page)))

@@ -22,7 +22,7 @@
   (select-page [self title]
     (let [page (new-page self title)]
       (with-rw-lock self readLock
-        (if (not (page-exists? page))
+        (if (new-page? page)
           (throw+ {:type :page-not-found})
           page))))
 
@@ -35,7 +35,11 @@
 
   (search-pages [self word]
     (with-rw-lock self readLock
-      (shell/grep-iF shell word))))
+      (shell/grep-iF shell word)))
+
+  (has-page? [self title]
+    (with-rw-lock self readLock
+      (shell/test-f shell title))))
 
 (defrecord Page [storage title source edit-comment latest-revision-cache]
   IPage
@@ -58,7 +62,7 @@
           (try+
             (shell/ci (.shell storage) title (page-source self nil) (or edit-comment ""))
             (catch Object e
-              (when (page-exists? self)
+              (when (not (new-page? self))
                 (shell/co-u (.shell storage) title)
                 (shell/touch-rcs-file (.shell storage) title (modified-at self nil)))
               (throw+ e)))))))
@@ -80,9 +84,8 @@
   (latest-revision? [self revision]
     (= revision (latest-revision self)))
 
-  (page-exists? [self]
-    (with-rw-lock storage readLock
-      (shell/test-f (.shell storage) title)))
+  (new-page? [self]
+    (not (has-page? storage title)))
 
   (page-history [self]
     (with-rw-lock storage readLock
@@ -113,7 +116,7 @@
   (remove-page [self]
     (jdbc/db-transaction [db (.db storage)]
       (with-rw-lock storage writeLock
-        (assert (page-exists? self) "page must exist")
+        (assert (not (new-page? self)) "page must be saved")
         (shell/rm-co-file (.shell storage) title)
         (shell/rm-rcs-file (.shell storage) title)
         (jdbc/delete! db :page_relation (sql/where {:source title}))))))
