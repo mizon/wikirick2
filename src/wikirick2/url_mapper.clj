@@ -11,14 +11,14 @@
     (build-url self [""] nil))
 
   (page-path [self page-title]
-    (build-url self ["w" page-title] nil))
+    (build-url self [page-title] nil))
 
   (page-revision-path [self page-title revision]
-    (build-url self ["w" page-title] (str "?rev=" revision)))
+    (build-url self [page-title] (str "?rev=" revision)))
 
   (page-diff-path [self page-title src-rev dest-rev]
     (build-url self
-               ["w" page-title "diff" (format "%s-%s" src-rev dest-rev)]
+               [page-title "diff" (format "%s-%s" src-rev dest-rev)]
                nil))
 
   (diff-from-previous-path [self page-title revision]
@@ -30,10 +30,10 @@
     (page-diff-path self page-title revision (inc revision)))
 
   (page-action-path [self page-title action-name]
-    (build-url self ["w" page-title (.toLowerCase action-name)] nil))
+    (build-url self [page-title (.toLowerCase action-name)] nil))
 
   (theme-path [self]
-    (build-url self ["theme.css"] nil))
+    (build-url self ["static" "theme.css"] nil))
 
   (search-path [self]
     (build-url self ["search"] nil)))

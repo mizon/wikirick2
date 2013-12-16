@@ -85,12 +85,12 @@
 
 (def wikirick-routes
   (-> (routes (GET "/" {params :params} (open-read-view (assoc params :title "Front Page")))
-              (GET "/w/:title" {params :params} (open-read-view params))
-              (GET "/w/:title/edit" [title] (open-edit-view title))
-              (POST "/w/:title/edit" req (post-page req))
-              (GET "/w/:title/diff/:range" {params :params} (open-diff-view params))
-              (GET "/w/:title/history" [title] (open-history-view title))
               (GET "/search" {params :params} (open-search-view params))
-              (route/resources "/")
+              (route/resources "/static")
+              (GET "/:title" {params :params} (open-read-view params))
+              (GET "/:title/edit" [title] (open-edit-view title))
+              (POST "/:title/edit" req (post-page req))
+              (GET "/:title/diff/:range" {params :params} (open-diff-view params))
+              (GET "/:title/history" [title] (open-history-view title))
               (route/not-found "Not Found"))
       catch-known-exceptions))
