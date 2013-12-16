@@ -71,7 +71,7 @@
     (testing "redirects when GET /SomePage"
       (let [res (app (request :get "/SomePage"))]
         (is (= (res :status) 302))
-        (is (= ((res :headers) "Location") "/SomePage/edit"))))
+        (is (= (-> res :headers (get "Location")) "/SomePage/edit"))))
 
     (testing "handles POST /FooPage/edit"
       (with-wiki-service
@@ -92,7 +92,7 @@
             (is (= (res :status) 303))
             (let [foo-page (select-page storage "FooPage")]
               (is (= (page-source foo-page nil) page-content))
-              (is (= (-> (res :headers) (get "Location")) "/FooPage")))))
+              (is (= (-> res :headers (get "Location")) "/FooPage")))))
 
         (testing "denies requests without editor referer"
           (let [res (app (request :post
@@ -136,16 +136,23 @@
     (testing "redirects when GET /SomePage/history"
       (let [res (app (request :get "/SomePage/history"))]
         (is (= (res :status) 302))
-        (is (= ((res :headers) "Location") "/SomePage/edit"))))
+        (is (= (-> res :headers (get "Location")) "/SomePage/edit"))))
 
     (testing "handles GET /search"
-      (with-wiki-service
-        (let [res (app (request :get "/search" {:word "some"}))]
-          (is (= (res :status) 200))
-          (is (= (res :body)
-                 (search-view screen
-                              "some"
-                              (search-pages storage "some")))))))
+      (testing "shows search results"
+        (with-wiki-service
+          (let [res (app (request :get "/search" {:word "some"}))]
+            (is (= (res :status) 200))
+            (is (= (res :body)
+                   (search-view screen
+                                "some"
+                                (search-pages storage "some")))))))
+
+      (testing "opens an editor for the 'search' wiki page"
+        (with-wiki-service
+          (let [res (app (request :get "/search"))]
+            (is (= (res :status) 302))
+            (is (= (-> res :headers (get "Location")) "/search/edit"))))))
 
     (testing "handles invalid title requests"
       (let [res (app (request :get "/Foo%20%20Bar"))]

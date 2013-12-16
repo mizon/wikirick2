@@ -26,7 +26,8 @@
 
 (defn- open-search-view [{:keys [word]}]
   (with-wiki-service
-    (search-view screen word (search-pages storage word))))
+    (if word
+      (search-view screen word (search-pages storage word)))))
 
 (defn- open-history-view [title]
   (with-wiki-service
