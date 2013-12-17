@@ -9,7 +9,7 @@
   (has-page? [self title]))
 
 (defprotocol IPage
-  (save-page [self])
+  (save-page [self revision])
   (page-source [self revision])
   (latest-revision [self])
   (latest-revision? [self revision])

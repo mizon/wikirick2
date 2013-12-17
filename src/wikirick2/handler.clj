@@ -59,7 +59,7 @@
                 (new-view screen page messages)
                 (edit-view screen page messages)))]
       (try+
-        (save-page page)
+        (save-page page nil)
         (response/redirect-after-post (page-path url-mapper (.title page)))
         (catch [:type :empty-source] _
           (reopen-editor ["Source is empty."]))

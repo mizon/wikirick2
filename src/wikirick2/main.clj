@@ -14,14 +14,14 @@
     (if (not (has-page? storage "Front Page"))
       (let [front-page (new-page storage "Front Page")
             front-page (assoc front-page :source "Welcome to Wikirick2 Wiki Engine!")]
-        (save-page front-page)))
+        (save-page front-page nil)))
     (if (not (has-page? storage "Sidebar"))
       (let [sidebar (new-page storage "Sidebar")
             sidebar (assoc sidebar :source "Menu
 ----
 You can edit here.
 ")]
-        (save-page sidebar)))
+        (save-page sidebar nil)))
     service))
 
 (defroutes application

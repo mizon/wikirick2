@@ -20,12 +20,13 @@
 (def storage (.storage testing-service))
 
 (deftest wikirick-routes-
-  (save-page (create-page storage "FooPage" "some content"))
+  (save-page (create-page storage "FooPage" "some content") nil)
   (save-page (assoc (select-page storage "FooPage")
-               :source "foo content"))
-  (save-page (create-page storage "BarPage" "some content"))
-  (save-page (create-page storage "Front Page" "front page content"))
-  (save-page (create-page storage "Sidebar" "## Sidebar"))
+               :source "foo content")
+             nil)
+  (save-page (create-page storage "BarPage" "some content") nil)
+  (save-page (create-page storage "Front Page" "front page content") nil)
+  (save-page (create-page storage "Sidebar" "## Sidebar") nil)
 
   (testing "handles GET /"
     (with-wiki-service

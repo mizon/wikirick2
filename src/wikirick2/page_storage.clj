@@ -43,7 +43,7 @@
 
 (defrecord Page [storage title source edit-comment latest-revision-cache]
   IPage
-  (save-page [self]
+  (save-page [self revision]
     (letfn [(update-page-relation [db]
               (let [priority (nlinks-per-page-size self)]
                 (jdbc/delete! db :page_relation (sql/where {:source title}))
@@ -60,6 +60,7 @@
           (update-page-relation db)
           (shell/co-l (.shell storage) title)
           (try+
+            (shell/write-file (.shell storage) title (page-source self nil))
             (shell/ci (.shell storage) title (page-source self nil) (or edit-comment ""))
             (catch Object e
               (when (not (new-page? self))

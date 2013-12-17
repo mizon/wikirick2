@@ -23,8 +23,10 @@
       (:out result)
       (throw+ (parse-co-error (:err result))))))
 
+(defn write-file [shell title source]
+  (spit (format "%s/%s" (.base-dir shell) title) source))
+
 (defn ci [shell title source edit-comment]
-  (spit (format "%s/%s" (.base-dir shell) title) source)
   (let [result (shell/sh "ci" "-u" title
                          :in edit-comment
                          :dir (.base-dir shell))]
