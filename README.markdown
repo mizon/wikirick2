@@ -20,9 +20,9 @@ Requirements
 
 Installation
 ------------
-Before installation, you must get Leiningen which is a package manager for Clojure programming language.
+Before installation, you must satisfy the above requirements.
 
-After installed Leiningen, clone this repository and type the next command in the direcotry please:
+If you could satisfy them, clone this repository and type the next command in the direcotry please:
 
     $ lein ring server
 
