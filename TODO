@@ -1,7 +1,6 @@
 TODO
 ====
-* Add initial pages
-* Add error notification
-* Make the storage to check contents
-* Make the storage to merge conflicts
-* Make the storage to adding newlines to ends of sources
+* Make the look more pretty
+* Make handlers to verify parameters
+* Make the page storage to control newline chars
+* Add a screen for mobile browsers
