@@ -26,7 +26,6 @@
     (page-diff-path self page-title (dec revision) revision))
 
   (diff-from-next-path [self page-title revision]
-    {:pre (not= revision 1)}
     (page-diff-path self page-title revision (inc revision)))
 
   (page-action-path [self page-title action-name]
