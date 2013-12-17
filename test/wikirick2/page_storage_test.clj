@@ -139,7 +139,31 @@ foo: foobar
       (is (throw+? (save-page (select-page storage "Foo") nil) [:type :unchanged-source]))
 
       (is (= (map :title (select-recent-pages storage 10))
-             ["Bar" "Foo"]))))
+             ["Bar" "Foo"])))
+
+    (testing-storage "merge revisions when base-rev is given"
+      (save-page (create-page storage "Foo" "foo") nil)
+      (save-page (create-page storage "Foo" "noo
+foo") nil)
+
+      (let [page (create-page storage "Foo" "foo
+bar")]
+        (save-page page 1))
+      (is (= (page-source (select-page storage "Foo") nil)
+             "noo
+foo
+bar
+")))
+
+    (testing-storage "throws :merge-conflict error if there are some conflicts"
+      (save-page (create-page storage "Foo" "foo") nil)
+      (save-page (create-page storage "Foo" "foo
+noo") nil)
+
+      (let [page (create-page storage "Foo" "foo
+bar
+")]
+        (is (throw+? (save-page page 1) [:type :merge-conflict])))))
 
   (testing-storage "page-source"
     (save-page (create-page storage "SomePage" "some content") nil)

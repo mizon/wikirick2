@@ -9,6 +9,7 @@
 
 (declare parse-co-error
          parse-ci-error
+         parse-rcsmerge-err
          rcs-file
          rcs-dir
          parse-date
@@ -30,8 +31,16 @@
   (let [result (shell/sh "ci" "-u" title
                          :in edit-comment
                          :dir (.base-dir shell))]
-    (if-let [error (parse-ci-error (:err result))]
-      (throw+ error))))
+    (if-let [e (parse-ci-error (:err result))]
+      (throw+ e))))
+
+(defn rcsmerge [shell title base-revision]
+  (let [result (shell/sh "rcsmerge"
+                         (format "-r1.%s" base-revision)
+                         title
+                         :dir (.base-dir shell))]
+    (if (not (zero? (:exit result)))
+      (throw+ (parse-rcsmerge-err (:err result))))))
 
 (defn ls-rcs-files [shell]
   (let [result (shell/sh "ls" "-t" (rcs-dir shell))
@@ -122,6 +131,12 @@
           (or (re-find #"\Anew revision:" message)
               (re-find #"\Ainitial revision:" message)) nil
           :else {:type :unknown-ci-error :message message})))
+
+(defn- parse-rcsmerge-err [err]
+  (cond (re-find #"(?m)^rcsmerge: warning: conflicts during merge" err)
+        {:type :merge-conflict}
+        :else
+        {:type :unknown-rcsmerge-error :message err}))
 
 (defn- rcs-file [title]
   (format "%s,v" title))

@@ -43,7 +43,7 @@
 
 (defrecord Page [storage title source edit-comment latest-revision-cache]
   IPage
-  (save-page [self revision]
+  (save-page [self base-revision]
     (letfn [(update-page-relation [db]
               (let [priority (nlinks-per-page-size self)]
                 (jdbc/delete! db :page_relation (sql/where {:source title}))
@@ -61,8 +61,11 @@
           (shell/co-l (.shell storage) title)
           (try+
             (shell/write-file (.shell storage) title (page-source self nil))
+            (if base-revision
+              (shell/rcsmerge (.shell storage) title base-revision))
             (shell/ci (.shell storage) title (or edit-comment ""))
             (catch Object e
+              ;; Rollback
               (when (not (new-page? self))
                 (shell/co-u (.shell storage) title)
                 (shell/touch-rcs-file (.shell storage) title (modified-at self nil)))
