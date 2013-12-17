@@ -59,7 +59,8 @@
             (is (= (res :body)
                    (edit-view screen
                               (select-page storage "FooPage")
-                              [])))))
+                              []
+                              2)))))
 
         (testing "shows new view"
           (let [res (app (request :get "/NewPage/edit"))]
@@ -80,10 +81,11 @@
           (let [foo-page (create-page storage "FooPage" "foo content")
                 res (app (-> (request :post "/FooPage/edit"
                                       {:source (page-source foo-page nil)
-                                       :preview true})
+                                       :preview true
+                                       :base-rev 2})
                              (header "referer" "/FooPage/edit")))]
             (is (= (res :status) 200))
-            (is (= (res :body) (preview-view screen foo-page)))))
+            (is (= (res :body) (preview-view screen foo-page 2)))))
 
         (testing "register the posted page"
           (let [page-content "some content\n"
@@ -103,22 +105,43 @@
             (is (= (res :body) "Not Found"))))
 
         (testing "reopen the editor if posted unchanged source"
-          (let [_ (app (-> (request :post "/FooPage/edit" {:source "foo content"})
+          (let [_ (app (-> (request :post "/FooPage/edit" {:source "foo content"
+                                                           :base-rev 2})
                            (header "referer" "/FooPage/edit")))
-                res (app (-> (request :post "/FooPage/edit" {:source "foo content"})
+                res (app (-> (request :post "/FooPage/edit" {:source "foo content"
+                                                             :base-rev 2})
                              (header "referer" "/FooPage/edit")))]
             (is (= (res :status) 200))
             (is (= (res :body) (edit-view screen
                                           (create-page storage "FooPage" "foo content")
-                                          ["Source is unchanged."])))))
+                                          ["Source is unchanged."]
+                                          2)))))
 
         (testing "reopen the editor if posted empty source"
-          (let [res (app (-> (request :post "/FooPage/edit" {:source "  "})
+          (let [res (app (-> (request :post "/FooPage/edit" {:source "  "
+                                                             :base-rev 2})
                              (header "referer" "/FooPage/edit")))]
             (is (= (res :status) 200))
             (is (= (res :body) (edit-view screen
                                           (create-page storage "FooPage" "  ")
-                                          ["Source is empty."])))))))
+                                          ["Source is empty."]
+                                          2)))))
+
+        (testing "reopen the editor if conflicts found"
+          (save-page (create-page storage "ConflictPage" "foobar") nil)
+          (save-page (create-page storage "ConflictPage" "foobar\nfoobar") nil)
+
+          (let [res (app (-> (request :post
+                                      "/ConflictPage/edit"
+                                      {:source "foobar\nconflict-line"
+                                       :base-rev 1})
+                             (header "referer" "/ConflictPage/edit")))]
+            (is (= (res :status) 200))
+            (is (= (res :body)
+                   (edit-view screen
+                              (create-page storage "ConflictPage" "foobar\nconflict-line")
+                              ["Unresolvable conflicts found. Please edit again."]
+                              1)))))))
 
     (testing "handles GET /FooPage/diff/from-to"
       (with-wiki-service

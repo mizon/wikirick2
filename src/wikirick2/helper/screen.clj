@@ -116,16 +116,18 @@
                         [:li (h message)])
                       messages)])
 
-(defn editor-form [screen page placeholder source]
+(defn editor-form [screen page placeholder source base-revision]
   [:form {:method "post"
           :action (page-action-path (.url-mapper screen)
                                     (.title page)
                                     "edit")}
+   (if base-revision
+     [:input {:name "base-rev" :type "hidden" :value base-revision}])
    [:textarea {:name "source" :placeholder placeholder} (h source)]
    [:button {:name "preview" :type "submit"} "Preview"]
    [:button {:type "submit"} "Submit"]])
 
-(defn page-editor [screen page new-or-edit placeholder source errors]
+(defn page-editor [screen page new-or-edit placeholder source base-revision errors]
   (let [url-mapper (.url-mapper screen)]
     (base-view screen
                (.title page)
@@ -137,7 +139,7 @@
                    [:ul.errors
                     (for [e errors]
                       [:li (h e)])])
-                 (editor-form screen page placeholder source)]])))
+                 (editor-form screen page placeholder source base-revision)]])))
 
 (defn title-to-li [screen title]
   (let [url-mapper (.url-mapper screen)]

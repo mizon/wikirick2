@@ -20,7 +20,7 @@
   (with-wiki-service
     (try+
       (let [page (select-page storage title)]
-        (edit-view screen page []))
+        (edit-view screen page [] (latest-revision page)))
       (catch [:type :page-not-found] _
         (new-view screen (assoc (new-page storage title) :source "new content") [])))))
 
@@ -52,28 +52,33 @@
       (if (not (and referer (.endsWith referer editor-path)))
         (throw+ {:type :direct-post-denied})))))
 
-(defn- register-page [page]
+(defn- register-page [page base-rev]
   (with-wiki-service
     (letfn [(reopen-editor [messages]
               (if (new-page? page)
                 (new-view screen page messages)
-                (edit-view screen page messages)))]
+                (edit-view screen page messages base-rev)))]
       (try+
-        (save-page page nil)
+        (save-page page (and base-rev (Integer/parseInt base-rev)))
         (response/redirect-after-post (page-path url-mapper (.title page)))
         (catch [:type :empty-source] _
           (reopen-editor ["Source is empty."]))
         (catch [:type :unchanged-source] _
-          (reopen-editor ["Source is unchanged."]))))))
+          (reopen-editor ["Source is unchanged."]))
+        (catch [:type :merge-conflict] _
+          (reopen-editor ["Unresolvable conflicts found. Please edit again."]))))))
 
 (defn- post-page [req]
   (with-wiki-service
-    (let [{title :title source :source preview? :preview} (req :params)]
+    (let [{title :title
+           source :source
+           preview? :preview
+           base-rev :base-rev} (req :params)]
       (deny-direct-post req title)
       (let [page (assoc (new-page storage title) :source source)]
         (if preview?
-          (preview-view screen page)
-          (register-page page))))))
+          (preview-view screen page base-rev)
+          (register-page page base-rev))))))
 
 (defn- catch-known-exceptions [app]
   (fn [req]

@@ -24,12 +24,12 @@
                       `[:ul ~@(map #(title-to-li self %) (referred-titles page))]])]]))
 
   (new-view [self page errors]
-    (page-editor self page "New" (page-source page nil) nil errors))
+    (page-editor self page "New" (page-source page nil) nil nil errors))
 
-  (edit-view [self page errors]
-    (page-editor self page "Edit" nil (page-source page nil) errors))
+  (edit-view [self page errors base-rev]
+    (page-editor self page "Edit" nil (page-source page nil) base-rev errors))
 
-  (preview-view [self page]
+  (preview-view [self page base-rev]
     (base-view self
                (.title page)
                [(navigation self page :edit)
@@ -37,7 +37,7 @@
                 `[:article.preview.edit
                   ~[:h1 (h (.title page)) ": " [:em.preview "Preview"]]
                   ~@(render-page page nil false)
-                  ~(editor-form self page "" (page-source page nil))]]))
+                  ~(editor-form self page "" (page-source page nil) base-rev)]]))
 
   (diff-view [self page from-rev to-rev]
     (let [diff-lines (string/split-lines (diff-revisions page from-rev to-rev))
