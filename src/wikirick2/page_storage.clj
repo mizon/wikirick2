@@ -61,7 +61,7 @@
           (shell/co-l (.shell storage) title)
           (try+
             (shell/write-file (.shell storage) title (page-source self nil))
-            (shell/ci (.shell storage) title (page-source self nil) (or edit-comment ""))
+            (shell/ci (.shell storage) title (or edit-comment ""))
             (catch Object e
               (when (not (new-page? self))
                 (shell/co-u (.shell storage) title)

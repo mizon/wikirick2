@@ -26,7 +26,7 @@
 (defn write-file [shell title source]
   (spit (format "%s/%s" (.base-dir shell) title) source))
 
-(defn ci [shell title source edit-comment]
+(defn ci [shell title edit-comment]
   (let [result (shell/sh "ci" "-u" title
                          :in edit-comment
                          :dir (.base-dir shell))]
