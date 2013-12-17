@@ -14,7 +14,7 @@ $added-line-color: #090;
 $removed-line-color: #900;
 
 @mixin smaller-font() {
-  font-size: 80%;
+  font-size: smaller;
 }
 
 @mixin border() {
