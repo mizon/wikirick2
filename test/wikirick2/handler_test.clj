@@ -87,7 +87,7 @@
             (is (= (res :status) 200))
             (is (= (res :body) (preview-view screen foo-page 2)))))
 
-        (testing "register the posted page"
+        (testing "registers the posted page"
           (let [page-content "some content\n"
                 res (app (-> (request :post "/FooPage/edit"
                                       {:source page-content})
@@ -104,7 +104,7 @@
             (is (= (res :status) 404))
             (is (= (res :body) "Not Found"))))
 
-        (testing "reopen the editor if posted unchanged source"
+        (testing "reopens the editor if posted unchanged source"
           (let [_ (app (-> (request :post "/FooPage/edit" {:source "foo content"
                                                            :base-rev 2})
                            (header "referer" "/FooPage/edit")))
@@ -117,7 +117,7 @@
                                           ["Source is unchanged."]
                                           2)))))
 
-        (testing "reopen the editor if posted empty source"
+        (testing "reopens the editor if posted empty source"
           (let [res (app (-> (request :post "/FooPage/edit" {:source "  "
                                                              :base-rev 2})
                              (header "referer" "/FooPage/edit")))]
@@ -127,7 +127,7 @@
                                           ["Source is empty."]
                                           2)))))
 
-        (testing "reopen the editor if conflicts found"
+        (testing "reopens the editor if conflicts found"
           (save-page (create-page storage "ConflictPage" "foobar") nil)
           (save-page (create-page storage "ConflictPage" "foobar\nfoobar") nil)
 
