@@ -109,7 +109,7 @@
                    (search-box screen "")
                    (editable-sidebar screen)
                    (recent-changes screen)]
-                  [:footer "Made with Clojure Programming Language"]]])))
+                  [:footer ((.config screen) :footer-message)]]])))
 
 (defn error-notification [screen messages]
   `[:ul.errors ~@(map (fn [message]
