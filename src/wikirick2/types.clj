@@ -47,6 +47,4 @@
   (history-view [self page])
   (search-view [self word result]))
 
-(defrecord Template [title body])
-
 (defrecord WikiService [config storage url-mapper screen])
