@@ -108,7 +108,7 @@ body {
         text-decoration: none; }
     #container aside section {
       margin-bottom: 2em;
-      font-size: 80%; }
+      font-size: smaller; }
       #container aside section h2 {
         margin-bottom: 0.5em; }
       #container aside section h2:before {
@@ -129,7 +129,7 @@ body {
   #container footer {
     clear: both;
     text-align: right;
-    font-size: 80%;
+    font-size: smaller;
     border-top: solid 1px #cccccc;
     padding: 0.5em 0; }
 
@@ -142,7 +142,7 @@ body {
     #wrapper .content nav.page-actions {
       margin-bottom: 0.5em;
       float: right;
-      font-size: 80%;
+      font-size: smaller;
       color: #999999; }
       #wrapper .content nav.page-actions ul {
         width: 100%; }
@@ -159,7 +159,7 @@ body {
         color: #006699;
         font-weight: bold; }
     #wrapper .content p.page-info {
-      font-size: 80%;
+      font-size: smaller;
       padding: 0 0.5em;
       position: absolute;
       top: 0;
