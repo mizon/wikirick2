@@ -128,8 +128,9 @@ body {
         list-style-type: none; }
   #container footer {
     clear: both;
-    text-align: center;
+    text-align: right;
     font-size: 80%;
+    border-top: solid 1px #cccccc;
     padding: 0.5em 0; }
 
 #wrapper {
