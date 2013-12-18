@@ -22,10 +22,6 @@
   (orphan-page? [self])
   (remove-page [self]))
 
-(defprotocol IPageRelation
-  (update-relations [self page])
-  (do-referred-titles [self page]))
-
 (defprotocol IURLMapper
   (index-path [self])
   (page-path [self page])
