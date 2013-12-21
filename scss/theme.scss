@@ -7,11 +7,6 @@ $border-color: #CCC;
 $disabled-color: #999;
 $hovered-bg-color: #CCF;
 $header-bg-color: #EEE;
-$even-line-bg-color: #FFF;
-$odd-line-bg-color: #EEF;
-$section-header-color: #009;
-$added-line-color: #090;
-$removed-line-color: #900;
 
 @mixin border() {
   border: solid 1px $border-color;
@@ -24,21 +19,14 @@ $removed-line-color: #900;
     margin-bottom: 0.5em;
   }
 
-  h2 {
-    margin-bottom: 0.5em;
-  }
-
-  h2:before {
-    content: "■ ";
-    color: $em-color;
-  }
-
   h3 {
-    font-size: 90%;
+    font-size: smaller;
   }
 
   h4, h5, h6 {
     font-size: smaller;
+    font-weight: normal;
+    text-decoration: underline;
   }
 
   p, ul, ol, pre {
@@ -98,12 +86,8 @@ body {
       margin-bottom: 2em;
 
       h2 {
-        margin-bottom: 0.5em;
-      }
-
-      h2:before {
-        content: "■ ";
-        color: $em-color;
+        border-left: solid 0.25em $em-color;
+        padding-left: 0.5em;
       }
     }
 
@@ -196,7 +180,7 @@ body {
       margin-bottom: 1em;
 
       h1 {
-        font-size: 125%;
+        font-size: larger;
         color: $em-color;
         padding-bottom: 0.25em;
         border-bottom: solid 1px $border-color;
@@ -248,11 +232,7 @@ body {
         }
 
         tr.odd {
-          background-color: $odd-line-bg-color;
-        }
-
-        tr.even {
-          background-color: $even-line-bg-color;
+          background-color: #EEF;
         }
 
         em.added {
@@ -316,15 +296,15 @@ body {
     article.diff {
       pre {
         .section-header {
-          color: $section-header-color;
+          color: #009;
         }
 
         .added {
-          color: $added-line-color;
+          color: #090;
         }
 
         .removed {
-          color: $removed-line-color;
+          color: #900;
         }
       }
     }
