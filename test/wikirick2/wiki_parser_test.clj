@@ -28,7 +28,7 @@ BarPage -> [[BarPage]]
     (is (= (wiki-parser/scan-wiki-links wiki-source) #{"SomePage" "FooPage" "BarPage"}))))
 
 (deftest valid-page-name?
-  (testing "check whether the wiki name is valid or not"
+  (testing "tests whether the wiki name is valid or not"
     (are [wiki-link-name] (wiki-parser/valid-page-name? wiki-link-name)
          "foobar"
          "foo bar")

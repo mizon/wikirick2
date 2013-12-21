@@ -141,7 +141,7 @@ foo: foobar
       (is (= (map :title (select-recent-pages storage 10))
              ["Bar" "Foo"])))
 
-    (testing-storage "merge revisions when base-rev is given"
+    (testing-storage "merges revisions when base-rev is given"
       (save-page (create-page storage "Foo" "foo") nil)
       (save-page (create-page storage "Foo" "noo
 foo") nil)
@@ -228,7 +228,7 @@ bar
         (let [hist (page-history (select-page storage "SomePage"))]
           (is (= ((last hist) :lines) nil))))
 
-      (testing "returns the commited dates"
+      (testing "returns the commit dates"
         (let [hist (page-history (select-page storage "SomePage"))
               committed-date ((first hist) :date)]
           (time/after? committed-date before)
@@ -283,7 +283,7 @@ foobar
         (save-page bar-page nil)
         (is (= (referred-titles some-page) ["FooPage" "BarPage"]))))
 
-    (testing-storage "forgots old referred titles"
+    (testing-storage "forgets old referred titles"
       (let [foo-page (create-page storage "FooPage" "[[BarPage]]")
             bar-page (create-page storage "BarPage" "some content")]
         (save-page foo-page nil)

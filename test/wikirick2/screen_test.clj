@@ -49,7 +49,7 @@
         (stubbing [page-source "foobar" latest-revision 6]
           (is (= (render foo-page nil true) [:p "foobar"])))))
 
-    (testing "don't caches rendered pages"
+    (testing "don't cache rendered pages"
       (let [render (prepare-renderer)
             latest-revision- 5]
         (stubbing [page-source "foo" latest-revision latest-revision-]
