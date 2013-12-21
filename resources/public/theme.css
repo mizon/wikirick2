@@ -109,7 +109,30 @@ body {
         text-decoration: none; }
     #container aside section {
       margin-bottom: 2em;
-      font-size: smaller; }
+      font-size: smaller;
+      margin-bottom: 2em; }
+      #container aside section h1, #container aside section h2, #container aside section h3, #container aside section h4, #container aside section h5, #container aside section h6 {
+        margin-bottom: 0.5em; }
+      #container aside section h2 {
+        margin-bottom: 0.5em; }
+      #container aside section h2:before {
+        content: "■ ";
+        color: #006699; }
+      #container aside section h3 {
+        font-size: 90%; }
+      #container aside section h4, #container aside section h5, #container aside section h6 {
+        font-size: smaller; }
+      #container aside section p, #container aside section ul, #container aside section ol, #container aside section pre {
+        margin-bottom: 1em; }
+      #container aside section ul li, #container aside section ol li {
+        margin-left: 1.25em; }
+      #container aside section pre {
+        padding: 0.5em;
+        background-color: #f8f8f8;
+        overflow: auto;
+        border: solid 1px #cccccc; }
+      #container aside section code {
+        margin: 0 0.25em; }
       #container aside section h2 {
         margin-bottom: 0.5em; }
       #container aside section h2:before {
@@ -122,11 +145,6 @@ body {
         width: 100%; }
     #container aside ol, #container aside ul {
       margin-bottom: 1em; }
-      #container aside ol li:before, #container aside ul li:before {
-        content: '-';
-        margin-right: 1em; }
-      #container aside ol li, #container aside ul li {
-        list-style-type: none; }
   #container footer {
     clear: both;
     text-align: right;
@@ -172,11 +190,34 @@ body {
           color: #006699;
           text-decoration: none; }
     #wrapper .content article {
+      border: solid 1px #cccccc;
+      margin-bottom: 2em;
       background-color: #FFF;
       clear: both;
       padding: 1em;
-      margin-bottom: 1em;
-      border: solid 1px #cccccc; }
+      margin-bottom: 1em; }
+      #wrapper .content article h1, #wrapper .content article h2, #wrapper .content article h3, #wrapper .content article h4, #wrapper .content article h5, #wrapper .content article h6 {
+        margin-bottom: 0.5em; }
+      #wrapper .content article h2 {
+        margin-bottom: 0.5em; }
+      #wrapper .content article h2:before {
+        content: "■ ";
+        color: #006699; }
+      #wrapper .content article h3 {
+        font-size: 90%; }
+      #wrapper .content article h4, #wrapper .content article h5, #wrapper .content article h6 {
+        font-size: smaller; }
+      #wrapper .content article p, #wrapper .content article ul, #wrapper .content article ol, #wrapper .content article pre {
+        margin-bottom: 1em; }
+      #wrapper .content article ul li, #wrapper .content article ol li {
+        margin-left: 1.25em; }
+      #wrapper .content article pre {
+        padding: 0.5em;
+        background-color: #f8f8f8;
+        overflow: auto;
+        border: solid 1px #cccccc; }
+      #wrapper .content article code {
+        margin: 0 0.25em; }
       #wrapper .content article h1 {
         font-size: 125%;
         color: #006699;
@@ -185,19 +226,6 @@ body {
         #wrapper .content article h1 a {
           text-decoration: none;
           color: #006699; }
-      #wrapper .content article h1, #wrapper .content article h2, #wrapper .content article h3, #wrapper .content article h4, #wrapper .content article h5, #wrapper .content article h6 {
-        margin-bottom: 0.5em; }
-      #wrapper .content article p, #wrapper .content article ul, #wrapper .content article ol, #wrapper .content article pre {
-        margin-bottom: 1em; }
-      #wrapper .content article ul li, #wrapper .content article ol li {
-        margin-left: 1.5em; }
-      #wrapper .content article pre {
-        padding: 0.5em;
-        background-color: #f8f8f8;
-        overflow: auto;
-        border: solid 1px #cccccc; }
-      #wrapper .content article code {
-        margin: 0 0.25em; }
       #wrapper .content article nav.related-pages {
         margin-top: 2em;
         padding: 0.5em 0;

@@ -84,7 +84,7 @@
   (let [pages (select-recent-pages (.storage screen) 10)]
     [:section
      [:h2 "Recent Changes"]
-     [:ol
+     [:ul
       (for [p pages]
         [:li
          [:a {:href (page-path (.url-mapper screen) (.title p))} (h (.title p))]
