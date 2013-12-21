@@ -49,6 +49,11 @@ $header-bg-color: #EEE;
   code {
     margin: 0 0.25em;
   }
+
+  a[href^="http"] {
+    background: url(../static/external.png) no-repeat right top;
+    padding-right: 12px;
+  }
 }
 
 body {

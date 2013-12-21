@@ -129,6 +129,9 @@ body {
         border: solid 1px #cccccc; }
       #container aside section code {
         margin: 0 0.25em; }
+      #container aside section a[href^="http"] {
+        background: url(../static/external.png) no-repeat right top;
+        padding-right: 12px; }
       #container aside section h2 {
         border-left: solid 0.25em #006699;
         padding-left: 0.5em; }
@@ -209,6 +212,9 @@ body {
         border: solid 1px #cccccc; }
       #wrapper .content article code {
         margin: 0 0.25em; }
+      #wrapper .content article a[href^="http"] {
+        background: url(../static/external.png) no-repeat right top;
+        padding-right: 12px; }
       #wrapper .content article h1 {
         font-size: larger;
         color: #006699;
