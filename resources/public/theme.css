@@ -91,12 +91,19 @@ body {
   background-color: #f8f8f8;
   font-family: sans-serif; }
 
+a:link {
+  text-decoration: none; }
+
+a:hover {
+  text-decoration: underline; }
+
 #container {
   width: 95%;
   min-width: 800px;
   margin: 1em auto; }
   #container h1, #container h2, #container h3, #container h4 {
-    color: #333333; }
+    font-weight: bold;
+    color: #333; }
   #container aside {
     float: left;
     width: 10em;
@@ -104,7 +111,8 @@ body {
     #container aside header {
       margin-bottom: 1em; }
       #container aside header a {
-        color: #333333;
+        font-weight: bold;
+        color: #333;
         text-decoration: none; }
     #container aside section {
       margin-bottom: 2em;
@@ -128,7 +136,11 @@ body {
         overflow: auto;
         border: solid 1px #cccccc; }
       #container aside section code {
-        margin: 0 0.25em; }
+        font-weight: bold;
+        color: #333; }
+      #container aside section pre code {
+        font-weight: normal;
+        color: #000; }
       #container aside section a[href^="http"] {
         background: url(../static/external.png) no-repeat right top;
         padding-right: 12px; }
@@ -165,11 +177,10 @@ body {
         #wrapper .content nav.page-actions ul li {
           float: left;
           padding: 0 0.5em; }
-      #wrapper .content nav.page-actions a:link, #wrapper .content nav.page-actions a:visited {
-        color: #333333;
+      #wrapper .content nav.page-actions a {
+        color: #000;
         text-decoration: none; }
       #wrapper .content nav.page-actions a:hover {
-        text-weight: bold;
         text-decoration: underline; }
       #wrapper .content nav.page-actions .selected {
         color: #006699;
@@ -184,8 +195,7 @@ body {
         color: #006699;
         font-weight: bold; }
         #wrapper .content p.page-info em a {
-          color: #006699;
-          text-decoration: none; }
+          color: #006699; }
     #wrapper .content article {
       border: solid 1px #cccccc;
       margin-bottom: 2em;
@@ -211,7 +221,11 @@ body {
         overflow: auto;
         border: solid 1px #cccccc; }
       #wrapper .content article code {
-        margin: 0 0.25em; }
+        font-weight: bold;
+        color: #333; }
+      #wrapper .content article pre code {
+        font-weight: normal;
+        color: #000; }
       #wrapper .content article a[href^="http"] {
         background: url(../static/external.png) no-repeat right top;
         padding-right: 12px; }
@@ -239,12 +253,12 @@ body {
       #wrapper .content article table.tabular {
         width: 100%;
         border-collapse: collapse;
-        border: solid 1px #cccccc;
-        border-style: solid none; }
+        border-top: solid 1px #cccccc;
+        border-bottom: solid 1px #cccccc; }
         #wrapper .content article table.tabular tr th {
-          background-color: #eeeeee;
+          background-color: #EEE;
           border: solid 1px #cccccc;
-          border-style: solid none; }
+          border-width: 1px 0; }
         #wrapper .content article table.tabular tr th, #wrapper .content article table.tabular tr td {
           text-align: center;
           padding: 0 0.5em; }
@@ -271,7 +285,7 @@ body {
         color: #900; }
       #wrapper .content article.preview form {
         border-top: solid 1px #cccccc;
-        padding-top: 1em; }
+        border-top: solid 1px #cccccc; }
     #wrapper .content article.search table {
       margin: 1em 0; }
       #wrapper .content article.search table .title {
@@ -289,5 +303,4 @@ body {
     #wrapper .content article.history a.revision {
       display: block; }
     #wrapper .content article.history a.changes {
-      display: block;
-      text-decoration: none; }
+      display: block; }
