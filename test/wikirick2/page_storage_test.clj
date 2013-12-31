@@ -40,7 +40,7 @@
       (let [page (new-page storage "NewPage")]
         (is (= (.title page) "NewPage"))))
 
-    (testing "failes to make a invalid title page"
+    (testing "fails to make a invalid title page"
       (is (throw+? (new-page storage "New/Page") [:type :invalid-page-title]))))
 
   (testing "select-page"
@@ -49,10 +49,10 @@
         (save-page page nil)
         (is (page= (select-page storage "SomePage") page))))
 
-    (testing-storage "failes to select non-existed page"
+    (testing-storage "fails to select non-existed page"
       (is (throw+? (select-page storage "FooPage") [:type :page-not-found])))
 
-    (testing-storage "failes to select with a invalid title"
+    (testing-storage "fails to select with a invalid title"
       (is (throw+? (select-page storage "Foo/Page") [:type :invalid-page-title]))))
 
   (testing "select-all-pages"
